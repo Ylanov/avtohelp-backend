@@ -1,0 +1,57 @@
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from utils.mixins import BaseMixin
+
+
+# Create your models here.
+class Newsletter(BaseMixin):
+    """Model to new represetation."""
+
+    title = models.CharField(max_length=255, verbose_name=_('Title'))
+    text = models.TextField(verbose_name=_('Text'))
+    publish = models.BooleanField(default=False, verbose_name=_('Publish'))
+    publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
+                                        verbose_name=_('Publish date'))
+
+    class Meta:
+        """Meta class."""
+
+        verbose_name = _('New')
+        verbose_name_plural = _('News')
+
+
+class PushNotification(BaseMixin):
+    """Push-notification model"""
+
+    INITIALIZE = 0
+    CREATE_REQUEST = 1
+    NEW_MESSAGE = 2
+
+    EVENT_CHOICES = (
+        (INITIALIZE, _('Initialization')),
+        (CREATE_REQUEST, _('Create assistance request')),
+        (NEW_MESSAGE, _('New message'))
+    )
+
+    title = models.CharField(max_length=255, verbose_name=_('Title'))
+    description = models.CharField(max_length=255, verbose_name=_('Description'))
+    event = models.PositiveSmallIntegerField(choices=EVENT_CHOICES,
+                                             default=INITIALIZE,
+                                             verbose_name=_('Event'))
+    user = models.ForeignKey('account.User',
+                             verbose_name=_('User'),
+                             on_delete=models.CASCADE)
+    status = models.BooleanField(default=False,
+                                 null=True, blank=True,
+                                 verbose_name=_('Status'))
+    sent_count = models.PositiveIntegerField(
+        _('Sent notifications count'),
+        default=0,
+        blank=True
+    )
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Push notification')
+        verbose_name_plural = _('Push notifications')

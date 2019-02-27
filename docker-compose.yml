@@ -1,0 +1,49 @@
+version: '3'
+services:
+  # PostgreSQL database
+  db:
+    image: mdillon/postgis:9.5
+    hostname: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+  redis:
+   image: redis:2.8.23
+   ports:
+      - "6379:6379"
+  worker:
+    build: .
+    command: ./run_celery.sh
+    environment:
+      - SETTINGS_CONFIGURATION=local
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_HOSTNAME=db
+      - DB_PORT=5432
+      - DB_PASSWORD=postgres
+    volumes:
+      - .:/code
+    links:
+      - db
+      - redis
+  road_helper:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - SETTINGS_CONFIGURATION=local
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_HOSTNAME=db
+      - DB_PORT=5432
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db
+      - redis
+      - worker
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
