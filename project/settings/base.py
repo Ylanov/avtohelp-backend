@@ -51,6 +51,7 @@ CONTRIB_APPS = [
 ]
 
 PROJECT_APPS = [
+    'authorization.apps.AuthorizationConfig',
     'account.apps.AccountConfig',
     'utils.apps.UtilsConfig',
     'versioning.apps.VersioningConfig',
@@ -246,7 +247,7 @@ CORS_ALLOW_CREDENTIALS = False
 # SMS
 SMS_SEND_DELAY = 30
 SMS_EXPIRATION = 5
-SMS_CODE_MAX_VALUE = 9999
+SMS_CODE_LENGTH = 4
 SMS_INPUT_ATTEMPTS = 3
 SMS_AVAILABLE = 3
 SMS_BLOCKING_PERIOD = 86400  # 24 hours

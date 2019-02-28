@@ -1,8 +1,10 @@
 from fcm_django.models import FCMDevice
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 
-from userprofile.serializers import current as userprofile_serializer
+from userprofile.serializers import current as serializers
+from userprofile import models
 
 
 # Create your views here.
@@ -14,7 +16,7 @@ class FCMDeviceViewSet(generics.GenericAPIView):
       instead of creating new one.
     """
 
-    serializer_class = userprofile_serializer.FCMDeviceSerializer
+    serializer_class = serializers.FCMDeviceSerializer
     lookup_fields = ('registration_id', 'type',)
     queryset = FCMDevice.objects.all()
 
@@ -39,3 +41,41 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         obj = queryset.filter(**filter).first()
         obj and self.check_object_permissions(self.request, obj)
         return obj
+
+
+class ProfileView(generics.RetrieveUpdateAPIView):
+    """
+    View for retrieving user profile
+    :return: return object
+    """
+
+    model = models.Profile
+    serializer_class = serializers.ProfileSerializer
+    queryset = model.objects.all()
+
+    def get_object(self):
+        """Override get object method"""
+        obj = get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
+        return obj
+
+
+class FillProfileView(generics.UpdateAPIView):
+    """
+    Fill first name, last name and middle name
+    in user profile
+    Request:
+    {
+        "first_name": "Alexander",
+        "last_name": "Sidorov",
+        "middle_name": "Prikhodko",
+    }
+
+    Response:
+    {
+        ?
+    }
+
+    :return: return obj
+    """
+
+    pass

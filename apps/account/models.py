@@ -3,10 +3,10 @@
 from django.contrib.auth.models import AbstractUser, UserManager as AbstractUserManager
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from userprofile.models import Profile, FriendList, BlackList
-
 from phonenumber_field.modelfields import PhoneNumberField
+from rest_framework.authtoken.models import Token
 
+from userprofile.models import Profile, FriendList, BlackList
 
 """
 MANAGERS
@@ -29,6 +29,15 @@ class UserManager(AbstractUserManager):
         FriendList.objects.create(owner=obj)
         return obj
 
+    def get_or_make(self, phone):
+        """Get user object or make new one"""
+        qs = User.objects.filter(phone=phone)
+        if qs.exists():
+            obj = qs.first(), False
+        else:
+            obj = self.make(phone=phone), True
+        return obj
+
 
 """
 QUERYSETS
@@ -39,7 +48,12 @@ class UserQuerySet(models.QuerySet):
     """Base User queryset"""
 
     def created(self):
+        """Order by created date"""
         return self.order_by('-created')
+
+    def by_phone(self, phone):
+        """Queryset by user phone"""
+        return self.filter(phone=phone)
 
 
 """
@@ -73,4 +87,10 @@ class User(AbstractUser):
 
     def __str__(self):
         """String method."""
-        return "%s:%s" % (self.phone.as_e164, self.get_short_name())
+        return "%s:%s" % (self.phone, self.get_short_name())
+
+    def regenerate_auth_token(self):
+        """Regenerate auth token method"""
+        self.auth_token.delete()
+        Token.objects.get_or_create(user=self)
+        return self.auth_token

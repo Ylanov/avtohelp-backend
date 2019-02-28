@@ -100,3 +100,18 @@ class BlackList(BaseMixin):
         """Meta-class"""
         verbose_name = _('Black list')
         verbose_name_plural = _('Black lists')
+
+
+class UserLock(BaseMixin):
+    """Model for keep not valid login attempts."""
+
+    user = models.OneToOneField('account.User', on_delete=models.CASCADE)
+    attempts = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    attempt_timestamp = models.DateTimeField(blank=True, null=True, default=None,
+                                             verbose_name=_('Last datetime authorization attempt'))
+
+    class Meta:
+        """Meta class."""
+
+        verbose_name = _('User lock')
+        verbose_name_plural = _('User locks')
