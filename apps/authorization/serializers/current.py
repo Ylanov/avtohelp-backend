@@ -72,7 +72,7 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
         user = User.objects.get(phone=attrs.get('phone'))
 
         # check user code
-        qs = models.SMSCode.objects.by_phone(user.phone).by_code(attrs.get('value')).sent()
+        qs = models.SMSCode.objects.by_phone(user.phone).by_code(attrs.get('code')).sent()
 
         # if code is correct return SMSCode object
         if qs.exists():

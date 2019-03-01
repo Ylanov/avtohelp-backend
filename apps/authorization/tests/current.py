@@ -45,17 +45,6 @@ class TestCatalog(TestCase):
         self.color_3 = CarColor.objects.create(name='Green')
         self.cars_colors = CarColor.objects.count()
 
-    def test_authorization(self):
-        """Test view for authorize user"""
-
-        data = {"phone": self.phone}
-
-        api_path = '%s:authorization:authorization' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.post(reverse(api_path), data=data)
-        user = User.objects.filter(phone=data.get('phone')).first()
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data.get('id'), user.id)
-
     def test_verification(self):
         """Test view for verify user phone"""
 
@@ -67,19 +56,17 @@ class TestCatalog(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(sms_code.status, sms_code.SENT)
 
-    def test_authentication(self):
-        """Test view for authenticate user"""
+    def test_authorization(self):
+        """Test view for authorize user"""
 
-        # authorize
-        api_path = '%s:authorization:authorization' % settings.AVAILABLE_VERSIONS.get('current')
-        self.client.post(reverse(api_path), data={"phone": self.phone})
         # verify
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
         self.client.post(reverse(api_path), data={"phone": self.phone})
-        # authenticate
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
-        data = {"phone": self.phone, "code": sms_code.code}
-        api_path = '%s:authorization:authentication' % settings.AVAILABLE_VERSIONS.get('current')
+
+        # authorize
+        data = {"phone": self.phone, "code": int(sms_code.code)}
+        api_path = '%s:authorization:auth' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.post(reverse(api_path), data=data)
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

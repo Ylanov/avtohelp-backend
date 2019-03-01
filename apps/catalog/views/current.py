@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from catalog import models
 from catalog.serializers import current as serializers
@@ -8,6 +9,7 @@ from catalog.serializers import current as serializers
 class CarListView(generics.ListAPIView):
     """User car list view"""
 
+    permission_classes = (IsAuthenticated, )
     serializer_class = serializers.CarListSerializer
     queryset = models.Car.objects.all()
     pagination_class = None
@@ -16,6 +18,7 @@ class CarListView(generics.ListAPIView):
 class CarDetailView(generics.RetrieveAPIView):
     """User car detail view"""
 
+    permission_classes = (IsAuthenticated, )
     serializer_class = serializers.CarDetailSerializer
     queryset = models.Car.objects.all()
 
@@ -23,6 +26,7 @@ class CarDetailView(generics.RetrieveAPIView):
 class CarMarkListView(generics.ListAPIView):
     """Car brands list view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarMarkListSerializer
     queryset = models.CarMark.objects.all()
     pagination_class = None
@@ -31,6 +35,7 @@ class CarMarkListView(generics.ListAPIView):
 class CarMarkDetailView(generics.RetrieveAPIView):
     """Car brands detail view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarMarkDetailSerializer
     queryset = models.CarMark.objects.all()
 
@@ -38,6 +43,7 @@ class CarMarkDetailView(generics.RetrieveAPIView):
 class CarColorListView(generics.ListAPIView):
     """Car brands list view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarColorListSerializer
     queryset = models.CarColor.objects.all()
     pagination_class = None
@@ -46,6 +52,7 @@ class CarColorListView(generics.ListAPIView):
 class CarColorDetailView(generics.RetrieveAPIView):
     """Car color detail view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarColorDetailSerializer
     queryset = models.CarColor.objects.all()
 
@@ -53,6 +60,7 @@ class CarColorDetailView(generics.RetrieveAPIView):
 class CarModelListView(generics.ListAPIView):
     """Car brands list view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarModelListSerializer
     queryset = models.CarModel.objects.all()
     pagination_class = None
@@ -61,6 +69,7 @@ class CarModelListView(generics.ListAPIView):
 class CarModelDetailView(generics.RetrieveAPIView):
     """Car brands detail view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CarModelDetailSerializer
     queryset = models.CarModel.objects.all()
 
@@ -68,6 +77,7 @@ class CarModelDetailView(generics.RetrieveAPIView):
 class CityListView(generics.ListAPIView):
     """City list view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CityListSerializer
     queryset = models.City.objects.all()
     pagination_class = None
@@ -76,5 +86,6 @@ class CityListView(generics.ListAPIView):
 class CityDetailView(generics.RetrieveAPIView):
     """City detail view"""
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.CityDetailSerializer
     queryset = models.City.objects.all()

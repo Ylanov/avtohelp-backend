@@ -1,13 +1,14 @@
 from django.conf import settings
-from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 
 from account.models import User
 from catalog.models import CarModel, CarMark, CarColor, Car, City
 
 
-class TestCatalog(TestCase):
+class TestCatalog(APITestCase):
     VERSION = settings.AVAILABLE_VERSIONS.get('current')
 
     @classmethod
@@ -70,6 +71,11 @@ class TestCatalog(TestCase):
 
     def test_list_cars(self):
         """Test view for getting list of users cars"""
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
         api_path = '%s:catalog:car_list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -77,6 +83,11 @@ class TestCatalog(TestCase):
 
     def test_car_detail(self):
         """Test view for getting detail of user car"""
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
         api_path = '%s:catalog:car_detail' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path, kwargs={'pk': self.car_1.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
