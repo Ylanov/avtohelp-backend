@@ -149,3 +149,12 @@ class SMSCode(BaseMixin):
     def activate(self):
         """Activate code."""
         self.status = self.ACTIVATED
+
+    @property
+    def unlock_time(self):
+        return None
+
+    @property
+    def remain_time(self):
+        return self.unlock_time
+    

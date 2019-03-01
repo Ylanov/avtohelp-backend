@@ -124,6 +124,7 @@ class AuthenticationSerializer(serializers.ModelSerializer):
             obj.attempt_timestamp = None
             obj.save()
             # NOTE: итересный return
+            # NOTE: to model
             return None
 
         # # Get user by his phone from init data
@@ -142,12 +143,28 @@ class AuthenticationSerializer(serializers.ModelSerializer):
 
         # Check user code
         qs = models.SMSCode.objects.by_phone(user.phone).by_code(value).sent()
+        # if qs.exists():
+        #     return qs.first()
+        # else:
+        #     profile_models.UserLock.objects.get_or_create(user=user)[0]
+        #     raise Exception
+
+
+        
+        # 1000
+        # 1001
+        # 1002
+
+        # 1003
+
         if not qs.exists():
             # Check for frequency for entering verification code, after first try
             if user_lock.attempts >= 1:
 
                 # NOTE: вот тут не понял немного, подойдешь расскажешь при чем тут время задержки отправок смс
+                             # 1.03.2019 10:00 - 1.03.2019 9:00 
                 last_entry = timezone.now() - user_lock.attempt_timestamp
+                    # 3600                   30
                 if last_entry.seconds <= settings.SMS_SEND_DELAY:
                     raise api_exceptions.TooOftenTriedError(detail=get_exception_body(
                         api_exceptions.TooOftenTriedError))
@@ -157,6 +174,12 @@ class AuthenticationSerializer(serializers.ModelSerializer):
             if user_lock.attempts == settings.SMS_INPUT_ATTEMPTS:
                 unlock_time = user_lock.attempt_timestamp + timezone.timedelta(
                     seconds=settings.SMS_BLOCKING_PERIOD)
+
+                # 1.03.2019 9:20 
+                # 1.03.2019 9:30 
+                # 1.03.2019 9:40 + 10
+                
+                # 1.03.2019 9:50  
                 if unlock_time > timezone.now():
                     remain_time = unlock_time - timezone.now()
                     raise api_exceptions.TemporaryLockError({'detail': _('Temporary lock'),
@@ -174,6 +197,7 @@ class AuthenticationSerializer(serializers.ModelSerializer):
                 user_lock.attempt_timestamp = timezone.now()
                 user_lock.attempts += 1
                 user_lock.save()
+                # NOTE: to model
                 raise api_exceptions.CodeIsNotAcceptedError(detail={
                     'remaining_attempts': settings.SMS_INPUT_ATTEMPTS - user_lock.attempts,
                     'status_code': api_exceptions.CodeIsNotAcceptedError.extended_status_code

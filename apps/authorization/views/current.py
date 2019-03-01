@@ -1,4 +1,5 @@
 from rest_framework import generics, views, status
+from rest_framework.response import Response
 from rest_framework.exceptions import NotAuthenticated
 
 from account import models as account_models
@@ -13,6 +14,8 @@ class AuthorizationView(generics.CreateAPIView):
     Response: {"id": 1, "phone": "+79000000000"}
     :return: object
     """
+
+    # FIXIT: убрать
 
     serializer_class = serializers.AuthorizationSerializer
     queryset = account_models.User.objects.all()
@@ -56,7 +59,7 @@ class LogoutView(views.APIView):
             if not request.user.is_anonymous:
                 # NOTE: вот с этого момента по подробнее
                 request.user.regenerate_auth_token()
-                return views.Response(status=status.HTTP_200_OK)
+                return Response(status=status.HTTP_200_OK)
             else:
                 # FIXIT: есть специальный permisson по этому поводу, не надо выдумывать
                 raise NotAuthenticated()
