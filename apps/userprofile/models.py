@@ -1,13 +1,14 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from utils import methods
 from utils.mixins import BaseMixin
 
 
-# Register your models here.
 class Profile(BaseMixin):
     """Profile model"""
 
@@ -102,6 +103,16 @@ class BlackList(BaseMixin):
         verbose_name_plural = _('Black lists')
 
 
+class UserLockQuerySet(models.QuerySet):
+    """QuerySet for model UserLock"""
+    pass
+
+
+class UserLockManager(models.Manager):
+    """Manager for model UserLock"""
+    pass
+
+
 class UserLock(BaseMixin):
     """Model for keep not valid login attempts."""
 
@@ -110,9 +121,34 @@ class UserLock(BaseMixin):
     attempts = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
     attempt_timestamp = models.DateTimeField(blank=True, null=True, default=None,
                                              verbose_name=_('Last datetime authorization attempt'))
+    objects = UserLockManager.from_queryset(UserLockQuerySet)()
 
     class Meta:
         """Meta class."""
 
         verbose_name = _('User lock')
         verbose_name_plural = _('User locks')
+
+    def increment_attempts(self):
+        """Increment attempts"""
+        self.attempt_timestamp = timezone.now()
+        self.attempts += 1
+        self.save()
+
+    def reset_attempts(self):
+        """Reset attempts to verify sent sms code"""
+        self.attempts = 0
+        self.attempt_timestamp = None
+        self.save()
+
+    @property
+    def datetime_before_unlock(self):
+        """Datetime before for unlock"""
+        last_attempt_datetime = self.modified
+        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
+        return last_attempt_datetime + timedelta_datetime
+
+    @property
+    def remain_before_unlock(self):
+        """Remaining time before unlock"""
+        return (self.datetime_before_unlock - timezone.now()).seconds

@@ -149,12 +149,28 @@ class SMSCode(BaseMixin):
     def activate(self):
         """Activate code."""
         self.status = self.ACTIVATED
+        self.save()
 
     @property
-    def unlock_time(self):
-        return None
+    def datetime_before_resend(self):
+        """Datetime before for re-request sms code"""
+        last_sms_datetime = SMSCode.objects.order_by('created').last().created
+        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_SEND_DELAY)
+        return last_sms_datetime + timedelta_datetime
 
     @property
-    def remain_time(self):
-        return self.unlock_time
-    
+    def datetime_before_unlock(self):
+        """Datetime before for unlock"""
+        last_sms_datetime = SMSCode.objects.order_by('created').last().created
+        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
+        return last_sms_datetime + timedelta_datetime
+
+    @property
+    def remain_before_resend(self):
+        """Remaining time before re-request sms code"""
+        return (self.datetime_before_resend - timezone.now()).seconds
+
+    @property
+    def remain_before_unlock(self):
+        """Remaining time before unlock"""
+        return (self.datetime_before_unlock - timezone.now()).seconds

@@ -1,24 +1,10 @@
 from rest_framework import generics, views, status
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.exceptions import NotAuthenticated
 
 from account import models as account_models
 from authorization import models as models
 from authorization.serializers import current as serializers
-
-
-class AuthorizationView(generics.CreateAPIView):
-    """
-    View for get or create user.
-    Request: {"phone": "+79000000000"}
-    Response: {"id": 1, "phone": "+79000000000"}
-    :return: object
-    """
-
-    # FIXIT: убрать
-
-    serializer_class = serializers.AuthorizationSerializer
-    queryset = account_models.User.objects.all()
 
 
 class PhoneVerificationView(generics.CreateAPIView):
@@ -29,20 +15,22 @@ class PhoneVerificationView(generics.CreateAPIView):
     :return: object
     """
 
+    permission_classes = (AllowAny,)
     serializer_class = serializers.PhoneVerificationSerializer
     queryset = models.SMSCode.objects.all()
 
 
-class AuthenticationView(generics.CreateAPIView):
+class AuthorizationView(generics.CreateAPIView):
     """
     View for verify user phone
-    Request: {"phone": "+79000000000", "sms_code": "1234"}
+    Request: {"phone": "+79000000000", "code": "1234"}
     Response: {"token": "fsioufuy49fu490f9wehfofhiodhfio"}
     :return: object
     """
 
-    serializer_class = serializers.AuthenticationSerializer
-    queryset = account_models.User.objects.all()
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.AuthorizationView
+    queryset = models.SMSCode.objects.all()
 
 
 class LogoutView(views.APIView):
@@ -56,10 +44,6 @@ class LogoutView(views.APIView):
 
         def post(self, request, format=None):
             """Delete existed auth token and then create new one for logout"""
-            if not request.user.is_anonymous:
-                # NOTE: вот с этого момента по подробнее
-                request.user.regenerate_auth_token()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                # FIXIT: есть специальный permisson по этому поводу, не надо выдумывать
-                raise NotAuthenticated()
+            self.request.user.logout()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+

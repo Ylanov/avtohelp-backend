@@ -51,25 +51,25 @@ class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for retrieving user profile"""
 
     # RESPONSE
-    id = serializers.CharField(read_only=True)
-    user = serializers.CharField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
     avatar = serializers.ImageField(read_only=True)
-    city = serializers.IntegerField(read_only=True, source='city,id')
+    city_id = serializers.IntegerField(read_only=True)
     geo_lat = serializers.SerializerMethodField(read_only=True)
     geo_lon = serializers.SerializerMethodField(read_only=True)
-    friends = serializers.IntegerField(read_only=True, source='friends.id')
-    blacklist = serializers.IntegerField(read_only=True, source='blacklist.id')
+    friends_id = serializers.IntegerField(read_only=True)
+    blacklist_id = serializers.IntegerField(read_only=True)
     # REQUEST
-    first_name = serializers.CharField(allow_blank=True)
-    last_name = serializers.CharField(allow_blank=True)
-    middle_name = serializers.CharField(allow_blank=True)
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
+    middle_name = serializers.CharField()
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'user', 'first_name', 'last_name', 'middle_name',
-                  'avatar', 'city', 'geo_lat', 'geo_lon', 'friends', 'blacklist')
+        fields = ('id', 'user_id', 'first_name', 'last_name', 'middle_name',
+                  'avatar', 'city_id', 'geo_lat', 'geo_lon', 'friends_id', 'blacklist_id')
 
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""

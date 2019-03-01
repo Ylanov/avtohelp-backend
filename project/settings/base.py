@@ -191,7 +191,7 @@ MEDIA_URL = '/media/'
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
-
+USE_CELERY = True
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -216,9 +216,7 @@ REST_FRAMEWORK = {
     'DEFAULT_VERSION': (AVAILABLE_VERSIONS['current'],),
     'ALLOWED_VERSIONS': AVAILABLE_VERSIONS.values(),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.AllowAny',
-        # FIXIT: этот permission на 2-3 вьюхи авторизации/регистрации
-        # а сюда IsAuthenticated
+        'rest_framework.permissions.IsAuthenticated',
     ),
 }
 
@@ -253,6 +251,7 @@ SMS_CODE_LENGTH = 4
 SMS_INPUT_ATTEMPTS = 3
 SMS_AVAILABLE = 3
 SMS_BLOCKING_PERIOD = 86400  # 24 hours
+SEND_SMS = True  # Actual sms sending switcher
 SEND_SMS = True  # Actual sms sending switcher
 
 

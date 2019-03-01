@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser, UserManager as AbstractUser
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from rest_framework.authtoken.models import Token
 
 from userprofile.models import Profile, FriendList, BlackList
 
@@ -89,8 +88,6 @@ class User(AbstractUser):
         """String method."""
         return "%s:%s" % (self.phone, self.get_short_name())
 
-    def regenerate_auth_token(self):
+    def logout(self):
         """Regenerate auth token method"""
         self.auth_token.delete()
-        Token.objects.get_or_create(user=self)
-        return self.auth_token

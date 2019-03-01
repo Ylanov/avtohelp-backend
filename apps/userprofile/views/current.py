@@ -2,6 +2,7 @@ from fcm_django.models import FCMDevice
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 
 from userprofile.serializers import current as serializers
 from userprofile import models
@@ -44,11 +45,33 @@ class FCMDeviceViewSet(generics.GenericAPIView):
 
 class ProfileView(generics.RetrieveUpdateAPIView):
     """
-    View for retrieving user profile
+    View for retrieving or update user profile.
+    Allowed HTTP-requests: (GET, PATCH, PUT)
+
+    Request (GET): {}
+    Response (GET): {**user_data}
+
+    Request (PATCH - partial):
+    {
+        "first_name": "First name",
+        "last_name": "Last name",
+        "middle_name": "Middle name",
+    }
+    Response (PATCH): {**user_data}
+
+    Request (PUT):
+    {
+        "first_name": "First name",
+        "last_name": "Last name",
+        "middle_name": "Middle name",
+    }
+    Response (PUT): {**user_data}
+
     :return: return object
     """
 
     model = models.Profile
+    permission_classes = (IsAuthenticated,)
     serializer_class = serializers.ProfileSerializer
     queryset = model.objects.all()
 

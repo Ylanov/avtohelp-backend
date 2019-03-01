@@ -4,7 +4,24 @@ from utils.mixins import BaseMixin
 from django.utils.translation import ugettext_lazy as _
 
 
-# Create your models here.
+"""
+ASSISTANCE REQUEST
+"""
+
+
+class AssistanceRequestManager(models.Manager):
+    """Custom manager fro model AssistanceRequest"""
+    pass
+
+
+class AssistanceRequestQuerySet(models.QuerySet):
+    """Custom QuerySet for AssistanceRequest"""
+
+    def by_user(self, user):
+        """Filter request by user"""
+        return self.filter(user=user)
+
+
 class AssistanceRequest(BaseMixin):
     """Assistance request model"""
 
@@ -20,6 +37,8 @@ class AssistanceRequest(BaseMixin):
     car = models.ForeignKey('catalog.Car',
                             verbose_name=_('Car'),
                             on_delete=models.CASCADE)
+
+    objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
 
     class Meta:
         """Meta class"""
