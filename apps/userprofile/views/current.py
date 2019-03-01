@@ -26,8 +26,7 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(
-            serializer.data, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
 
     def get_object_or_none(self):
         """Object as resylt and the view is displaying or None."""
@@ -55,9 +54,8 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         """Override get object method"""
-        obj = get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
-        return obj
-
+        return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
+        
 
 class FillProfileView(generics.UpdateAPIView):
     """
@@ -77,5 +75,3 @@ class FillProfileView(generics.UpdateAPIView):
 
     :return: return obj
     """
-
-    pass

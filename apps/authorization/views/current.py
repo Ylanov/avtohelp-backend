@@ -54,7 +54,9 @@ class LogoutView(views.APIView):
         def post(self, request, format=None):
             """Delete existed auth token and then create new one for logout"""
             if not request.user.is_anonymous:
+                # NOTE: вот с этого момента по подробнее
                 request.user.regenerate_auth_token()
                 return views.Response(status=status.HTTP_200_OK)
             else:
+                # FIXIT: есть специальный permisson по этому поводу, не надо выдумывать
                 raise NotAuthenticated()

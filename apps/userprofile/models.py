@@ -106,6 +106,7 @@ class UserLock(BaseMixin):
     """Model for keep not valid login attempts."""
 
     user = models.OneToOneField('account.User', on_delete=models.CASCADE)
+    # NOTE: это попытки входа или попытки ввода кода??
     attempts = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
     attempt_timestamp = models.DateTimeField(blank=True, null=True, default=None,
                                              verbose_name=_('Last datetime authorization attempt'))

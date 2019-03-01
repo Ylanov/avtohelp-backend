@@ -22,6 +22,7 @@ class AuthorizationSerializer(serializers.ModelSerializer):
 
         model = models.User
         fields = ('id', 'phone')
+        # NOTE: это что и за чем? создаем юзера когда захотим?
 
     def create(self, validated_data):
         """Override create method"""
@@ -65,22 +66,29 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
             # If queryset filtered by status Sent and Waiting exists
             # write unlock date by this: last created sms-coded obj + SMS_BLOCKING_PERIOD
             if qs.ready_to_go():
+
+                #NOTE: интересное условие, его аналог если я ничего не путаю if qs is not None
                 unlock_time = qs.sent().order_by('created').last().created + timezone.timedelta(
                     seconds=settings.SMS_BLOCKING_PERIOD) if qs else None
 
                 # Create remain time from unlock_time
+
                 remain_time = (unlock_time - timezone.now()) if unlock_time else None
 
                 # If exists sended sms-code and two declined, then raised exception
                 if qs.sent().count() == 1 and qs.declined().count() == (settings.SMS_INPUT_ATTEMPTS - 1):
                     raise api_exceptions.TemporaryLockError(detail={
                         'detail': api_exceptions.TemporaryLockError.default_detail,
+                        # NOTE: если предидущее условие сработает в else то remain_time будет равно None
+                        # у которого нет свойства seconds, что приведет к ошибке
                         'remaining_time': remain_time.seconds
                     })
 
                 # Else set status of previous sms-code to DECLINED
                 else:
                     models.SMSCode.objects.decline_all_others(qs.sent().last())
+
+                # NOTE: напиши эту логику на бумаге, есть подозрение что все много проще можно сделать
         return attrs
 
     def create(self, validated_data):
@@ -115,6 +123,7 @@ class AuthenticationSerializer(serializers.ModelSerializer):
             obj.attempts = 0
             obj.attempt_timestamp = None
             obj.save()
+            # NOTE: итересный return
             return None
 
         # # Get user by his phone from init data
@@ -124,6 +133,8 @@ class AuthenticationSerializer(serializers.ModelSerializer):
         user_lock = profile_models.UserLock.objects.get_or_create(user=user)[0]
 
         # Common checks
+        # NOTE: через %time посмотри может эффективнее регулярку 0-9 длинной в SMS_CODE_LENGHT
+        # само serializers.CharField запихать
         if not value.isdigit():
             raise serializers.ValidationError(_('Invalid code'))
         if len(value) != settings.SMS_CODE_LENGTH:
@@ -134,6 +145,8 @@ class AuthenticationSerializer(serializers.ModelSerializer):
         if not qs.exists():
             # Check for frequency for entering verification code, after first try
             if user_lock.attempts >= 1:
+
+                # NOTE: вот тут не понял немного, подойдешь расскажешь при чем тут время задержки отправок смс
                 last_entry = timezone.now() - user_lock.attempt_timestamp
                 if last_entry.seconds <= settings.SMS_SEND_DELAY:
                     raise api_exceptions.TooOftenTriedError(detail=get_exception_body(
@@ -173,16 +186,19 @@ class AuthenticationSerializer(serializers.ModelSerializer):
         """Create or retrieve object"""
 
         smscode = validated_data.get('code')
-        user = smscode.user
         # find all other code records for this phone and make them DECLINED
         models.SMSCode.objects.decline_all_others(smscode)
         # and make a token
-        token, created = Token.objects.get_or_create(user=user)
+        token, created = Token.objects.get_or_create(user=smscode.user)
         # change status
         smscode.activate()
         smscode.save()
         # update the created time of the token to keep it valid
+
         if not created:
             token.created = timezone.now()
+            # FIXIT: вот так делать не надо!!!
+            # хочешь обновлять токен - дай ему поле modified/refreshed или вроде того
+            # created - время когда номинально была сделана запись в таблице, не больше не меньше
             token.save()
         return smscode

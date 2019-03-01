@@ -217,6 +217,8 @@ REST_FRAMEWORK = {
     'ALLOWED_VERSIONS': AVAILABLE_VERSIONS.values(),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
+        # FIXIT: этот permission на 2-3 вьюхи авторизации/регистрации
+        # а сюда IsAuthenticated
     ),
 }
 

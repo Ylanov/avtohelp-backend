@@ -79,8 +79,7 @@ class SMSCodeQuerySet(models.query.QuerySet):
 
     def ready_to_go(self):
         """Filter only waiting and sent codes."""
-        return self.filter(status__in=[self.model.SENT,
-                                       self.model.WAITING])
+        return self.filter(status__in=[self.model.SENT, self.model.WAITING])
 
     def declined(self):
         """Filter only declined codes."""
@@ -117,8 +116,7 @@ class SMSCode(BaseMixin):
                              null=True, blank=True, verbose_name=_('User'),
                              on_delete=models.CASCADE)
 
-    status = models.PositiveSmallIntegerField(
-        default=WAITING, choices=STATUS_CHOICES)
+    status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS_CHOICES)
     code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_('Code'))
 
     objects = SMSCodeManager.from_queryset(SMSCodeQuerySet)()

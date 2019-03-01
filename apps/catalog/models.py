@@ -64,7 +64,6 @@ class CarModel(BaseMixin, NameMixin):
 
 class CarColor(NameMixin, BaseMixin):
     """Car color model"""
-    pass
 
     class Meta:
         """Meta class"""
@@ -75,7 +74,6 @@ class CarColor(NameMixin, BaseMixin):
 
 class ServiceCategory(NameMixin, BaseMixin):
     """Service category model"""
-    pass
 
     class Meta:
         """Meta model"""
@@ -95,6 +93,8 @@ class Service(NameMixin, BaseMixin):
         verbose_name=_('Service contact phone'), unique=True,
         error_messages={'unique': _("A service with that phone already exists.")},
     )
+    # FIXIT: убери unique, это справочник. + один и тот же номер может быть у нескольких компаний
+    # особенно это касается авто сервисов, шиномонтажка. мойка и чет еще, сервиса 3,  телефон 1
 
     class Meta:
         """Meta class"""
