@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from userprofile.models import Profile, FriendList, BlackList
+from utils.mixins import BaseMixin
 
 """
 MANAGERS
@@ -60,7 +61,7 @@ MODELS
 """
 
 
-class User(AbstractUser):
+class User(AbstractUser, BaseMixin):
     """Base user model."""
 
     phone = PhoneNumberField(
@@ -71,10 +72,8 @@ class User(AbstractUser):
                                 blank=True, default=None)
     email = models.EmailField(_('email address'), blank=True,
                               null=True, default=None)
-    patronymic = models.CharField(_('patronymic'), max_length=30, blank=True)
-
     USERNAME_FIELD = 'phone'
-    REQUIRED_FIELDS = ['username', 'email']
+    REQUIRED_FIELDS = ('username', 'email')
 
     objects = UserManager.from_queryset(UserQuerySet)()
 
@@ -91,3 +90,15 @@ class User(AbstractUser):
     def logout(self):
         """Regenerate auth token method"""
         self.auth_token.delete()
+
+    def get_first_name(self):
+        """Return user first_name"""
+        return self.profile.first_name if self.profile else None
+
+    def get_last_name(self):
+        """Return user last"""
+        return self.profile.last_name if self.profile else None
+
+    def get_middle_name(self):
+        """Return user middle_name"""
+        return self.profile.middle_name if self.profile else None

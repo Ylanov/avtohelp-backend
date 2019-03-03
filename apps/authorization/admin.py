@@ -1,7 +1,19 @@
 from django.contrib import admin
-from .models import SMSCode
+from django.utils.translation import ugettext_lazy as _
+from . import models
+
+
+class SMSCodeModelAdmin(admin.ModelAdmin):
+    """Custom admin page for SMSCode"""
+
+    readonly_fields = ('id', 'user', 'code', 'status', 'phone', 'created', 'modified')
+    list_display = readonly_fields
+    fieldsets = (
+        (_('User\'s data'), {'fields': ('user', 'phone',)}),
+        (_('SMS data'), {'fields': ('code', 'status')}),
+        (_('Info'), {'fields': ('created', 'modified')}),
+    )
+
 
 # Register your models here.
-admin.site.register(SMSCode)
-# NOTE: самому удобно пользоваться такой админкой? а клиенту или другим членам команды?
-# FIXIT: сделай хоть фильтры по статусу и определи list_display чтоли
+admin.site.register(models.SMSCode, SMSCodeModelAdmin)

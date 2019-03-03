@@ -33,22 +33,26 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
             if qs.by_date().exists():
                 raise api_exceptions.TooOftenTriedError(detail={
                     'detail': api_exceptions.TooOftenTriedError.default_detail,
-                    'remaining_time': self.Meta.model().remain_before_resend
+                    'remaining_time': qs.first().remain_before_resend
                 })
             elif qs.count() >= 3:
                 raise api_exceptions.TemporaryLockError(detail={
                     'detail': api_exceptions.TooOftenTriedError.default_detail,
-                    'remaining_time': f'{self.Meta.model().remain_before_resend}'
+                    'remaining_time': qs.first().remain_before_resend
                 })
         return attrs
 
     def create(self, validated_data):
         """Create method."""
+        # make a new user
+        user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
         # make a new sms
-        obj = models.SMSCode.objects.make(user=User.objects.get_or_make(phone=validated_data.get('phone'))[0],
-                                          **validated_data)
+        obj = models.SMSCode.objects.make(user=user,  **validated_data)
         # send actual sms logic
-        obj.send_sms()
+        if settings.USE_CELERY:
+            tasks.send_verification_sms.delay(sms_code_id=obj.id)
+        else:
+            tasks.send_verification_sms(sms_code_id=obj.id)
         return obj
 
 
@@ -56,7 +60,7 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
     """Authentication serializer"""
 
     # REQUEST
-    code = serializers.IntegerField(label=_('Code'), required=True, write_only=True)
+    code = serializers.CharField(label=_('Code'), write_only=True)
     phone = PhoneNumberField(label=_("Phone"), write_only=True)
 
     # RESPONSE
@@ -76,11 +80,13 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
 
         # if code is correct return SMSCode object
         if qs.exists():
+            # put SMSCode object instead of code number
+            attrs['code'] = qs.first()
             if settings.USE_CELERY:
-                tasks.reset_user_attempts.delay(user_id=user.id)
+                tasks.success_authorization.delay(user_id=user.id)
             else:
-                tasks.reset_user_attempts(user_id=user.id)
-            return qs.first()
+                tasks.success_authorization(user_id=user.id)
+            return attrs
         else:
             # get or create UserLock object by user
             user_lock = profile_models.UserLock.objects.get_or_create(user=user)[0]
@@ -95,9 +101,9 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
                     })
                 else:
                     if settings.USE_CELERY:
-                        tasks.reset_user_attempts.delay(user_id=user.id)
+                        tasks.not_completed_authorization.delay(user_id=user.id)
                     else:
-                        tasks.reset_user_attempts(user_id=user.id)
+                        tasks.not_completed_authorization(user_id=user.id)
                     raise api_exceptions.TemporaryLockError(detail={
                         'detail': api_exceptions.TemporaryLockError.default_detail,
                         'remaining_time': user_lock.remain_before_unlock
@@ -112,11 +118,7 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
 
     def create(self, validated_data):
         """Create or retrieve object"""
-        smscode = validated_data.get('code')
-        # find all other code records for this phone and make them DECLINED
-        models.SMSCode.objects.decline_all_others(smscode)
-        # and make a token
+        smscode = validated_data['code']
+        # make a token
         Token.objects.get_or_create(user=smscode.user)
-        # change status
-        smscode.activate()
         return smscode

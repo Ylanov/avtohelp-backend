@@ -6,8 +6,6 @@ from catalog.views import current as views
 app_name = 'catalog'
 
 urlpatterns = [
-    path('cars', views.CarListView.as_view(),  name='car_list'),
-    path('cars/<int:pk>', views.CarDetailView.as_view(),  name='car_detail'),
     path('cars/colors', views.CarColorListView.as_view(),  name='car_color_list'),
     path('cars/colors/<int:pk>', views.CarColorDetailView.as_view(),  name='car_color_detail'),
     path('cars/marks', views.CarMarkListView.as_view(),  name='car_mark_list'),

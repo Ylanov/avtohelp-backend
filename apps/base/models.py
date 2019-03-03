@@ -5,7 +5,7 @@ from utils.mixins import BaseMixin
 
 # Create your models here.
 class Newsletter(BaseMixin):
-    """Model to new represetation."""
+    """Model to new representation."""
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
     text = models.TextField(verbose_name=_('Text'))
@@ -16,8 +16,8 @@ class Newsletter(BaseMixin):
     class Meta:
         """Meta class."""
 
-        verbose_name = _('New')
-        verbose_name_plural = _('News')
+        verbose_name = _('News')
+        verbose_name_plural = _('Newsletter')
 
 
 class PushNotification(BaseMixin):

@@ -84,3 +84,24 @@ class ProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Override update method"""
         return super().update(instance, validated_data)
+
+
+class CarListSerializer(serializers.ModelSerializer):
+    """Car list serialzier"""
+
+    class Meta:
+        """Meta model"""
+
+        model = models.Car
+        fields = ('id', 'created', 'user')
+
+
+class CarDetailSerializer(serializers.ModelSerializer):
+    """Car detail serialzier"""
+
+    class Meta:
+        """Meta model"""
+
+        model = models.Car
+        fields = ('id', 'created', 'modified', 'user', 'mark',
+                  'model', 'color', 'license_plate')

@@ -41,6 +41,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 CONTRIB_APPS = [
+    'bootstrap_admin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -246,12 +247,10 @@ CORS_ALLOW_CREDENTIALS = False
 
 # SMS
 SMS_SEND_DELAY = 30
-SMS_EXPIRATION = 5
+SMS_EXPIRATION = 5  # minutes
 SMS_CODE_LENGTH = 4
-SMS_INPUT_ATTEMPTS = 3
-SMS_AVAILABLE = 3
-SMS_BLOCKING_PERIOD = 86400  # 24 hours
-SEND_SMS = True  # Actual sms sending switcher
+SMS_INPUT_ATTEMPTS = 2
+SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 SEND_SMS = True  # Actual sms sending switcher
 
 

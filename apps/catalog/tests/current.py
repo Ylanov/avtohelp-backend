@@ -1,11 +1,10 @@
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
-from catalog.models import CarModel, CarMark, CarColor, Car, City
+from catalog.models import CarModel, CarMark, CarColor, City
 
 
 class TestCatalog(APITestCase):
@@ -48,50 +47,11 @@ class TestCatalog(APITestCase):
         self.color_3 = CarColor.objects.create(name='Green')
         self.cars_colors = CarColor.objects.count()
 
-        # Create user cars
-        self.car_1 = Car.objects.create(user=self.user_1,
-                                        mark=self.toyota,
-                                        model=self.toyota_model,
-                                        color=self.color_1)
-        self.car_2 = Car.objects.create(user=self.user_2,
-                                        mark=self.nissan,
-                                        model=self.nissan_model,
-                                        color=self.color_2)
-        self.car_3 = Car.objects.create(user=self.user_3,
-                                        mark=self.vaz,
-                                        model=self.vaz_model,
-                                        color=self.color_3)
-        self.cars_count = Car.objects.count()
-
         # Create cities
         self.city_1 = City.objects.create(name='Krasnodar')
         self.city_2 = City.objects.create(name='Kaliningrad')
         self.city_3 = City.objects.create(name='Novosibirsk')
         self.cities_count = City.objects.count()
-
-    def test_list_cars(self):
-        """Test view for getting list of users cars"""
-
-        # Authorize user 1
-        self.token, created = Token.objects.get_or_create(user=self.user_1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        api_path = '%s:catalog:car_list' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), self.cars_count)
-
-    def test_car_detail(self):
-        """Test view for getting detail of user car"""
-
-        # Authorize user 1
-        self.token, created = Token.objects.get_or_create(user=self.user_1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        api_path = '%s:catalog:car_detail' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.car_1.id}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('user'), self.car_1.user.id)
 
     def test_list_car_colors(self):
         """Test view for getting list of users cars colors"""

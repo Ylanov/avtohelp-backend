@@ -18,27 +18,6 @@ class City(BaseMixin, NameMixin):
         verbose_name_plural = _('Cities')
 
 
-class Car(BaseMixin):
-    """Car model"""
-
-    user = models.ForeignKey('account.User', on_delete=models.PROTECT)
-
-    mark = models.ForeignKey('CarMark',
-                             on_delete=models.CASCADE)
-    model = models.ForeignKey('CarModel',
-                              on_delete=models.CASCADE)
-    color = models.ForeignKey('CarColor',
-                              on_delete=models.CASCADE)
-    license_plate = models.CharField(max_length=255,
-                                     verbose_name=_('License plate'))
-
-    class Meta:
-        """Meta class"""
-
-        verbose_name = _('Car')
-        verbose_name_plural = _('Cars')
-
-
 class CarMark(BaseMixin, NameMixin):
     """Car brands model"""
     pass

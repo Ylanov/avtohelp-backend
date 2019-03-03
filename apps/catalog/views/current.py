@@ -1,28 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 from catalog import models
 from catalog.serializers import current as serializers
 
 
 # Create your views here.
-class CarListView(generics.ListAPIView):
-    """User car list view"""
-
-    permission_classes = (IsAuthenticated, )
-    serializer_class = serializers.CarListSerializer
-    queryset = models.Car.objects.all()
-    pagination_class = None
-
-
-class CarDetailView(generics.RetrieveAPIView):
-    """User car detail view"""
-
-    permission_classes = (IsAuthenticated, )
-    serializer_class = serializers.CarDetailSerializer
-    queryset = models.Car.objects.all()
-
-
 class CarMarkListView(generics.ListAPIView):
     """Car brands list view"""
 

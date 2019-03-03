@@ -80,6 +80,23 @@ class ProfileView(generics.RetrieveUpdateAPIView):
         return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
         
 
+class CarListView(generics.ListAPIView):
+    """User car list view"""
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.CarListSerializer
+    queryset = models.Car.objects.all()
+    pagination_class = None
+
+
+class CarDetailView(generics.RetrieveAPIView):
+    """User car detail view"""
+
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.CarDetailSerializer
+    queryset = models.Car.objects.all()
+
+
 class FillProfileView(generics.UpdateAPIView):
     """
     Fill first name, last name and middle name

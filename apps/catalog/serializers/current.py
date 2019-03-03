@@ -4,27 +4,6 @@ from rest_framework import serializers
 from catalog import models
 
 
-class CarListSerializer(serializers.ModelSerializer):
-    """Car list serialzier"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Car
-        fields = ('id', 'created', 'user')
-
-
-class CarDetailSerializer(serializers.ModelSerializer):
-    """Car detail serialzier"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Car
-        fields = ('id', 'created', 'modified', 'user', 'mark',
-                  'model', 'color', 'license_plate')
-
-
 class CarMarkListSerializer(serializers.ModelSerializer):
     """Car brand list serializer"""
 

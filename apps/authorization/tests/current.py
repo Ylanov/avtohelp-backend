@@ -3,7 +3,6 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 
-from account.models import User
 from authorization.models import SMSCode
 from catalog.models import CarModel, CarMark, CarColor
 
@@ -71,3 +70,49 @@ class TestCatalog(TestCase):
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(sms_code.status, sms_code.ACTIVATED)
+
+    def test_authorization_2(self):
+        """Test view for authorize user"""
+
+        # verify
+        api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
+        self.client.post(reverse(api_path), data={"phone": self.phone})
+        sms_code = SMSCode.objects.filter(phone=self.phone).first()
+
+        # authorize
+        data = {"phone": self.phone, "code": sms_code.code}
+        api_path = '%s:authorization:auth' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.post(reverse(api_path), data=data)
+        sms_code = SMSCode.objects.filter(phone=self.phone).first()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(sms_code.status, sms_code.ACTIVATED)
+
+    def test_fail_authorization(self):
+        """Test view for authorize user"""
+
+        # verify
+        api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
+        self.client.post(reverse(api_path), data={"phone": self.phone})
+        SMSCode.objects.filter(phone=self.phone).first()
+
+        # authorize
+        data = {"phone": self.phone, "code": 1234}
+        api_path = '%s:authorization:auth' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.post(reverse(api_path), data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_authorization_attempts(self):
+        """Test authorization attempts"""
+
+        # verify
+        api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
+        self.client.post(reverse(api_path), data={"phone": self.phone})
+        SMSCode.objects.filter(phone=self.phone).first()
+
+        # authorize
+        data = {"phone": self.phone, "code": 1234}
+        api_path = '%s:authorization:auth' % settings.AVAILABLE_VERSIONS.get('current')
+        for i in range(settings.SMS_INPUT_ATTEMPTS):
+            self.client.post(reverse(api_path), data=data)
+        response = self.client.post(reverse(api_path), data=data)
+        self.assertEqual(response.status_code, status.HTTP_423_LOCKED)

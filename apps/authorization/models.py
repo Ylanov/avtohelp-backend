@@ -39,6 +39,8 @@ class SMSCodeManager(models.Manager):
 
     def decline_all_by_user(self, user):
         """Set status declined on all records."""
+        if isinstance(user, int):
+            user = User.objects.get(id=user)
         # find all other code records for this phone
         qs = self.by_phone(user.phone).ready_to_go()
         # make them DECLINED
@@ -46,7 +48,7 @@ class SMSCodeManager(models.Manager):
 
 
 class SMSCodeQuerySet(models.query.QuerySet):
-    """Extended querysets for SMSCode model."""
+    """Extended queryset for SMSCode model."""
 
     def by_phone(self, phone):
         """Phone filter."""
@@ -69,7 +71,7 @@ class SMSCodeQuerySet(models.query.QuerySet):
         return self.filter(modified__gte=delta)
 
     def expired(self, minutes=settings.SMS_EXPIRATION):
-        """Filter expirder codes."""
+        """Filter expired codes."""
         delta = timezone.now() - timedelta(minutes=minutes)
         return self.filter(created__lte=delta).ready_to_go()
 
@@ -145,6 +147,12 @@ class SMSCode(BaseMixin):
             send_verification_sms.delay(sms_code_id=self.id)
         else:
             logger.debug('Send SMS')
+
+    def fake(self):
+        """Fake send sms method"""
+
+        self.status = self.SENT
+        self.save()
 
     def activate(self):
         """Activate code."""

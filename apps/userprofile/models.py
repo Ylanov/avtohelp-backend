@@ -9,6 +9,27 @@ from utils import methods
 from utils.mixins import BaseMixin
 
 
+class Car(BaseMixin):
+    """Car model"""
+
+    user = models.ForeignKey('account.User', on_delete=models.PROTECT)
+
+    mark = models.ForeignKey('catalog.CarMark',
+                             on_delete=models.CASCADE)
+    model = models.ForeignKey('catalog.CarModel',
+                              on_delete=models.CASCADE)
+    color = models.ForeignKey('catalog.CarColor',
+                              on_delete=models.CASCADE)
+    license_plate = models.CharField(max_length=255,
+                                     verbose_name=_('License plate'))
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Car')
+        verbose_name_plural = _('Cars')
+
+
 class Profile(BaseMixin):
     """Profile model"""
 
