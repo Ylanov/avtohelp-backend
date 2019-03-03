@@ -8,6 +8,7 @@ class SMSCodeModelAdmin(admin.ModelAdmin):
 
     readonly_fields = ('id', 'user', 'code', 'status', 'phone', 'created', 'modified')
     list_display = readonly_fields
+    list_filter = ('status', 'created')
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'phone',)}),
         (_('SMS data'), {'fields': ('code', 'status')}),
