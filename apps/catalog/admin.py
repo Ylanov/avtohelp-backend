@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from catalog.models import (City, CarMark,
                             CarModel, CarColor,
-                            ServiceCategory, Service)
+                            ServiceCategory)
 
 common_list_display = ('id', 'name', 'created', 'modified')
 
@@ -32,15 +32,9 @@ class ServiceCategoryModelAdmin(admin.ModelAdmin):
     list_display = common_list_display
 
 
-class ServiceModelAdmin(admin.ModelAdmin):
-    """Custom admin page for Service"""
-    list_display = common_list_display
-
-
 # Register your models here.
 admin.site.register(City, CityModelAdmin)
 admin.site.register(CarMark, CarMarkModelAdmin)
 admin.site.register(CarModel, CarModelModelAdmin)
 admin.site.register(CarColor, CarColorModelAdmin)
 admin.site.register(ServiceCategory, ServiceCategoryModelAdmin)
-admin.site.register(Service, ServiceModelAdmin)

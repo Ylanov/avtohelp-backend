@@ -7,6 +7,7 @@ from rest_framework.authtoken.models import Token
 
 from account.models import User
 from authorization import models
+from catalog import models as catalog_models
 from userprofile import models as profile_models
 from utils import api_exceptions, tasks
 from utils.mixins import AuthorizationMixin
@@ -16,12 +17,14 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     """Verification phone serializer"""
 
     phone = PhoneNumberField(write_only=True)
+    city_id = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
+                                                 write_only=True)
 
     class Meta:
         """Override create method"""
 
         model = models.SMSCode
-        fields = ('phone',)
+        fields = ('phone', 'city_id')
 
     def validate(self, attrs):
         """Validate method."""
@@ -45,7 +48,8 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Create method."""
         # make a new user
-        user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
+        user = User.objects.get_or_make(phone=validated_data.get('phone'),
+                                        city=validated_data.pop('city_id'))[0]
         # make a new sms
         obj = models.SMSCode.objects.make(user=user,  **validated_data)
         # send actual sms logic

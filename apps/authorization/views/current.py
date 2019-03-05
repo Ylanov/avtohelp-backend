@@ -10,7 +10,7 @@ from authorization.serializers import current as serializers
 class PhoneVerificationView(generics.CreateAPIView):
     """
     View for verify user phone number
-    Request: {"phone": "+79000000000"}
+    Request: {"phone": "+79000000000", "city": 1}
     Response: {"detail": ""Sms was sent}
     :return: object
     """

@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from authorization.models import SMSCode
-from catalog.models import CarModel, CarMark, CarColor
+from catalog.models import CarModel, CarMark, CarColor, City
 
 
 class TestCatalog(TestCase):
@@ -25,6 +25,7 @@ class TestCatalog(TestCase):
     def setUp(self):
         # user data
         self.phone = '+79000000000'
+        self.city = City.objects.create(name="Krasnodar")
 
         # Create car brands
         self.toyota = CarMark.objects.create(name='Toyota')
@@ -47,7 +48,7 @@ class TestCatalog(TestCase):
     def test_verification(self):
         """Test view for verify user phone"""
 
-        data = {"phone": self.phone}
+        data = {"phone": self.phone, "city_id": self.city.id}
 
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.post(reverse(api_path), data=data)
@@ -60,7 +61,7 @@ class TestCatalog(TestCase):
 
         # verify
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
-        self.client.post(reverse(api_path), data={"phone": self.phone})
+        self.client.post(reverse(api_path), data={"phone": self.phone, "city_id": self.city.id})
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
 
         # authorize
@@ -76,7 +77,7 @@ class TestCatalog(TestCase):
 
         # verify
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
-        self.client.post(reverse(api_path), data={"phone": self.phone})
+        self.client.post(reverse(api_path), data={"phone": self.phone, "city_id": self.city.id})
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
 
         # authorize
@@ -92,7 +93,7 @@ class TestCatalog(TestCase):
 
         # verify
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
-        self.client.post(reverse(api_path), data={"phone": self.phone})
+        self.client.post(reverse(api_path), data={"phone": self.phone, "city_id": self.city.id})
         SMSCode.objects.filter(phone=self.phone).first()
 
         # authorize
@@ -106,7 +107,7 @@ class TestCatalog(TestCase):
 
         # verify
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
-        self.client.post(reverse(api_path), data={"phone": self.phone})
+        self.client.post(reverse(api_path), data={"phone": self.phone, "city_id": self.city.id})
         SMSCode.objects.filter(phone=self.phone).first()
 
         # authorize

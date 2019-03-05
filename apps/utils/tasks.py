@@ -1,10 +1,14 @@
 import logging
 
 from celery import shared_task
+from celery.schedules import crontab
+from celery.task import periodic_task
 
 from authorization import models as auth_models
 from userprofile import models as profile_models
+from order import models as order_models
 from django.conf import settings
+from django.utils import timezone
 
 
 logger = logging.getLogger('CELERY')
@@ -69,3 +73,17 @@ def change_smscode_status(user_id, status):
     smscode = auth_models.SMSCode.objects.get(user=user_id)
     smscode.status = status
     smscode.save()
+
+
+@periodic_task(run_every=crontab(minute=settings.REQUEST_RELEVANCE))
+def check_request_relevance():
+    """Check relevance of assistance requests"""
+    timedelta = timezone.now() + timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
+    available_requests = order_models.AssistanceRequest.objects.by_status(
+        status=order_models.AssistanceRequest.AVAILABLE)
+    if available_requests.exists():
+        for request in available_requests:
+            expired_date = request.created + timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
+            if expired_date >= timedelta:
+                request.status = order_models.AssistanceRequest.EXPIRED
+                request.save()

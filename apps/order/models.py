@@ -1,12 +1,8 @@
-from django.db import models
 from django.contrib.gis.db import models as gis_models
-from utils.mixins import BaseMixin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-
-"""
-ASSISTANCE REQUEST
-"""
+from utils.mixins import BaseMixin
 
 
 class AssistanceRequestManager(models.Manager):
@@ -21,9 +17,21 @@ class AssistanceRequestQuerySet(models.QuerySet):
         """Filter request by user"""
         return self.filter(user=user)
 
+    def by_status(self, status):
+        """Filter by status"""
+        return self.filter(status=status)
+
 
 class AssistanceRequest(BaseMixin):
     """Assistance request model"""
+
+    AVAILABLE = 1
+    EXPIRED = 0
+
+    STATUS_CHOCIES = (
+        (AVAILABLE, _('Assistance request is available')),
+        (EXPIRED, _('Assistance request was expired'))
+    )
 
     user = models.ForeignKey('account.User',
                              verbose_name=_('User'),
@@ -37,6 +45,9 @@ class AssistanceRequest(BaseMixin):
     car = models.ForeignKey('userprofile.Car',
                             verbose_name=_('Car'),
                             on_delete=models.CASCADE)
+
+    status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
+                                              default=AVAILABLE, choices=STATUS_CHOCIES)
 
     objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
 

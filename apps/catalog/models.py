@@ -1,9 +1,9 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
-from utils.mixins import BaseMixin, NameMixin
 from phonenumber_field.modelfields import PhoneNumberField
+
+from apps.utils.mixins import BaseMixin, NameMixin
 
 
 # Create your models here.
@@ -60,23 +60,3 @@ class ServiceCategory(NameMixin, BaseMixin):
         verbose_name = _('Service category')
         verbose_name_plural = _('Service categories')
 
-
-class Service(NameMixin, BaseMixin):
-    """Service model"""
-
-    category = models.ForeignKey('ServiceCategory',
-                                 on_delete=models.CASCADE)
-    description = models.CharField(max_length=255, verbose_name=_('Description'))
-    location = gis_models.PointField(_('Location'))
-    phone = PhoneNumberField(
-        verbose_name=_('Service contact phone'), unique=True,
-        error_messages={'unique': _("A service with that phone already exists.")},
-    )
-    # FIXIT: убери unique, это справочник. + один и тот же номер может быть у нескольких компаний
-    # особенно это касается авто сервисов, шиномонтажка. мойка и чет еще, сервиса 3,  телефон 1
-
-    class Meta:
-        """Meta class"""
-
-        verbose_name = _('Service')
-        verbose_name_plural = _('Services')

@@ -254,6 +254,10 @@ SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 SEND_SMS = True  # Actual sms sending switcher
 
 
+# ASSISTANCE REQUESTS
+REQUEST_RELEVANCE = 30  # minutes
+
+
 # Django Rest Swagger
 SWAGGER_SETTINGS = {
     'JSON_EDITOR': False,

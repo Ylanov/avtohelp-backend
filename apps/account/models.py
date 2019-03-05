@@ -5,43 +5,8 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from userprofile.models import Profile, FriendList, BlackList
+from userprofile.models import Profile
 from utils.mixins import BaseMixin
-
-"""
-MANAGERS
-"""
-
-
-class UserManager(AbstractUserManager):
-    """Base User manager"""
-
-    use_in_migrations = False
-
-    def make(self, phone):
-        """Default make-method for creating user"""
-
-        obj = self.model(phone=phone)
-        obj.save()
-
-        Profile.objects.create(user=obj)
-        BlackList.objects.create(owner=obj)
-        FriendList.objects.create(owner=obj)
-        return obj
-
-    def get_or_make(self, phone):
-        """Get user object or make new one"""
-        qs = User.objects.filter(phone=phone)
-        if qs.exists():
-            obj = qs.first(), False
-        else:
-            obj = self.make(phone=phone), True
-        return obj
-
-
-"""
-QUERYSETS
-"""
 
 
 class UserQuerySet(models.QuerySet):
@@ -56,9 +21,28 @@ class UserQuerySet(models.QuerySet):
         return self.filter(phone=phone)
 
 
-"""
-MODELS
-"""
+class UserManager(AbstractUserManager):
+    """Base User manager"""
+
+    use_in_migrations = False
+
+    def make(self, phone, city):
+        """Default make-method for creating user"""
+
+        obj = self.model(phone=phone)
+        obj.save()
+
+        Profile.objects.create(user=obj, city=city)
+        return obj
+
+    def get_or_make(self, phone, city):
+        """Get user object or make new one"""
+        qs = User.objects.filter(phone=phone)
+        if qs.exists():
+            obj = qs.first(), False
+        else:
+            obj = self.make(phone=phone, city=city), True
+        return obj
 
 
 class User(AbstractUser, BaseMixin):

@@ -1,20 +1,22 @@
 import re
 
-from django.db import models as db_models
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.exceptions import ValidationError
+from utils.api_exceptions import CityNotFound
 
 from account import models as account_models
+from catalog import models as catalog_models
 
 
-class BaseMixin(db_models.Model):
+class BaseMixin(models.Model):
     """Base mixin model."""
 
-    created = db_models.DateTimeField(default=timezone.now, editable=False,
-                                      verbose_name=_('Date created'))
-    modified = db_models.DateTimeField(auto_now=True,
-                                       verbose_name=_('Date updated'))
+    created = models.DateTimeField(default=timezone.now, editable=False,
+                                   verbose_name=_('Date created'))
+    modified = models.DateTimeField(auto_now=True,
+                                    verbose_name=_('Date updated'))
 
     class Meta:
         """Meta-class"""
@@ -22,10 +24,10 @@ class BaseMixin(db_models.Model):
         abstract = True
 
 
-class NameMixin(db_models.Model):
+class NameMixin(models.Model):
     """Name field model mixin."""
 
-    name = db_models.CharField(max_length=255, verbose_name=_('Name'))
+    name = models.CharField(max_length=255, verbose_name=_('Name'))
 
     class Meta:
         """Meta class."""
@@ -56,4 +58,15 @@ class AuthorizationMixin(object):
         pattern = r'[0-9]{4}'
         if not re.fullmatch(pattern, str(value)):
             raise ValidationError(_('Invalid code'))
+        return value
+
+
+class ProfileMixin(object):
+    """Profile mixin"""
+
+    def validate_city_id(self, value):
+        """Validator for city"""
+        qs = catalog_models.City.objects.filter(id=value)
+        if not qs.exists():
+            raise CityNotFound(city_id=value)
         return value

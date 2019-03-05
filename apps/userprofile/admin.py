@@ -5,7 +5,6 @@ from .models import (Profile, FriendRequest,
                      UserLock, Car)
 
 common_fields = ('id', 'user', 'created', 'modified')
-common_fields_for_lists = ('id', 'owner', 'created', 'modified')
 
 
 class CarModelAdmin(admin.ModelAdmin):
@@ -28,17 +27,17 @@ class ProfileModelAdmin(admin.ModelAdmin):
 
 class FriendRequestModelAdmin(admin.ModelAdmin):
     """Custom admin page for FriendRequest"""
-    list_display = common_fields
+    list_display = ('id', 'user', 'invited') + common_fields[-2:]
 
 
 class FriendListModelAdmin(admin.ModelAdmin):
     """Custom admin page for FriendList"""
-    list_display = common_fields_for_lists
+    list_display = ('id', 'owner', 'friend', 'created', 'modified')
 
 
 class BlackListModelAdmin(admin.ModelAdmin):
     """Custom admin page for BlackList"""
-    list_display = common_fields_for_lists
+    list_display = ('id', 'owner', 'foe', 'created', 'modified')
 
 
 class UserLockModelAdmin(admin.ModelAdmin):

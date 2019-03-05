@@ -23,10 +23,16 @@ class TestCatalog(APITestCase):
         print(f"End test catalog app v{cls.VERSION}\n")
 
     def setUp(self):
+        # Create cities
+        self.city_1 = City.objects.create(name='Krasnodar')
+        self.city_2 = City.objects.create(name='Kaliningrad')
+        self.city_3 = City.objects.create(name='Novosibirsk')
+        self.cities_count = City.objects.count()
+
         # Create users
-        self.user_1 = User.objects.make(phone='+79000000001')
-        self.user_2 = User.objects.make(phone='+79000000002')
-        self.user_3 = User.objects.make(phone='+79000000003')
+        self.user_1 = User.objects.make(phone='+79000000001', city=self.city_1)
+        self.user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
+        self.user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
         self.users_count = User.objects.count()
 
         # Create car brands
@@ -46,12 +52,6 @@ class TestCatalog(APITestCase):
         self.color_2 = CarColor.objects.create(name='Black')
         self.color_3 = CarColor.objects.create(name='Green')
         self.cars_colors = CarColor.objects.count()
-
-        # Create cities
-        self.city_1 = City.objects.create(name='Krasnodar')
-        self.city_2 = City.objects.create(name='Kaliningrad')
-        self.city_3 = City.objects.create(name='Novosibirsk')
-        self.cities_count = City.objects.count()
 
     def test_list_car_colors(self):
         """Test view for getting list of users cars colors"""

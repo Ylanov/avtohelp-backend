@@ -1,4 +1,5 @@
 """Catalogue app serializers."""
+from django.contrib.gis.geos.point import Point
 from rest_framework import serializers
 
 from catalog import models
@@ -86,25 +87,3 @@ class CityDetailSerializer(serializers.ModelSerializer):
         model = models.City
         fields = ('id', 'created', 'modified',
                   'name')
-
-
-class ServiceListSerializer(serializers.ModelSerializer):
-    """Service list serializer"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Service
-        fields = ('id', 'created', 'name')
-
-
-class ServiceDetailSerializer(serializers.ModelSerializer):
-    """Service detail serializer"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Service
-        fields = ('id', 'created', 'modified', 'name',
-                  'category', 'description', 'location',
-                  'phone')

@@ -6,8 +6,8 @@ from .models import AssistanceRequest
 class AssistanceRequestModelAdmin(admin.ModelAdmin):
     """Custom admin page for AssistanceRequest"""
 
-    readonly_fields = ('id', 'user', 'created', 'modified')
-    list_display = readonly_fields
+    readonly_fields = ('id', 'created', 'modified')
+    list_display = ('id', 'user', 'created', 'modified')
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'car',)}),
         (_('Assistance request'), {'fields': ('issue', 'description')}),
@@ -17,4 +17,4 @@ class AssistanceRequestModelAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(AssistanceRequest)
+admin.site.register(AssistanceRequest, AssistanceRequestModelAdmin)

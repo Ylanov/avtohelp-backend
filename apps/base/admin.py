@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Newsletter, PushNotification
+from .models import Newsletter, PushNotification, Service
 
 
 class NewsletterModelAdmin(admin.ModelAdmin):
@@ -15,6 +15,12 @@ class PushNotificationModelAdmin(admin.ModelAdmin):
     list_display = readonly_fields
 
 
+class ServiceModelAdmin(admin.ModelAdmin):
+    """Custom admin page for Service"""
+    list_display = ('id', 'name', 'created', 'modified')
+
+
 # Register your models here.
 admin.site.register(Newsletter, NewsletterModelAdmin)
 admin.site.register(PushNotification, PushNotificationModelAdmin)
+admin.site.register(Service, ServiceModelAdmin)
