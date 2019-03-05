@@ -59,6 +59,7 @@ class CarCreateSerializer(serializers.ModelSerializer):
 
     mark = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarMark.objects.all())
     model = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarModel.objects.all())
+
     color = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarColor.objects.all())
     license_plate = serializers.CharField()
 
@@ -68,38 +69,41 @@ class CarCreateSerializer(serializers.ModelSerializer):
         model = models.Car
         fields = ('mark', 'model', 'color', 'license_plate')
 
+    def validat(self, attrs):
+        if attrs.get('mark') != attrs.get('model').makrs.all():
+            raise!!
+
+
     def create(self, validated_data):
         """Override create method"""
         import ipdb; ipdb.set_trace()
         validated_data['user'] = self.context.get('request').user
-        return super(CarCreateSerializer, self).create(validated_data)
+        return super().create(validated_data)
 
 
-class ProfileSerializer(serializers.ModelSerializer, mixins.ProfileMixin):
+class ProfileSerializer(serializers.ModelSerializer,
+                         mixins.ProfileMixin):  ## PrimaryKeyRelatedField
     """Serializer for retrieving user profile"""
 
-    # RESPONSE
-    id = serializers.IntegerField(read_only=True)
-    user_id = serializers.IntegerField(read_only=True)
-    # geo_lat = serializers.SerializerMethodField(read_only=True)
-    # geo_lon = serializers.SerializerMethodField(read_only=True)
-    friends_id = serializers.IntegerField(read_only=True)
-    blacklist_id = serializers.IntegerField(read_only=True)
+    # # RESPONSE
+
     phone = PhoneNumberField(read_only=True, source='user.phone')
     # REQUEST
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    middle_name = serializers.CharField()
-    avatar = serializers.ImageField()
-    city_id = serializers.IntegerField()
+    # city_id = serializers.IntegerField()
     # car = CarCreateSerializer(source='user.car', write_only=True)
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'user_id', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'avatar', 'city_id', 'friends_id', 'blacklist_id',
+        fields = (
+                    'id', 'user_id',
+                     'first_name', 'last_name', 'middle_name',
+                  'phone', 'avatar', 
+
+                  'city_id', 
+
+                  # 'friends_id', 'blacklist_id',
                   # 'car'
                   #'geo_lat', 'geo_lon'
                   )

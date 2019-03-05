@@ -11,26 +11,43 @@ from utils import methods
 from utils.mixins import BaseMixin
 
 
+# class Model:
+#     pass
+
+# class Mark:
+#     pass
+
+# class Color:
+#     pass
+
 class CarManager(models.Manager):
     """Custom Manager for Car"""
 
-    def make(self, user, mark_id, model_id, color_id, license_plate):
-        """Create Car object"""
-        brands = catalog_models.CarMark.objects.filter(id=mark_id)
-        if brands.exists():
-            car_models = catalog_models.CarModel.objects.filter(id=model_id, mark=brands.first())
-            if car_models.exists():
-                colors = catalog_models.CarColor.objects.filter(id=color_id)
-                if colors.exists():
-                    return self.create(user=user, mark=brands.first(),
-                                       model=car_models.first(), color=colors.exists(),
-                                       license_plate=license_plate)
-                else:
-                    raise api_exceptions.CarColorNotFound(color_id=color_id)
-            else:
-                raise api_exceptions.CarBrandModelIsNotFound(model_id=model_id)
-        else:
-            raise api_exceptions.CarBrandIsNotFound(brand_id=mark_id)
+    # def make(self, user, mark: Mark, model: Model, color: Color, license_plate):
+    #     assert isinstance(mark, Mark), 'Bad makr object'
+
+
+    # def make(self, user, mark_id, model_id, color_id, license_plate):
+    #     """Create Car object"""
+
+
+
+    #     brands = catalog_models.CarMark.objects.filter(id=mark_id)
+
+    #     if brands.exists():
+    #         car_models = catalog_models.CarModel.objects.filter(id=model_id, mark=brands.first())
+    #         if car_models.exists():
+    #             colors = catalog_models.CarColor.objects.filter(id=color_id)
+    #             if colors.exists():
+    #                 return self.create(user=user, mark=brands.first(),
+    #                                    model=car_models.first(), color=colors.exists(),
+    #                                    license_plate=license_plate)
+    #             else:
+    #                 raise api_exceptions.CarColorNotFound(color_id=color_id)
+    #         else:
+    #             raise api_exceptions.CarBrandModelIsNotFound(model_id=model_id)
+    #     else:
+    #         raise api_exceptions.CarBrandIsNotFound(brand_id=mark_id)
 
 
 class CarQuerySet(models.QuerySet):
@@ -105,6 +122,13 @@ class Profile(BaseMixin):
 
         verbose_name = _('Profile')
         verbose_name_plural = _('Profiles')
+
+
+class ProfileLocation(BaseMixin):
+
+    profile = OneToOneField(Profile)
+    location = gis_models
+
 
 
 class FriendRequestQuerySet(models.QuerySet):
