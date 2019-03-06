@@ -42,10 +42,6 @@ class AssistanceRequest(BaseMixin):
     description = models.TextField(verbose_name=_('Description'))
     location = gis_models.PointField(_('Location'),
                                      blank=True, null=True, default=None)
-    car = models.ForeignKey('userprofile.Car',
-                            verbose_name=_('Car'),
-                            on_delete=models.CASCADE)
-
     status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
                                               default=AVAILABLE, choices=STATUS_CHOCIES)
 

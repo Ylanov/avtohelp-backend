@@ -59,8 +59,6 @@ class ProfileListView(generics.ListAPIView):
     serializer_class = serializers.ProfileListSerializer
     filter_class = filters.ProfileListFilterSet
     queryset = models.Profile.objects.all().select_related(
-        'friends',
-        'blacklist',
         'user',
     ).order_by('first_name', 'last_name')
 
@@ -135,15 +133,59 @@ class FriendRequestCreateView(generics.CreateAPIView):
     REQUEST:
     {"user_id": IntegerField}
     RESPONSE:
+    {}
+    """
+    serializer_class = serializers.FriendRequestSerializer
+    queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').all()
+
+
+class FriendRequestApproveView(generics.UpdateAPIView):
+    """
+    View for approve request from user
+    REQUEST:
+    {"request": IntegerField}
+    RESPONSE:
     {
-        "id": IntegerField,
-        "created": DateTimeField,
-        "user_id": IntegerField,
         "approved": BooleanField
     }
     """
+    serializer_class = serializers.FriendRequestApproveSerializer
+    queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').not_approved()
+
+
+class FriendRequestListView(generics.ListAPIView):
+    """
+    View for retrieve request to add to friend list
+    """
+
     serializer_class = serializers.FriendRequestSerializer
-    queryset = models.FriendRequest.objects.select_related('profile__friendlist', 'user').all()
+    queryset = models.FriendRequest.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.requests(user=self.request.user)
+
+
+class MyFriendRequestListView(generics.ListAPIView):
+    """
+    View for retrieve user friend requests
+    """
+
+    serializer_class = serializers.FriendRequestSerializer
+    queryset = models.FriendRequest.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.my_requests(user=self.request.user)
+
+
+class FriendRequestDetailView(generics.RetrieveAPIView):
+    """
+    View for retrieve user friend request
+    """
+
+    serializer_class = serializers.FriendRequestSerializer
+    queryset = models.FriendRequest.objects.all()
 
 
 class ProfileBlackListView(generics.ListAPIView):
@@ -159,7 +201,7 @@ class ProfileBlackListView(generics.ListAPIView):
         return self.queryset.my_list(user=self.request.user)
 
 
-class BlackListRequestCreateView(generics.CreateAPIView):
+class BlackListCreateCreateView(generics.CreateAPIView):
     """
     View for creating request to add to the blacklist
     REQUEST:
@@ -171,20 +213,5 @@ class BlackListRequestCreateView(generics.CreateAPIView):
         "user_id": IntegerField
     }
     """
-    serializer_class = serializers.BlackListRequestSerializer
+    serializer_class = serializers.BlackListCreateSerializer
     queryset = models.FriendRequest.objects.select_related('profile__blacklist', 'user').all()
-
-
-class CarListView(generics.ListAPIView):
-    """User car list view"""
-
-    serializer_class = serializers.CarListSerializer
-    queryset = models.Car.objects.all()
-    pagination_class = None
-
-
-class CarDetailView(generics.RetrieveAPIView):
-    """User car detail view"""
-
-    serializer_class = serializers.CarDetailSerializer
-    queryset = models.Car.objects.all()

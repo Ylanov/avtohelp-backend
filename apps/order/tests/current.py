@@ -1,4 +1,3 @@
-from autofixture import AutoFixture
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
@@ -7,6 +6,7 @@ from rest_framework.test import APITestCase
 
 from account import models as account_models
 from catalog import models as catalog_models
+from car import models as car_models
 from order import models
 from userprofile import models as profile_models
 
@@ -33,23 +33,25 @@ class TestOrder(APITestCase):
         self.city = catalog_models.City.objects.create(name='Krasnodar')
 
         # Create car brands
-        self.toyota = catalog_models.CarMark.objects.create(name='Toyota')
+        self.toyota = car_models.CarMark.objects.create(name='Toyota')
 
         # Create car models
-        self.toyota_model = catalog_models.CarModel.objects.create(name='Supra',
+        self.toyota_model = car_models.CarModel.objects.create(name='Supra',
                                                                    mark=self.toyota)
 
         # Create car colors
-        self.color_1 = catalog_models.CarColor.objects.create(name='White')
+        self.color_1 = car_models.CarColor.objects.create(name='White')
 
         # Create user
         self.user_1 = account_models.User.objects.make(phone='+79000000000', city=self.city)
 
-        # Create user car
-        self.car = profile_models.Car.objects.create(user=self.user_1,
-                                                     mark=self.toyota,
-                                                     model=self.toyota_model,
-                                                     color=self.color_1)
+        # Create user cars
+        self.car_1 = car_models.Car.objects.create(mark=self.toyota,
+                                                   car_model=self.toyota_model)
+        self.car_user_1 = profile_models.ProfileCar.objects.create(owner=self.user_1,
+                                                                   car=self.car_1,
+                                                                   color=self.color_1,
+                                                                   license_plate='aaa123aa 70')
 
         # Authorize
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -93,16 +95,13 @@ class TestOrder(APITestCase):
         # Create assistance requests
         models.AssistanceRequest.objects.create(user=self.user_1,
                                                 issue='Issue 1',
-                                                description='Description',
-                                                car=self.car)
+                                                description='Description')
         models.AssistanceRequest.objects.create(user=user_2,
                                                 issue='Issue 2',
-                                                description='Description',
-                                                car=self.car)
+                                                description='Description')
         models.AssistanceRequest.objects.create(user=user_3,
                                                 issue='Issue 3',
-                                                description='Description',
-                                                car=self.car)
+                                                description='Description')
 
         # Put user_2 in BlackList
         profile_models.BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -120,8 +119,7 @@ class TestOrder(APITestCase):
         assistance_request = models.AssistanceRequest.objects.create(
             user=self.user_1,
             issue='Issue 1',
-            description='Issue description',
-            car=self.car
+            description='Issue description'
         )
         response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)

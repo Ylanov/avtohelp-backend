@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from utils.mixins import BaseMixin, NameMixin
-from django.contrib.gis.db import models as gis_models
-from phonenumber_field.modelfields import PhoneNumberField
+
+from utils.mixins import BaseMixin
 
 
 # Create your models here.
@@ -57,22 +56,3 @@ class PushNotification(BaseMixin):
 
         verbose_name = _('Push notification')
         verbose_name_plural = _('Push notifications')
-
-
-class Service(NameMixin, BaseMixin):
-    """Service model"""
-
-    category = models.ForeignKey('catalog.ServiceCategory',
-                                 on_delete=models.CASCADE)
-    description = models.CharField(max_length=255, verbose_name=_('Description'))
-    location = gis_models.PointField(_('Location'))
-    phone = PhoneNumberField(
-        verbose_name=_('Service contact phone'),
-        error_messages={'unique': _("A service with that phone already exists.")},
-    )
-
-    class Meta:
-        """Meta class"""
-
-        verbose_name = _('Service')
-        verbose_name_plural = _('Services')

@@ -28,26 +28,6 @@ class NewsDetailView(generics.RetrieveAPIView):
     serializer_class = serializers.NewsDetailSerializer
 
 
-class ServiceStationListView(generics.ListAPIView):
-    """
-    ServiceStations list view
-    """
-
-    permission_classes = (AllowAny,)
-    serializer_class = serializers.ServiceListSerializer
-    queryset = models.Service.objects.all()
-
-
-class ServiceStationDetailView(generics.RetrieveAPIView):
-    """
-    ServiceStations detail view
-    """
-
-    permission_classes = (AllowAny,)
-    serializer_class = serializers.ServiceDetailSerializer
-    queryset = models.Service.objects.all()
-
-
 class NotificationListView(generics.ListAPIView):
     """
     Push-notification list view

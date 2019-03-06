@@ -59,7 +59,8 @@ PROJECT_APPS = [
     'userprofile.apps.UserprofileConfig',
     'catalog.apps.CatalogConfig',
     'base.apps.BaseConfig',
-    'order.apps.OrderConfig'
+    'order.apps.OrderConfig',
+    'car.apps.CarConfig',
 ]
 
 EXTERNAL_APPS = [

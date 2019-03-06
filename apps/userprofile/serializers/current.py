@@ -6,9 +6,11 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, exceptions
 
 from account import models as account_models
-from userprofile import models
 from catalog import models as catalog_models
-from utils import mixins, api_exceptions
+from catalog.serializers import current as catalog_serializers
+from car.serializers import current as car_serializers
+from userprofile import models
+from utils import api_exceptions
 
 
 class FCMDeviceSerializer(serializers.ModelSerializer):
@@ -54,81 +56,98 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CarCreateSerializer(serializers.ModelSerializer):
-    """Serializer for update or create car information"""
+class GeoPositonMixin(serializers.ModelSerializer):
+    """Added additional fields for show geo position in X, Y coord."""
 
-    mark = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarMark.objects.all())
-    model = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarModel.objects.all())
-
-    color = serializers.PrimaryKeyRelatedField(queryset=catalog_models.CarColor.objects.all())
-    license_plate = serializers.CharField()
+    geo_lat = serializers.SerializerMethodField(read_only=True, allow_null=True)
+    geo_lon = serializers.SerializerMethodField(read_only=True, allow_null=True)
 
     class Meta:
         """Meta class"""
+        model = models.Profile
+        fields = ('geo_lat', 'geo_lon')
 
-        model = models.Car
-        fields = ('mark', 'model', 'color', 'license_plate')
+    def get_geo_lat(self, obj):
+        """Point(longitude, latitude)"""
+        if isinstance(obj.user.profilelocation.location, Point):
+            return obj.user.profilelocation.location.y
 
-    def validat(self, attrs):
-        if attrs.get('mark') != attrs.get('model').makrs.all():
-            raise!!
-
-
-    def create(self, validated_data):
-        """Override create method"""
-        import ipdb; ipdb.set_trace()
-        validated_data['user'] = self.context.get('request').user
-        return super().create(validated_data)
+    def get_geo_lon(self, obj):
+        """Point(longitude, latitude)"""
+        if isinstance(obj.user.profilelocation.location, Point):
+            return obj.user.profilelocation.location.x
 
 
-class ProfileSerializer(serializers.ModelSerializer,
-                         mixins.ProfileMixin):  ## PrimaryKeyRelatedField
-    """Serializer for retrieving user profile"""
+class ProfileCarDetailSerializer(serializers.ModelSerializer):
+    """Serializer for ProfileCar"""
 
-    # # RESPONSE
+    color_name = serializers.CharField(source='color.name')
+    car = car_serializers.CarDetailSerializer()
 
-    phone = PhoneNumberField(read_only=True, source='user.phone')
-    # REQUEST
-    # city_id = serializers.IntegerField()
-    # car = CarCreateSerializer(source='user.car', write_only=True)
+    class Meta:
+        """meta model"""
+
+        model = models.ProfileCar
+        fields = ('id', 'created', 'modified', 'color_name', 'license_plate', 'car')
+
+
+class ProfileViewSerializer(serializers.ModelSerializer):
+    """Profile serializer for Requests"""
+
+    phone = serializers.CharField(source='user.phone')
+    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = (
-                    'id', 'user_id',
-                     'first_name', 'last_name', 'middle_name',
-                  'phone', 'avatar', 
-
-                  'city_id', 
-
-                  # 'friends_id', 'blacklist_id',
-                  # 'car'
-                  #'geo_lat', 'geo_lon'
+        fields = ('id', 'first_name', 'last_name', 'middle_name',
+                  'phone', 'profile_car'
                   )
+
+
+class ProfileSerializer(GeoPositonMixin):
+    """Serializer for retrieving user profile"""
+
+    # RESPONSE
+    phone = PhoneNumberField(read_only=True, source='user.phone')
+    city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
+    car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+    #   or  #
+    # car = serializers.CharField(source='get_car_info')
+
+    # REQUEST
+    city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
+                                              write_only=True)
+
+    class Meta:
+        """Meta class"""
+
+        model = models.Profile
+        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
+                  'phone', 'avatar', 'city', 'city_detail',
+                  'car', 'geo_lat', 'geo_lon')
 
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.y
+        if isinstance(obj.user.profilelocation.location, Point):
+            return obj.user.profilelocation.location.y
 
     def get_geo_lon(self, obj):
         """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.x
+        if isinstance(obj.user.profilelocation.location, Point):
+            return obj.user.profilelocation.location.x
 
 
-class ProfileListSerializer(serializers.ModelSerializer):
+class ProfileListSerializer(GeoPositonMixin):
     """Serializer for ProfileListView"""
-
-    license_plate = serializers.CharField(source='user.car_set.first.license_plate', allow_null=True)
 
     class Meta:
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'user_id', 'avatar',
-                  'first_name', 'last_name', 'license_plate')
+                  'first_name', 'last_name', 'geo_lat',
+                  'geo_lon')
 
 
 class ProfileFriendListSerializer(serializers.ModelSerializer):
@@ -146,10 +165,10 @@ class ProfileBlackListSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'foe_id')
+        fields = ('id', 'created', 'foe')
 
 
-class FriendListPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
+class FriendRequestPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     """Override PrimaryKeyRelatedField"""
 
     def to_internal_value(self, data):
@@ -157,36 +176,70 @@ class FriendListPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
             data = self.pk_field.to_internal_value(data)
         try:
             request_user = self.context.get('request').user
+            if request_user.id == data:
+                raise api_exceptions.EqualIDError()
             qs = self.get_queryset().filter(
-                # Get all users in qs that are NOT in my BlackList
-                ~Q(id__in=Subquery(models.FriendRequest.objects.my_list(request_user).values('invited__id'))))
+                # Get all users in qs that are NOT in my FriendRequest
+                ~Q(id__in=Subquery(models.FriendRequest.objects.my_requests(request_user).values('invited__id'))))
             return qs.get(pk=data)
         except ObjectDoesNotExist:
-            raise api_exceptions.AlreadyFriends(owner=request_user.id,
-                                                user=data)
+            raise api_exceptions.FriendRequestAlreadyExists(owner=request_user.id,
+                                                            invited=data)
         except (TypeError, ValueError):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
 
+class FriendRequestDetailSerializer(GeoPositonMixin):
+    """Serializer for model FriendRequest"""
+
+    car = serializers.CharField(source='get_car_info')
+
+    class Meta:
+        """Meta class"""
+        model = models.Profile
+        fields = ('id', 'created', 'user_id', 'first_name',
+                  'last_name', 'car', 'geo_lat', 'geo_lon')
+
+
 class FriendRequestSerializer(serializers.ModelSerializer):
-    """Serializer class for FriendRequest"""
+    """Serializer for model FriendRequest"""
 
     # REQUEST
-    user_id = FriendListPrimaryKeyRelatedField(queryset=account_models.User.objects.all(),
-                                               source='invited')
+    # invited user
+    user = FriendRequestPrimaryKeyRelatedField(queryset=account_models.User.objects.all(),
+                                               source='invited',
+                                               write_only=True)
 
     # RESPONSE
-    approved = serializers.BooleanField(read_only=True)
+    # detail of invited user
+    invited = FriendRequestDetailSerializer(source='invited.profile', read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.FriendRequest
-        fields = ('id', 'created', 'user_id', 'approved')
+        fields = ('id', 'created', 'invited', 'user', 'approved')
 
     def create(self, validated_data):
         """Override create-method"""
-        validated_data['user'] = self.context.get('request').user
-        return super().create(validated_data)
+        validated_data['owner'] = self.context.get('request').user
+        friend_request = models.FriendRequest.objects.make(owner=validated_data['owner'],
+                                                           user=validated_data['invited'])
+        return friend_request
+
+
+class FriendRequestApproveSerializer(serializers.ModelSerializer):
+    """Serializer for model FriendRequest"""
+
+    class Meta:
+        """Meta class"""
+        model = models.FriendRequest
+        fields = ('approved',)
+
+    def update(self, instance, validated_data):
+        """Override update method"""
+        instance.approved = True
+        instance.save()
+        return instance
 
 
 class BlackListPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
@@ -208,7 +261,7 @@ class BlackListPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
             self.fail('incorrect_type', data_type=type(data).__name__)
 
 
-class BlackListRequestSerializer(serializers.ModelSerializer):
+class BlackListCreateSerializer(serializers.ModelSerializer):
     """Serializer class for BlackListRequest"""
 
     # REQUEST
@@ -224,24 +277,3 @@ class BlackListRequestSerializer(serializers.ModelSerializer):
         """Override create method"""
         validated_data['owner'] = self.context.get('request').user
         return super().create(validated_data)
-
-
-class CarListSerializer(serializers.ModelSerializer):
-    """Car list serialzier"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Car
-        fields = ('id', 'created', 'user')
-
-
-class CarDetailSerializer(serializers.ModelSerializer):
-    """Car detail serialzier"""
-
-    class Meta:
-        """Meta model"""
-
-        model = models.Car
-        fields = ('id', 'created', 'modified', 'user', 'mark',
-                  'model', 'color', 'license_plate')

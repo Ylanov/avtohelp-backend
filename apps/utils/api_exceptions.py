@@ -125,3 +125,14 @@ class FriendRequestAlreadyExists(ValidationErrorMixin):
         self.default_detail = dict(detail=self.default_detail % (owner, invited),
                                    status_code=self.extended_status_code)
         super().__init__()
+
+
+class EqualIDError(ValidationErrorMixin):
+    """Sent IDs are the same"""
+    default_detail = _('Sent IDs are the same')
+    extended_status_code = '%s.7' % ValidationErrorMixin.status_code
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()

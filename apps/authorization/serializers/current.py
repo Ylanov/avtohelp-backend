@@ -17,14 +17,14 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     """Verification phone serializer"""
 
     phone = PhoneNumberField(write_only=True)
-    city_id = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
-                                                 write_only=True)
+    city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
+                                              write_only=True)
 
     class Meta:
         """Override create method"""
 
         model = models.SMSCode
-        fields = ('phone', 'city_id')
+        fields = ('phone', 'city')
 
     def validate(self, attrs):
         """Validate method."""
@@ -49,7 +49,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         """Create method."""
         # make a new user
         user = User.objects.get_or_make(phone=validated_data.get('phone'),
-                                        city=validated_data.pop('city_id'))[0]
+                                        city=validated_data.pop('city'))[0]
         # make a new sms
         obj = models.SMSCode.objects.make(user=user,  **validated_data)
         # send actual sms logic
@@ -60,12 +60,12 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         return obj
 
 
-class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
+class AuthorizationView(serializers.ModelSerializer):
     """Authentication serializer"""
 
     # REQUEST
-    code = serializers.CharField(label=_('Code'), write_only=True)
-    phone = PhoneNumberField(label=_("Phone"), write_only=True)
+    code = serializers.CharField(write_only=True)
+    phone = PhoneNumberField(write_only=True)
 
     # RESPONSE
     token = serializers.CharField(read_only=True, source='user.auth_token')
@@ -93,7 +93,7 @@ class AuthorizationView(serializers.ModelSerializer, AuthorizationMixin):
             return attrs
         else:
             # get or create UserLock object by user
-            user_lock = profile_models.UserLock.objects.get_or_create(user=user)[0]
+            user_lock = models.UserLock.objects.get_or_create(user=user)[0]
 
             # check if attempts exhausted
             if user_lock.attempts == settings.SMS_INPUT_ATTEMPTS:

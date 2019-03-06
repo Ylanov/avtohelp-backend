@@ -60,7 +60,7 @@ def success_authorization(user_id):
 def reset_attempts(user_id):
     """Reset user attempts"""
 
-    userlock_qs = profile_models.UserLock.objects.filter(user=user_id)
+    userlock_qs = auth_models.UserLock.objects.filter(user=user_id)
     # reset attempts
     if userlock_qs.exists():
         userlock_qs.first().reset_attempts()

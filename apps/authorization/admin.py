@@ -16,5 +16,11 @@ class SMSCodeModelAdmin(admin.ModelAdmin):
     )
 
 
+class UserLockModelAdmin(admin.ModelAdmin):
+    """Custom admin page for UserLock"""
+    list_display = ('id', 'user', 'created', 'modified')
+
+
 # Register your models here.
 admin.site.register(models.SMSCode, SMSCodeModelAdmin)
+admin.site.register(models.UserLock, UserLockModelAdmin)

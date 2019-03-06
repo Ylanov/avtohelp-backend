@@ -44,7 +44,6 @@ class AuthorizationMixin(object):
 
     def validate_phone(self, value):
         """Validate phone"""
-
         qs = account_models.User.objects.filter(phone=value.as_e164)
         if not qs.exists():
             raise ValidationError(detail={
@@ -54,19 +53,7 @@ class AuthorizationMixin(object):
 
     def validate_code(self, value):
         """Validate code method."""
-
         pattern = r'[0-9]{4}'
         if not re.fullmatch(pattern, str(value)):
             raise ValidationError(_('Invalid code'))
-        return value
-
-
-class ProfileMixin(object):
-    """Profile mixin"""
-
-    def validate_city_id(self, value):
-        """Validator for city"""
-        qs = catalog_models.City.objects.filter(id=value)
-        if not qs.exists():
-            raise CityNotFound(city_id=value)
         return value
