@@ -34,11 +34,19 @@ class CarDetailView(generics.RetrieveUpdateAPIView):
 
 
 class CarMarkListView(generics.ListAPIView):
-    """Car brands list view"""
+    """
+    Car brands list view
+    With filter by fields:
+    :param model_name: Search by field car model name
+    :param model_id: Search by field car model id
+    :type model_name: CharField Caldina
+    :type model_id: IntegerField 1
+    """
 
     permission_classes = (AllowAny,)
     serializer_class = serializers.CarMarkListSerializer
     queryset = models.CarMark.objects.all()
+    filter_class = filters.CarMarkListFilterSet
     pagination_class = None
 
 
@@ -68,11 +76,19 @@ class CarColorDetailView(generics.RetrieveAPIView):
 
 
 class CarModelListView(generics.ListAPIView):
-    """Car brands list view"""
+    """
+    Car model list view
+    With filter by fields:
+    :param mark_name: Search by field car mark name
+    :param mark_id: Search by field car mark id
+    :type mark_name: CharField Toyota
+    :type mark_id: IntegerField 1
+    """
 
     permission_classes = (AllowAny,)
     serializer_class = serializers.CarModelListSerializer
     queryset = models.CarModel.objects.all()
+    filter_class = filters.CarModelListFilterSet
     pagination_class = None
 
 
