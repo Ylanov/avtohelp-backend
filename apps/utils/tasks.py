@@ -3,13 +3,13 @@ import logging
 from celery import shared_task
 from celery.schedules import crontab
 from celery.task import periodic_task
-
-from authorization import models as auth_models
-from userprofile import models as profile_models
-from order import models as order_models
 from django.conf import settings
 from django.utils import timezone
+from fcm_django.models import FCMDevice
+from django.utils.translation import ugettext_lazy as _
 
+from authorization import models as auth_models
+from order import models as order_models
 
 logger = logging.getLogger('CELERY')
 
@@ -37,7 +37,6 @@ def send_verification_sms(sms_code_id):
 @shared_task
 def not_completed_authorization(user_id):
     """Authorization was not completed"""
-
     try:
         reset_attempts(user_id=user_id)
         auth_models.SMSCode.objects.decline_all_by_user(user=user_id)
@@ -59,7 +58,6 @@ def success_authorization(user_id):
 @shared_task
 def reset_attempts(user_id):
     """Reset user attempts"""
-
     userlock_qs = auth_models.UserLock.objects.filter(user=user_id)
     # reset attempts
     if userlock_qs.exists():
@@ -69,7 +67,6 @@ def reset_attempts(user_id):
 @shared_task
 def change_smscode_status(user_id, status):
     """Change SMSCode object status"""
-
     smscode = auth_models.SMSCode.objects.get(user=user_id)
     smscode.status = status
     smscode.save()
@@ -87,3 +84,17 @@ def check_request_relevance():
             if expired_date >= timedelta:
                 request.status = order_models.AssistanceRequest.EXPIRED
                 request.save()
+
+
+@shared_task
+def notify_users(title=None, body=None):
+    """Notify users about assistance request"""
+    if not (title or body) or not (title and body):
+        title = _('New assistance request')
+        body = _('New assistance request was published')
+    devices = FCMDevice.objects.all()
+    count = devices.send_message(title=title, body=body)
+    if count > 0:
+        logger.info(f'Users notified: {count}')
+    else:
+        logger.info(f'Error was occurred when sending PUSH-notifications')

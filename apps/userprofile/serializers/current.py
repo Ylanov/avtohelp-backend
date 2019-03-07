@@ -7,6 +7,7 @@ from rest_framework import serializers, exceptions
 
 from account import models as account_models
 from catalog import models as catalog_models
+from car import models as car_models
 from catalog.serializers import current as catalog_serializers
 from car.serializers import current as car_serializers
 from userprofile import models
@@ -137,6 +138,52 @@ class ProfileSerializer(GeoPositonMixin):
         """Point(longitude, latitude)"""
         if isinstance(obj.user.profilelocation.location, Point):
             return obj.user.profilelocation.location.x
+
+
+class ProfileCarCreateSerializer(serializers.ModelSerializer):
+    """Serializer class for ProfileCarCreateView"""
+
+    color = serializers.PrimaryKeyRelatedField(queryset=car_models.CarColor.objects.all(),
+                                               write_only=True)
+    mark = serializers.PrimaryKeyRelatedField(source='car.mark', queryset=car_models.CarMark.objects.all(),
+                                              write_only=True)
+    car_model = serializers.PrimaryKeyRelatedField(source='car.car_model', queryset=car_models.CarModel.objects.all(),
+                                                   write_only=True)
+    license_plate = serializers.CharField()
+
+    # RESPONSE
+    color_name = serializers.CharField(source='color.name', read_only=True)
+    car = car_serializers.CarDetailSerializer(read_only=True)
+
+    class Meta:
+        """meta model"""
+
+        model = models.ProfileCar
+        fields = ('id', 'created', 'modified', 'color',
+                  'mark', 'car_model', 'color_name', 'license_plate',
+                  'car'
+                  )
+
+    def create(self, validated_data):
+        """Override validated data"""
+        validated_data['owner'] = self.context.get('request').user
+        validated_data['car'] = car_models.Car.objects.get(**validated_data.pop('car'))
+        return super(ProfileCarCreateSerializer, self).create(validated_data)
+
+
+class ProfileCarListSerializer(serializers.ModelSerializer):
+    """Serializer class for ProfileCarCreateView"""
+
+    # RESPONSE
+    color_name = serializers.CharField(source='color.name', read_only=True)
+    car = car_serializers.CarDetailSerializer(read_only=True)
+
+    class Meta:
+        """meta model"""
+
+        model = models.ProfileCar
+        fields = ('id', 'created', 'modified', 'color_name',
+                  'license_plate', 'car')
 
 
 class ProfileListSerializer(GeoPositonMixin):

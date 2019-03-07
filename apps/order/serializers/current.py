@@ -3,6 +3,8 @@ from rest_framework import serializers
 
 from order import models
 from userprofile.serializers import current as profile_serializers
+from utils import tasks
+from django.conf import settings
 
 
 class AssistanceRequestMixin(serializers.ModelSerializer):
@@ -78,3 +80,11 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
             setattr(instance, 'geo_lon', float(0))
         return super().to_representation(instance)
 
+    def create(self, validated_data):
+        """Override create method"""
+        #  todo: provide the api_key in the google-services.json file
+        # if settings.USE_CELERY:
+        #     tasks.notify_users.delay()
+        # else:
+        #     tasks.notify_users()
+        return super(AssistanceRequestCreateSerializer, self).create(validated_data)

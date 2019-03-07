@@ -112,7 +112,61 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Override get object method"""
         return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
-        
+
+
+class ProfileCarCreateView(generics.CreateAPIView):
+    """
+    View for creating profile car
+    REQUEST:
+    {
+        "car_model": PrimaryKeyRelatedField,
+        "mark": PrimaryKeyRelatedField,
+        "color": PrimaryKeyRelatedField,
+        "license_plate": CharField
+    }
+    RESPONSE: object
+    :return: object
+    """
+    serializer_class = serializers.ProfileCarCreateSerializer
+    queryset = models.ProfileCar.objects.select_related('owner', 'car', 'color', 'car__mark',
+                                                        'car__car_model__mark').all()
+
+
+class ProfileCarDeleteView(generics.DestroyAPIView):
+    """
+    View for delete profile car
+    RESPONSE: None
+    :return: None
+    """
+    queryset = models.ProfileCar.objects.select_related('owner', 'car', 'color', 'car__mark',
+                                                        'car__car_model__mark').all()
+
+
+class ProfileCarDetailView(generics.RetrieveUpdateAPIView):
+    """
+    View for retrieve profile car
+    :return: object
+    """
+    serializer_class = serializers.ProfileCarCreateSerializer
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.ProfileCar.objects.select_related('owner', 'car', 'color', 'car__mark',
+                                                        'car__car_model__mark').filter(owner=self.request.user)
+
+
+class ProfileCarListView(generics.ListAPIView):
+    """
+    View for retrieve profile cars
+    :return: object
+    """
+    serializer_class = serializers.ProfileCarListSerializer
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.ProfileCar.objects.select_related('owner', 'car', 'color', 'car__mark',
+                                                        'car__car_model__mark').filter(owner=self.request.user)
+
 
 class ProfileFriendListView(generics.ListAPIView):
     """
@@ -120,11 +174,10 @@ class ProfileFriendListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.ProfileFriendListSerializer
-    queryset = models.FriendList.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.my_list(user=self.request.user)
+        return models.FriendList.objects.my_list(user=self.request.user)
 
 
 class FriendRequestCreateView(generics.CreateAPIView):
@@ -159,11 +212,10 @@ class FriendRequestListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.FriendRequestSerializer
-    queryset = models.FriendRequest.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.requests(user=self.request.user)
+        return models.FriendRequest.objects.requests(user=self.request.user)
 
 
 class MyFriendRequestListView(generics.ListAPIView):
@@ -172,11 +224,10 @@ class MyFriendRequestListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.FriendRequestSerializer
-    queryset = models.FriendRequest.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.my_requests(user=self.request.user)
+        return models.FriendRequest.objects.my_requests(user=self.request.user)
 
 
 class FriendRequestDetailView(generics.RetrieveAPIView):
@@ -194,11 +245,10 @@ class ProfileBlackListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.ProfileBlackListSerializer
-    queryset = models.BlackList.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.my_list(user=self.request.user)
+        return models.BlackList.objects.my_list(user=self.request.user)
 
 
 class BlackListCreateCreateView(generics.CreateAPIView):
