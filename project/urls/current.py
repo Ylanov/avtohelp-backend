@@ -11,4 +11,5 @@ urlpatterns = [
     path('catalog/', include('catalog.urls.current')),
     path('userprofile/', include('userprofile.urls.current')),
     path('order/', include('order.urls.current')),
+    path('chat/', include('chat.urls.current'))
 ]

@@ -57,3 +57,4 @@ virtualenv==16.4.1
 virtualenv-clone==0.5.1
 wcwidth==0.1.7
 phonenumbers==8.10.6
+channels==2.1.7

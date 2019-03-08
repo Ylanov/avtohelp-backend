@@ -61,6 +61,7 @@ PROJECT_APPS = [
     'base.apps.BaseConfig',
     'order.apps.OrderConfig',
     'car.apps.CarConfig',
+    'chat.apps.ChatConfig'
 ]
 
 EXTERNAL_APPS = [
