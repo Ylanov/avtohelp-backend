@@ -34,6 +34,8 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     # REQUEST
     sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     receiver = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    # COMMON
     message = serializers.CharField()
 
     class Meta:

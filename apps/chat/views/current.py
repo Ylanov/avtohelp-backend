@@ -2,6 +2,9 @@ from rest_framework import generics
 from chat.serializers import current as serializers
 from chat import models
 from account.models import User
+from django.shortcuts import render
+from django.utils.safestring import mark_safe
+import json
 
 
 class MessageListView(generics.ListAPIView):
@@ -21,3 +24,12 @@ class MessageCreateView(generics.CreateAPIView):
 
     serializer_class = serializers.MessageCreateSerializer
     queryset = models.Message.objects.all()
+
+
+def room(request, room_name):
+    return render(request, 'chat/room.html', {
+        'room_name_json': mark_safe(json.dumps(room_name))
+    })
+
+def index(request):
+    return render(request, 'chat/index.html', {})

@@ -45,6 +45,7 @@ pyfcm==1.4.5
 Pygments==2.3.1
 pytz==2018.9
 redis==3.2.0
+channels_redis==2.3.3
 requests==2.21.0
 requests-toolbelt==0.9.1
 simplejson==3.16.0
