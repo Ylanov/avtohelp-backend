@@ -65,12 +65,11 @@ class ProfileCarQuerySet(models.QuerySet):
 class ProfileCar(BaseMixin):
     """User profile car"""
 
+    # NOTE: ProfileCar with FK to User )
     owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
     car = models.ForeignKey('car.Car', on_delete=models.PROTECT)
-    color = models.ForeignKey('car.CarColor',
-                              on_delete=models.CASCADE)
-    license_plate = models.CharField(max_length=255,
-                                     verbose_name=_('License plate'))
+    color = models.ForeignKey('car.CarColor',on_delete=models.CASCADE)
+    license_plate = models.CharField(max_length=255, verbose_name=_('License plate'))
 
     class Meta:
         """Meta class"""
@@ -134,14 +133,12 @@ class FriendRequestManager(models.Manager):
 class FriendRequest(BaseMixin):
     """Friend request model"""
 
-    owner = models.ForeignKey('account.User',
-                              verbose_name=_('Owner'),
-                              on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User', verbose_name=_('Owner'), on_delete=models.CASCADE)
     invited = models.ForeignKey('account.User',
                                 verbose_name=_('Invited user'),
-                                related_name='friendrequest_invited', on_delete=models.CASCADE)
-    approved = models.BooleanField(default=False,
-                                   verbose_name=_('Status'))
+                                related_name='friendrequest_invited',
+                                on_delete=models.CASCADE)
+    approved = models.BooleanField(default=False, verbose_name=_('Status'))
 
     objects = FriendRequestManager.from_queryset(FriendRequestQuerySet)()
 
@@ -197,6 +194,11 @@ class FriendList(BaseMixin):
         verbose_name = _('Friend list')
         verbose_name_plural = _('Friend lists')
 
+# user = request.user  # I AM
+# User.objects.exclude(
+#     models.Q(blacklist_owner=user) | models.Q(blacked_user=user)
+# ).exclude(user)
+
 
 class BlackListQuerySet(models.QuerySet):
     """Custom QuerySet for model BlackList"""
@@ -208,6 +210,9 @@ class BlackListQuerySet(models.QuerySet):
     def in_list(self, user):
         """User in someones blacklist"""
         return self.filter(foe=user)
+
+    def somewhere(self, user):
+        return self.filter(models.Q(owner=user) | models.Q(foe=user))
 
     def are_foes(self, owner, user):
         """Check if owner has an enemy"""

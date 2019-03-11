@@ -33,9 +33,11 @@ class NotificationListView(generics.ListAPIView):
     Push-notification list view
     """
 
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny,)  # NOTE: rly?
     serializer_class = serializers.NotificationListSerializer
     queryset = models.PushNotification.objects.all()
+    # NOTE: PushNotification.user is Foreign key
+    # TODO: change get_queryset method to filter it by request.user 
 
 
 class NotificationDetailView(generics.RetrieveAPIView):

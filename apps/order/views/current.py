@@ -25,9 +25,11 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
         user = self.request.user
         return self.queryset.filter(
             # Get all users that are NOT in my BlackList
-            ~Q(user__id__in=Subquery(profile_models.BlackList.objects.my_list(user).values('foe__id')))).filter(
+            ~Q(user__id__in=Subquery(profile_models.BlackList.objects.my_list(user).values('foe__id')))
+        ).filter(
             # Get all users in which I can't be blacklisted
-            ~Q(user__id__in=Subquery(profile_models.BlackList.objects.in_list(user).values('owner__id'))))
+            ~Q(user__id__in=Subquery(profile_models.BlackList.objects.in_list(user).values('owner__id')))
+        )
 
 
 class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):

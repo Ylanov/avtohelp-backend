@@ -123,6 +123,7 @@ class ProfileSerializer(GeoPositonMixin):
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
                                               write_only=True)
 
+    # location = ProfileLocation(source='user.profilelocation')
     class Meta:
         """Meta class"""
 

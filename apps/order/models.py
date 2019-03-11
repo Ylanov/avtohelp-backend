@@ -9,6 +9,11 @@ class AssistanceRequestManager(models.Manager):
     """Custom manager fro model AssistanceRequest"""
     pass
 
+    # NOTE: If You don't need a manager you can use
+    # objects = AssistanceRequestQuerySet.as_manager()
+    # So You don't need to define a useless class
+    # https://docs.djangoproject.com/en/2.1/topics/db/managers/#create-manager-with-queryset-methods
+
 
 class AssistanceRequestQuerySet(models.QuerySet):
     """Custom QuerySet for AssistanceRequest"""
