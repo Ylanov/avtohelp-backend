@@ -32,8 +32,8 @@ class MessageCreateSerializer(serializers.ModelSerializer):
     receiver = ChatProfileDetailSerializer(source='receiver.profile', read_only=True)
 
     # REQUEST
-    sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-    receiver = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    sender = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_active=True))
+    receiver = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_active=True))
 
     # COMMON
     message = serializers.CharField()

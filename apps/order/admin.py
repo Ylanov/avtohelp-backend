@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
+
 from .models import AssistanceRequest
 
 
@@ -9,7 +10,7 @@ class AssistanceRequestModelAdmin(admin.ModelAdmin):
     readonly_fields = ('id', 'created', 'modified')
     list_display = ('id', 'user', 'created', 'modified')
     fieldsets = (
-        (_('User\'s data'), {'fields': ('user', 'car',)}),
+        (_('User\'s data'), {'fields': ('user',)}),
         (_('Assistance request'), {'fields': ('issue', 'description')}),
         (_('Location'), {'fields': ('location',)}),
         (_('Info'), {'fields': ('created', 'modified')}),

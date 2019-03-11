@@ -12,6 +12,7 @@ from catalog.serializers import current as catalog_serializers
 from car.serializers import current as car_serializers
 from userprofile import models
 from utils import api_exceptions
+from utils.serializers import GeoPositonMixin
 
 
 class FCMDeviceSerializer(serializers.ModelSerializer):
@@ -57,29 +58,6 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
         return instance
 
 
-# NOTE: user utils.serializers.CoordinatesSerializer
-class GeoPositonMixin(serializers.ModelSerializer):
-    """Added additional fields for show geo position in X, Y coord."""
-
-    geo_lat = serializers.SerializerMethodField(read_only=True, allow_null=True)
-    geo_lon = serializers.SerializerMethodField(read_only=True, allow_null=True)
-
-    class Meta:
-        """Meta class"""
-        model = models.Profile
-        fields = ('geo_lat', 'geo_lon')
-
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.y
-
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.x
-
-
 class ProfileCarDetailSerializer(serializers.ModelSerializer):
     """Serializer for ProfileCar"""
 
@@ -108,8 +86,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
                   )
 
 
-# NOTE: user utils.serializers.CoordinatesSerializer
-class ProfileSerializer(GeoPositonMixin):
+class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for retrieving user profile"""
 
     # RESPONSE
@@ -123,7 +100,6 @@ class ProfileSerializer(GeoPositonMixin):
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
                                               write_only=True)
 
-    # location = ProfileLocation(source='user.profilelocation')
     class Meta:
         """Meta class"""
 
@@ -131,16 +107,6 @@ class ProfileSerializer(GeoPositonMixin):
         fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
                   'phone', 'avatar', 'city', 'city_detail',
                   'car', 'geo_lat', 'geo_lon')
-
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.y
-
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.x
 
 
 class ProfileCarCreateSerializer(serializers.ModelSerializer):
@@ -189,7 +155,7 @@ class ProfileCarListSerializer(serializers.ModelSerializer):
                   'license_plate', 'car')
 
 
-class ProfileListSerializer(GeoPositonMixin):
+class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for ProfileListView"""
 
     class Meta:
@@ -218,28 +184,7 @@ class ProfileBlackListSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'foe')
 
 
-class FriendRequestPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-    """Override PrimaryKeyRelatedField"""
-
-    def to_internal_value(self, data):
-        if self.pk_field is not None:
-            data = self.pk_field.to_internal_value(data)
-        try:
-            request_user = self.context.get('request').user
-            if request_user.id == data:
-                raise api_exceptions.EqualIDError()
-            qs = self.get_queryset().filter(
-                # Get all users in qs that are NOT in my FriendRequest
-                ~Q(id__in=Subquery(models.FriendRequest.objects.my_requests(request_user).values('invited__id'))))
-            return qs.get(pk=data)
-        except ObjectDoesNotExist:
-            raise api_exceptions.FriendRequestAlreadyExists(owner=request_user.id,
-                                                            invited=data)
-        except (TypeError, ValueError):
-            self.fail('incorrect_type', data_type=type(data).__name__)
-
-
-class FriendRequestDetailSerializer(GeoPositonMixin):
+class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for model FriendRequest"""
 
     car = serializers.CharField(source='get_car_info')
@@ -256,9 +201,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     # REQUEST
     # invited user
-    user = FriendRequestPrimaryKeyRelatedField(queryset=account_models.User.objects.all(),
-                                               source='invited',
-                                               write_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=account_models.User.objects.all(),
+                                              source='invited',
+                                              write_only=True)
 
     # RESPONSE
     # detail of invited user
@@ -268,6 +213,20 @@ class FriendRequestSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.FriendRequest
         fields = ('id', 'created', 'invited', 'user', 'approved')
+
+    def validate(self, attrs):
+        """Override validate method"""
+        user = self.context.get('request').user
+        invited = attrs.get('invited')
+        if user.id == invited.id:
+            raise api_exceptions.EqualIDError()
+        # Check existed request
+        in_pending = models.FriendRequest.objects.waiting(user=user,
+                                                          invited=invited)
+        if in_pending:
+            raise api_exceptions.FriendRequestAlreadyExists(owner=user.id,
+                                                            invited=invited.id)
+        return attrs
 
     def create(self, validated_data):
         """Override create-method"""
@@ -287,41 +246,34 @@ class FriendRequestApproveSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """Override update method"""
-        instance.approved = True
-        instance.save()
-        return instance
-
-
-class BlackListPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
-    """Override PrimaryKeyRelatedField"""
-
-    def to_internal_value(self, data):
-        if self.pk_field is not None:
-            data = self.pk_field.to_internal_value(data)
-        try:
-            request_user = self.context.get('request').user
-            qs = self.get_queryset().filter(
-                # Get all users in qs that are NOT in my BlackList
-                ~Q(id__in=Subquery(models.BlackList.objects.my_list(request_user).values('foe__id'))))
-            return qs.get(pk=data)
-        except ObjectDoesNotExist:
-            raise api_exceptions.AlreadyBlacked(owner=request_user.id,
-                                                user=data)
-        except (TypeError, ValueError):
-            self.fail('incorrect_type', data_type=type(data).__name__)
+        return instance.approve(owner=instance.owner, invited=instance.invited)
 
 
 class BlackListCreateSerializer(serializers.ModelSerializer):
     """Serializer class for BlackListRequest"""
 
     # REQUEST
-    user_id = BlackListPrimaryKeyRelatedField(queryset=account_models.User.objects.filter(),
-                                              source='foe')
+    user_id = serializers.PrimaryKeyRelatedField(queryset=account_models.User.objects.filter(),
+                                                 source='foe')
 
     class Meta:
         """Meta class"""
         model = models.BlackList
         fields = ('id', 'created', 'user_id')
+
+    def validate(self, attrs):
+        """Override validate method"""
+        user = self.context.get('request').user
+        foe = attrs.get('foe')
+        if user.id == foe.id:
+            raise api_exceptions.EqualIDError()
+        # Check existed request
+        in_pending = models.BlackList.objects.are_foes(owner=user,
+                                                       user=foe)
+        if in_pending:
+            raise api_exceptions.AlreadyBlacked(owner=user.id,
+                                                user=foe.id)
+        return attrs
 
     def create(self, validated_data):
         """Override create method"""

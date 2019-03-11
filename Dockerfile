@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.7.2
 ENV PYTHONUNBUFFERED 1
 RUN apt-get update ; apt-get --assume-yes install binutils libproj-dev gdal-bin
 

@@ -55,25 +55,14 @@ class ProfileListView(generics.ListAPIView):
     :type license_plate: CharField "aaa123бб 70"
     """
 
-    pagination_class = None
     serializer_class = serializers.ProfileListSerializer
     filter_class = filters.ProfileListFilterSet
-    queryset = models.Profile.objects.all().select_related(
-        'user',
-    ).order_by('first_name', 'last_name')
 
     def get_queryset(self):
         """Override get_queryset method"""
-        user = self.request.user
-        return self.queryset.filter(
-            # Get all users that are NOT in my BlackList
-            ~Q(user__id__in=Subquery(models.BlackList.objects.my_list(user).values('foe__id')))).filter(
-            # Get all users in which I can't be blacklisted
-            ~Q(user__id__in=Subquery(models.BlackList.objects.in_list(user).values('owner__id')))).filter(
-            # Get all users that are NOT in my FriendList
-            ~Q(user__id__in=Subquery(models.FriendList.objects.my_list(user).values('friend__id')))).filter(
-            # Get all users that are NOT in my FriendList
-            ~Q(user__id__in=Subquery(models.FriendList.objects.in_list(user).values('owner__id')))).exclude(user=user)
+        return models.Profile.objects.select_related(
+            'user'
+        ).friendly(self.request.user).order_by('first_name', 'last_name')
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
@@ -205,29 +194,34 @@ class FriendRequestApproveView(generics.UpdateAPIView):
     serializer_class = serializers.FriendRequestApproveSerializer
     queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').not_approved()
 
+    def get_object(self):
+        return models.FriendRequest.objects.get(id=self.kwargs.get('pk'))
+
 
 class FriendRequestListView(generics.ListAPIView):
     """
-    View for retrieve request to add to friend list
+    View for request for adding ME to FriendList
+    Friend requests FROM ME to adding to my list
     """
 
     serializer_class = serializers.FriendRequestSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.requests(user=self.request.user)
+        return models.FriendRequest.objects.requests(invited=self.request.user)
 
 
 class MyFriendRequestListView(generics.ListAPIView):
     """
     View for retrieve user friend requests
+    My friend requests FOR ADDING SMBD to my list
     """
 
     serializer_class = serializers.FriendRequestSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.my_requests(user=self.request.user)
+        return models.FriendRequest.objects.my_requests(owner=self.request.user)
 
 
 class FriendRequestDetailView(generics.RetrieveAPIView):

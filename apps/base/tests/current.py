@@ -2,6 +2,7 @@ from autofixture import AutoFixture
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account import models as account_models
@@ -43,7 +44,7 @@ class TestCatalog(APITestCase):
         # Create news
         AutoFixture(models.Newsletter).create(5)
 
-        api_path = '%s:base:news-list' % self.VERSION
+        api_path = '%s:base:newsletter-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), models.Newsletter.objects.count())
@@ -54,21 +55,27 @@ class TestCatalog(APITestCase):
         # Create news
         news = AutoFixture(models.Newsletter).create(5)
 
-        api_path = '%s:base:news-detail' % self.VERSION
+        api_path = '%s:base:newsletter-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': news[0].id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_notifications_list(self):
         """Test notifications list view"""
+        # Authorize
+        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        api_path = '%s:base:notifications-list' % self.VERSION
+        api_path = '%s:base:pushnotification-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), models.PushNotification.objects.count())
 
     def test_notifications_detail(self):
         """Test notifications detail view"""
+        # Authorize
+        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        api_path = '%s:base:notifications-detail' % self.VERSION
+        api_path = '%s:base:pushnotification-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': self.notification.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -90,20 +90,20 @@ class TestCatalog(APITestCase):
 
     def test_list_car_colors(self):
         """Test view for getting list of users cars colors"""
-        api_path = '%s:car:car_color-list' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carcolor-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.cars_colors)
 
     def test_car_color_detail(self):
         """Test view for getting detail of car color"""
-        api_path = '%s:car:car_color-detail' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carcolor-detail' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path, kwargs={'pk': self.color_1.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_cars_marks_w_filters(self):
         """Test view for getting list of users cars marks with filter by model name"""
-        api_path = '%s:car:car_mark-list' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carmark-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path), data={'model_name': self.toyota_model.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarMark.objects.filter(carmodel__name=self.toyota_model.name).count())
@@ -114,20 +114,20 @@ class TestCatalog(APITestCase):
 
     def test_car_mark_detail(self):
         """Test view for getting detail of car mark"""
-        api_path = '%s:car:car_mark-detail' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carmark-detail' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_cars_model(self):
         """Test view for getting list of users cars model"""
-        api_path = '%s:car:car_model-list' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carmodel-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.car_models)
 
     def test_list_cars_model_w_filters(self):
         """Test view for getting list of users cars model with filters"""
-        api_path = '%s:car:car_model-list' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carmodel-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path), data={'mark_name': self.toyota.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarModel.objects.filter(mark__name=self.toyota.name).count())
@@ -138,7 +138,7 @@ class TestCatalog(APITestCase):
 
     def test_car_model_detail(self):
         """Test view for getting detail of car model"""
-        api_path = '%s:car:car_model-detail' % settings.AVAILABLE_VERSIONS.get('current')
+        api_path = '%s:car:carmodel-detail' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota_model.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -182,7 +182,7 @@ class TestCatalog(APITestCase):
     def test_services_list(self):
         """Test services list view"""
 
-        api_path = '%s:car:service-list' % self.VERSION
+        api_path = '%s:car:carservice-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), CarService.objects.count())
@@ -190,6 +190,6 @@ class TestCatalog(APITestCase):
     def test_services_detail(self):
         """Test services detail view"""
 
-        api_path = '%s:car:service-detail' % self.VERSION
+        api_path = '%s:car:carservice-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': self.service_2.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)

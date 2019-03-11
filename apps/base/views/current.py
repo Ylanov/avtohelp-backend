@@ -1,50 +1,80 @@
-from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
+
 from base import models
 from base.serializers import current as serializers
+from utils import views as view_mixins
 
 
-# Create your views here.
-class NewsListView(generics.ListAPIView):
+"""
+VIEWSETS
+"""
+
+
+class NewsViewSet(viewsets.ModelViewSet):
     """
-    News list view
+    ViewSet for model News
     """
-
-    permission_classes = (AllowAny,)
-    model = models.Newsletter
-    queryset = models.Newsletter.objects.all()
-    serializer_class = serializers.NewsListSerializer
-
-
-class NewsDetailView(generics.RetrieveAPIView):
-    """
-    News detail view
-    """
-
     permission_classes = (AllowAny,)
     model = models.Newsletter
     queryset = models.Newsletter.objects.all()
     serializer_class = serializers.NewsDetailSerializer
 
 
-class NotificationListView(generics.ListAPIView):
+class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewSet):
     """
-    Push-notification list view
-    """
-
-    permission_classes = (AllowAny,)  # NOTE: rly?
-    serializer_class = serializers.NotificationListSerializer
-    queryset = models.PushNotification.objects.all()
-    # NOTE: PushNotification.user is Foreign key
-    # TODO: change get_queryset method to filter it by request.user 
-
-
-class NotificationDetailView(generics.RetrieveAPIView):
-    """
-    Push-notification detail view
+    ViewSet for model Notification
     """
 
-    permission_classes = (AllowAny,)
-    serializer_class = serializers.NotificationListSerializer
-    queryset = models.PushNotification.objects.all()
+    serializer_class = serializers.NotificationDetailSerializer
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.filter(user=self.request.user)
+
+
+"""
+VIEWS
+"""
+
+
+# class NewsListView(generics.ListAPIView):
+#     """
+#     News list view
+#     """
+#
+#     permission_classes = (AllowAny,)
+#     model = models.Newsletter
+#     queryset = models.Newsletter.objects.all()
+#     serializer_class = serializers.NewsListSerializer
+#
+#
+# class NewsDetailView(generics.RetrieveAPIView):
+#     """
+#     News detail view
+#     """
+#
+#     permission_classes = (AllowAny,)
+#     model = models.Newsletter
+#     queryset = models.Newsletter.objects.all()
+#     serializer_class = serializers.NewsDetailSerializer
+#
+#
+# class NotificationListView(view_mixins.NotificationViewMixin, generics.ListAPIView):
+#     """
+#     Push-notification list view
+#     """
+#
+#     serializer_class = serializers.NotificationListSerializer
+#
+#     def get_queryset(self):
+#         """Override get_queryset method"""
+#         return self.queryset.filter(user=self.request.user)
+#
+#
+# class NotificationDetailView(view_mixins.NotificationViewMixin, generics.RetrieveAPIView):
+#     """
+#     Push-notification detail view
+#     """
+#
+#     serializer_class = serializers.NotificationDetailSerializer

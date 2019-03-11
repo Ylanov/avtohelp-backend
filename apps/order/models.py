@@ -1,18 +1,8 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from django.db.models import Q
 from utils.mixins import BaseMixin
-
-
-class AssistanceRequestManager(models.Manager):
-    """Custom manager fro model AssistanceRequest"""
-    pass
-
-    # NOTE: If You don't need a manager you can use
-    # objects = AssistanceRequestQuerySet.as_manager()
-    # So You don't need to define a useless class
-    # https://docs.djangoproject.com/en/2.1/topics/db/managers/#create-manager-with-queryset-methods
 
 
 class AssistanceRequestQuerySet(models.QuerySet):
@@ -25,6 +15,17 @@ class AssistanceRequestQuerySet(models.QuerySet):
     def by_status(self, status):
         """Filter by status"""
         return self.filter(status=status)
+
+    def ordinary(self, user):
+        """
+        Queryset that EXCLUDE requests in which user is owner of blacklist or he is a foe and excluded himself
+        :param user:
+        :type user: object
+        :return: AssistanceRequestQuerySet
+        """
+        return self.exclude(
+            Q(user__blacklist_owner__foe=user) |
+            Q(user__blacked_user__owner=user))
 
 
 class AssistanceRequest(BaseMixin):
@@ -50,7 +51,7 @@ class AssistanceRequest(BaseMixin):
     status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
                                               default=AVAILABLE, choices=STATUS_CHOCIES)
 
-    objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
+    objects = AssistanceRequestQuerySet.as_manager()
 
     class Meta:
         """Meta class"""

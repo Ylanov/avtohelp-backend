@@ -1,24 +1,25 @@
-from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.db import models
-from django.utils import timezone
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
-from catalog import models as catalog_models
-from utils import api_exceptions
 from utils import methods
 from utils.mixins import BaseMixin
 
 
 class ProfileQuerySet(models.QuerySet):
     """Custom QuerySet for model Profile"""
-    pass
 
-
-class ProfileManager(models.Manager):
-    """Custom Manager for model Profile"""
-    pass
+    def friendly(self, user):
+        """
+        Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
+        :param user:
+        :type user: object
+        :return: ProfileQuerySet
+        """
+        return self.exclude(Q(user__blacklist_owner__foe=user) |
+                            Q(user__blacked_user__owner=user)).exclude(user=user)
 
 
 class Profile(BaseMixin):
@@ -35,10 +36,10 @@ class Profile(BaseMixin):
                                    null=True, default=None,
                                    verbose_name=_('Avatar'))
     city = models.ForeignKey('catalog.City',
-                             on_delete=models.CASCADE,
-                             blank=True,
-                             null=True,
-                             default=None)
+                             default=None,
+                             on_delete=models.CASCADE)
+
+    objects = ProfileQuerySet.as_manager()
 
     class Meta:
         """Meta class."""
@@ -68,7 +69,7 @@ class ProfileCar(BaseMixin):
     # NOTE: ProfileCar with FK to User )
     owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
     car = models.ForeignKey('car.Car', on_delete=models.PROTECT)
-    color = models.ForeignKey('car.CarColor',on_delete=models.CASCADE)
+    color = models.ForeignKey('car.CarColor', on_delete=models.CASCADE)
     license_plate = models.CharField(max_length=255, verbose_name=_('License plate'))
 
     class Meta:
@@ -95,13 +96,13 @@ class ProfileLocation(BaseMixin):
 class FriendRequestQuerySet(models.QuerySet):
     """Custom QuerySet for model FriendRequest"""
 
-    def my_requests(self, user):
+    def my_requests(self, owner):
         """My requests to add SOMEONE in my friend list"""
-        return self.filter(owner=user)
+        return self.filter(owner=owner)
 
-    def requests(self, user):
+    def requests(self, invited):
         """Request to add ME in friend list"""
-        return self.filter(invited=user)
+        return self.filter(invited=invited)
 
     def approved(self):
         """Approved requests"""
@@ -126,14 +127,15 @@ class FriendRequestManager(models.Manager):
         """Create friend request"""
         obj = self.model(owner=owner, invited=user)
         obj.save()
-        FriendList.objects.create(owner=owner, friend=user, request=obj)
         return obj
 
 
 class FriendRequest(BaseMixin):
     """Friend request model"""
 
-    owner = models.ForeignKey('account.User', verbose_name=_('Owner'), on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User',
+                              verbose_name=_('Owner'),
+                              on_delete=models.CASCADE)
     invited = models.ForeignKey('account.User',
                                 verbose_name=_('Invited user'),
                                 related_name='friendrequest_invited',
@@ -146,6 +148,15 @@ class FriendRequest(BaseMixin):
         """Meta-class"""
         verbose_name = _('Friend request')
         verbose_name_plural = _('Friend request')
+
+    def approve(self, owner, invited):
+        """Approve friend request"""
+        # update flag
+        self.approved = True
+        self.save()
+        # create new record in FriendList
+        FriendList.objects.create(owner=owner, friend=invited, request=self)
+        return self
 
 
 class FriendListQuerySet(models.QuerySet):
@@ -181,11 +192,11 @@ class FriendList(BaseMixin):
     friend = models.ForeignKey('account.User',
                                verbose_name=_('Friend'),
                                related_name='friendlist_user',
-                               blank=True, null=True, default=None, on_delete=models.CASCADE)
+                               on_delete=models.CASCADE)
     request = models.ForeignKey('FriendRequest',
                                 verbose_name=_('Request'),
                                 related_name='friendlist_request',
-                                blank=True, null=True, default=None, on_delete=models.CASCADE)
+                                on_delete=models.CASCADE)
 
     objects = FriendListManager.from_queryset(FriendListQuerySet)()
 
@@ -236,7 +247,7 @@ class BlackList(BaseMixin):
     foe = models.ForeignKey('account.User',
                             verbose_name=_('Foe'),
                             related_name='blacked_user',
-                            blank=True, null=True, default=None, on_delete=models.CASCADE)
+                            on_delete=models.CASCADE)
 
     objects = BlackListManager.from_queryset(BlackListQuerySet)()
 

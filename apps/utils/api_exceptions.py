@@ -119,7 +119,7 @@ class AlreadyBlacked(ValidationErrorMixin):
 class FriendRequestAlreadyExists(ValidationErrorMixin):
     """Friend request already exists"""
     default_detail = _('Friend request from User ID %s to User ID %s, already exists')
-    extended_status_code = '%s.6' % ValidationErrorMixin.status_code
+    extended_status_code = '%s.7' % ValidationErrorMixin.status_code
 
     def __init__(self, owner, invited):
         self.default_detail = dict(detail=self.default_detail % (owner, invited),
@@ -130,7 +130,7 @@ class FriendRequestAlreadyExists(ValidationErrorMixin):
 class EqualIDError(ValidationErrorMixin):
     """Sent IDs are the same"""
     default_detail = _('Sent IDs are the same')
-    extended_status_code = '%s.7' % ValidationErrorMixin.status_code
+    extended_status_code = '%s.8' % ValidationErrorMixin.status_code
 
     def __init__(self):
         self.default_detail = dict(detail=self.default_detail,

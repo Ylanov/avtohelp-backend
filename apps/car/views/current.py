@@ -1,11 +1,73 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
 
 from car import models, filters
 from car.serializers import current as serializers
 
 
-# Create your views here.
+"""
+VIEWSETS
+"""
+
+
+class CarViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model CarViewSet
+    """
+    serializer_class = serializers.CarDetailSerializer
+    filter_class = filters.CarListFilterSet
+    queryset = models.Car.objects.select_related('mark', 'car_model__mark').all()
+    pagination_class = None
+
+
+class ColorsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model ColorsViewSet
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.CarColorDetailSerializer
+    queryset = models.CarColor.objects.all()
+    pagination_class = None
+
+
+class CarMarksViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model MarksViewSet
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.CarMarkDetailSerializer
+    queryset = models.CarMark.objects.all()
+    filter_class = filters.CarMarkListFilterSet
+    pagination_class = None
+
+
+class CarModelsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model ModelsViewSet
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.CarModelDetailSerializer
+    queryset = models.CarModel.objects.all()
+    filter_class = filters.CarModelListFilterSet
+    pagination_class = None
+
+
+class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model ServiceStationsViewSet
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.ServiceListSerializer
+    queryset = models.CarService.objects.all()
+
+
+
+
+"""
+VIEWS
+"""
+
+
 class CarListView(generics.ListAPIView):
     """
     Car list view

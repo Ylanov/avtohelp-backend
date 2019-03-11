@@ -14,8 +14,8 @@ class MessageListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        sender = generics.get_object_or_404(User.objects.all(), pk=self.kwargs.get('sender'))
-        receiver = generics.get_object_or_404(User.objects.all(), pk=self.kwargs.get('receiver'))
+        sender = generics.get_object_or_404(User.objects.filter(is_active=True), pk=self.kwargs.get('sender'))
+        receiver = generics.get_object_or_404(User.objects.filter(is_active=True), pk=self.kwargs.get('receiver'))
         return models.Message.objects.filter(sender=sender, receiver=receiver)
 
 

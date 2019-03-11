@@ -1,13 +1,12 @@
 from rest_framework import generics, views, status
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from account import models as account_models
-from authorization import models as models
 from authorization.serializers import current as serializers
+from utils import views as view_mixins
 
 
-class PhoneVerificationView(generics.CreateAPIView):
+class PhoneVerificationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIView):
     """
     View for verify user phone number
     Request: {"phone": "+79000000000", "city": 1}
@@ -15,12 +14,10 @@ class PhoneVerificationView(generics.CreateAPIView):
     :return: object
     """
 
-    permission_classes = (AllowAny,)
     serializer_class = serializers.PhoneVerificationSerializer
-    queryset = models.SMSCode.objects.all()
 
 
-class AuthorizationView(generics.CreateAPIView):
+class AuthorizationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIView):
     """
     View for verify user phone
     Request: {"phone": "+79000000000", "code": "1234"}
@@ -28,9 +25,7 @@ class AuthorizationView(generics.CreateAPIView):
     :return: object
     """
 
-    permission_classes = (AllowAny,)
     serializer_class = serializers.AuthorizationView
-    queryset = models.SMSCode.objects.all()
 
 
 class LogoutView(views.APIView):

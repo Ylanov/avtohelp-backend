@@ -37,7 +37,7 @@ class TestOrder(APITestCase):
 
         # Create car models
         self.toyota_model = car_models.CarModel.objects.create(name='Supra',
-                                                                   mark=self.toyota)
+                                                               mark=self.toyota)
 
         # Create car colors
         self.color_1 = car_models.CarColor.objects.create(name='White')

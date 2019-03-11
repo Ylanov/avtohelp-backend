@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from car import models
-from django.contrib.gis.geos.point import Point
+from utils.serializers import CoordinatesSerializer
 
 
 class CarListSerializer(serializers.ModelSerializer):
@@ -104,13 +104,8 @@ class CarDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'mark_name', 'model_name')
 
 
-
-# NOTE: user utils.serializers.CoordinatesSerializer
-class ServiceListSerializer(serializers.ModelSerializer):
+class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
     """Service list serializer"""
-
-    geo_lat = serializers.SerializerMethodField()
-    geo_lon = serializers.SerializerMethodField()
 
     class Meta:
         """Meta model"""
@@ -118,23 +113,9 @@ class ServiceListSerializer(serializers.ModelSerializer):
         model = models.CarService
         fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon')
 
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.y
 
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.x
-
-
-# NOTE: user utils.serializers.CoordinatesSerializer
-class ServiceDetailSerializer(serializers.ModelSerializer):
+class ServiceDetailSerializer(serializers.ModelSerializer, CoordinatesSerializer):
     """Service detail serializer"""
-
-    geo_lat = serializers.SerializerMethodField()
-    geo_lon = serializers.SerializerMethodField()
 
     class Meta:
         """Meta model"""
@@ -143,15 +124,3 @@ class ServiceDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'modified', 'name',
                   'category', 'description', 'geo_lat',
                   'geo_lon', 'phone')
-
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.y
-
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.x
-
-
