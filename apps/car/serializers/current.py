@@ -104,6 +104,8 @@ class CarDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'mark_name', 'model_name')
 
 
+
+# NOTE: user utils.serializers.CoordinatesSerializer
 class ServiceListSerializer(serializers.ModelSerializer):
     """Service list serializer"""
 
@@ -127,6 +129,7 @@ class ServiceListSerializer(serializers.ModelSerializer):
             return obj.location.x
 
 
+# NOTE: user utils.serializers.CoordinatesSerializer
 class ServiceDetailSerializer(serializers.ModelSerializer):
     """Service detail serializer"""
 

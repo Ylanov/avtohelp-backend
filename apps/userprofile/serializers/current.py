@@ -57,6 +57,7 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
         return instance
 
 
+# NOTE: user utils.serializers.CoordinatesSerializer
 class GeoPositonMixin(serializers.ModelSerializer):
     """Added additional fields for show geo position in X, Y coord."""
 
@@ -107,6 +108,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
                   )
 
 
+# NOTE: user utils.serializers.CoordinatesSerializer
 class ProfileSerializer(GeoPositonMixin):
     """Serializer for retrieving user profile"""
 
