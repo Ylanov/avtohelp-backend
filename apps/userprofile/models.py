@@ -21,6 +21,10 @@ class ProfileQuerySet(models.QuerySet):
         return self.exclude(Q(user__blacklist_owner__foe=user) |
                             Q(user__blacked_user__owner=user)).exclude(user=user)
 
+    def friends(self, owner):
+        """User friends"""
+        return self.filter()
+
 
 class Profile(BaseMixin):
     """Profile model"""
@@ -166,13 +170,18 @@ class FriendListQuerySet(models.QuerySet):
         """Get user friends"""
         return self.filter(owner=user, request__approved=True)
 
+    def common(self, user):
+        """Get user friends"""
+        return self.filter(Q(owner=user, request__approved=True) |
+                           Q(friend=user, request__approved=True))
+
     def in_list(self, user):
         """User in someones friendlist"""
         return self.filter(friend=user, request__approved=True)
 
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
-        if self.filter(owner=owner, friend=user).exists():
+        if self.filter(Q(owner=owner, friend=user) | Q(owner=user, friend=owner)).exists():
             return True
         else:
             return False
@@ -205,11 +214,6 @@ class FriendList(BaseMixin):
         verbose_name = _('Friend list')
         verbose_name_plural = _('Friend lists')
 
-# user = request.user  # I AM
-# User.objects.exclude(
-#     models.Q(blacklist_owner=user) | models.Q(blacked_user=user)
-# ).exclude(user)
-
 
 class BlackListQuerySet(models.QuerySet):
     """Custom QuerySet for model BlackList"""
@@ -222,7 +226,7 @@ class BlackListQuerySet(models.QuerySet):
         """User in someones blacklist"""
         return self.filter(foe=user)
 
-    def somewhere(self, user):
+    def common(self, user):
         return self.filter(models.Q(owner=user) | models.Q(foe=user))
 
     def are_foes(self, owner, user):

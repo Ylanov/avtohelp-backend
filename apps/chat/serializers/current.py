@@ -11,7 +11,7 @@ class MessageListSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
 
-        model = models.Message
+        model = models.ChatMessage
         fields = ('id', 'created', 'modified', 'is_read', 'message')
 
 
@@ -40,7 +40,7 @@ class MessageCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
-        model = models.Message
+        model = models.ChatMessage
         fields = ('id', 'created', 'modified', 'message',
                   'is_read', 'sender', 'receiver')
 

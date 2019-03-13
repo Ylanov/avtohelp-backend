@@ -114,10 +114,10 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'project.wsgi.application'
 ASGI_APPLICATION = 'project.routing.application'
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [('0.0.0.0', 6379)],
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
         },
     },
 }

@@ -166,7 +166,7 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.my_list(user=self.request.user)
+        return models.FriendList.objects.common(user=self.request.user)
 
 
 class FriendRequestCreateView(generics.CreateAPIView):
@@ -242,7 +242,7 @@ class ProfileBlackListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.BlackList.objects.my_list(user=self.request.user)
+        return models.BlackList.objects.common(user=self.request.user)
 
 
 class BlackListCreateCreateView(generics.CreateAPIView):

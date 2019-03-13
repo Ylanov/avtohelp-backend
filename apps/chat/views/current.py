@@ -5,6 +5,12 @@ from account.models import User
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
 import json
+from rest_framework.response import Response
+from rest_framework import status
+from userprofile import models as profile_models
+from rest_framework.permissions import AllowAny
+from django.db.models import Q
+from rest_framework.exceptions import APIException
 
 
 class MessageListView(generics.ListAPIView):
@@ -16,20 +22,36 @@ class MessageListView(generics.ListAPIView):
         """Override get_queryset method"""
         sender = generics.get_object_or_404(User.objects.filter(is_active=True), pk=self.kwargs.get('sender'))
         receiver = generics.get_object_or_404(User.objects.filter(is_active=True), pk=self.kwargs.get('receiver'))
-        return models.Message.objects.filter(sender=sender, receiver=receiver)
+        return models.ChatMessage.objects.filter(sender=sender, receiver=receiver)
 
 
 class MessageCreateView(generics.CreateAPIView):
     """Message create view"""
 
     serializer_class = serializers.MessageCreateSerializer
-    queryset = models.Message.objects.all()
+    queryset = models.ChatMessage.objects.all()
 
 
-def room(request, room_name):
-    return render(request, 'chat/room.html', {
-        'room_name_json': mark_safe(json.dumps(room_name))
-    })
+class RoomView(generics.GenericAPIView):
+    """Room view"""
 
-def index(request):
-    return render(request, 'chat/index.html', {})
+    def get(self, request, *args, **kwargs):
+        """Override get method."""
+        # return render(request, 'chat/room.html', {
+        #     'recipient_json': mark_safe(json.dumps(kwargs.get('recipient'))),
+        #     'recipient_id': kwargs.get('recipient')})
+        friends = profile_models.FriendList.objects.are_friends(owner=request.user,
+                                                                user=kwargs.get('recipient'))
+        if friends:
+            return render(request, 'chat/room.html', {
+                'recipient': kwargs.get('recipient'),
+                'token': request.user.auth_token
+            })
+        else:
+            raise APIException('not friend')
+
+
+# def room(request, user_id):
+#     return render(request, 'chat/room.html', {
+#         'user_id_json': mark_safe(json.dumps(user_id))
+#     })
