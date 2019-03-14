@@ -22,7 +22,6 @@ def fetch(branch=None):
     with cd(env.src):
         role = env.roles[0]
         run('git pull origin {}'.format(env.roledefs[role]['branch']))
-        run('git submodule update')
 
 
 def migrate():

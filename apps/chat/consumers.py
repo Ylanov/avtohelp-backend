@@ -70,19 +70,19 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
         Called by receive_json when someone sent a join command.
         """
         # The logged-in user is in our scope thanks to the authentication ASGI middleware
-        room = await get_room_or_error(room_id, self.scope["user"])
+        room = await get_room_or_error(is_public=True)
         # Send a join message if it's turned on
         if settings.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
             await self.channel_layer.group_send(
                 room.group_name,
                 {
                     "type": "chat.join",
-                    "room_id": room_id,
-                    "username": self.scope["user"].username,
+                    "room_id": room.id,
+                    "full_name": self.scope["user"].get_full_name(),
                 }
             )
         # Store that we're in the room
-        self.rooms.add(room_id)
+        self.rooms.add(room.id)
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
             room.group_name,
@@ -107,7 +107,7 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
                 {
                     "type": "chat.leave",
                     "room_id": room_id,
-                    "username": self.scope["user"].username,
+                    "full_name": self.scope["user"].get_full_name(),
                 }
             )
         # Remove that we're in the room
@@ -136,7 +136,7 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
             {
                 "type": "chat.message",
                 "room_id": room_id,
-                "username": self.scope["user"].username,
+                "full_name": self.scope["user"].get_full_name(),
                 "message": message,
             }
         )
@@ -153,7 +153,7 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": settings.MSG_TYPE_ENTER,
                 "room": event["room_id"],
-                "username": event["username"],
+                "full_name": event["full_name"],
             },
         )
 
@@ -166,7 +166,7 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": settings.MSG_TYPE_LEAVE,
                 "room": event["room_id"],
-                "username": event["username"],
+                "full_name": event["full_name"],
             },
         )
 
@@ -179,7 +179,7 @@ class ChatCommonConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": settings.MSG_TYPE_MESSAGE,
                 "room": event["room_id"],
-                "username": event["username"],
+                "full_name": event["full_name"],
                 "message": event["message"],
             },
         )
