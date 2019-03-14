@@ -9,9 +9,9 @@ if configuration == 'local':
 # elif configuration == 'ci':
 #     # continious integration server settings
 #     from .ci import *
-# elif configuration == 'development':
-#     # development server settings
-#     from .development import *
+elif configuration == 'development':
+    # development server settings
+    from .development import *
 # elif configuration == 'stage':
 #     # development server settings
 #     from .stage import *
