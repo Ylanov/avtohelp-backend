@@ -21,10 +21,6 @@ class ProfileQuerySet(models.QuerySet):
         return self.exclude(Q(user__blacklist_owner__foe=user) |
                             Q(user__blacked_user__owner=user)).exclude(user=user)
 
-    def friends(self, owner):
-        """User friends"""
-        return self.filter()
-
 
 class Profile(BaseMixin):
     """Profile model"""

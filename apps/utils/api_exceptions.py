@@ -22,6 +22,16 @@ EXCEPTIONS
 """
 
 
+class ClientError(Exception):
+    """
+    Custom exception class that is caught by the websocket receive()
+    handler and translated into a send back to the client.
+    """
+    def __init__(self, code):
+        super().__init__(code)
+        self.code = code
+
+
 class TooOftenTriedError(exceptions.APIException):
     """Too often tried to enter the code."""
     status_code = HTTP_420_ENHACE_YOUR_CALM
@@ -136,3 +146,17 @@ class EqualIDError(ValidationErrorMixin):
         self.default_detail = dict(detail=self.default_detail,
                                    status_code=self.extended_status_code)
         super().__init__()
+
+
+class ArentFriends(ValidationErrorMixin):
+    """Users aren't friends"""
+    default_detail = _('User ID %s and User ID %s aren\'t friends')
+    extended_status_code = '%s.9' % ValidationErrorMixin.status_code
+
+    def __init__(self, owner, user):
+        self.default_detail = dict(detail=self.default_detail % (owner, user),
+                                   status_code=self.extended_status_code)
+        super().__init__()
+
+
+

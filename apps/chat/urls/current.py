@@ -19,5 +19,6 @@ app_name = 'chat'
 urlpatterns = [
     # url(r'^(?P<user_id>[^/]+)/$', views.room, name='room'),
     # path('<int:recipient>', views.RoomView.as_view(), name='room-view')
-    path('<int:recipient>', views.RoomView.as_view(), name='room-view')
+    path('<int:recipient>', views.RoomView.as_view(), name='room-view'),
+    path('', views.RoomList.as_view(), name='room-list'),
 ]

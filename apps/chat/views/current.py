@@ -51,7 +51,23 @@ class RoomView(generics.GenericAPIView):
             raise APIException('not friend')
 
 
-# def room(request, user_id):
-#     return render(request, 'chat/room.html', {
-#         'user_id_json': mark_safe(json.dumps(user_id))
-#     })
+class RoomList(generics.GenericAPIView):
+    """
+    Root page view. This is essentially a single-page app, if you ignore the
+    login and admin parts.
+    """
+
+    permission_classes = (AllowAny,)
+
+    def get(self, request, *args, **kwargs):
+        """Override get method."""
+        # Get a list of rooms, ordered alphabetically
+        rooms = models.ChatRoom.objects.order_by("id")
+
+        # Render that in the index template
+        return render(request, "chat/index.html", {
+            "rooms": rooms,
+        })
+
+
+
