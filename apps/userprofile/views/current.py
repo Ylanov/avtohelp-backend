@@ -208,10 +208,10 @@ class FriendRequestListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.requests(invited=self.request.user)
+        return models.FriendRequest.objects.requests(invited=self.request.user).not_approved()
 
 
-class MyFriendRequestListView(generics.ListAPIView):
+class OutFriendRequestListView(generics.ListAPIView):
     """
     View for retrieve user friend requests
     My friend requests FOR ADDING SMBD to my list
@@ -221,7 +221,7 @@ class MyFriendRequestListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.my_requests(owner=self.request.user)
+        return models.FriendRequest.objects.my_requests(owner=self.request.user).not_approved()
 
 
 class FriendRequestDetailView(generics.RetrieveAPIView):
@@ -245,7 +245,7 @@ class ProfileBlackListView(generics.ListAPIView):
         return models.BlackList.objects.common(user=self.request.user)
 
 
-class BlackListCreateCreateView(generics.CreateAPIView):
+class BlackListCreateView(generics.CreateAPIView):
     """
     View for creating request to add to the blacklist
     REQUEST:
@@ -258,4 +258,22 @@ class BlackListCreateCreateView(generics.CreateAPIView):
     }
     """
     serializer_class = serializers.BlackListCreateSerializer
-    queryset = models.FriendRequest.objects.select_related('profile__blacklist', 'user').all()
+    queryset = models.BlackList.objects.select_related('owner', 'foe').all()
+
+
+class BlackListDetailView(generics.RetrieveAPIView):
+    """
+    Retrieve view blacklist object
+    """
+    serializer_class = serializers.BlackListDetailSerializer
+    queryset = models.BlackList.objects.select_related('owner', 'foe').all()
+
+
+class BlackListDestroyView(generics.DestroyAPIView):
+    """
+    View for destroy blacklist request
+    """
+
+    def get_queryset(self):
+        """Override get queryset method"""
+        return models.BlackList.objects.my_list(user=self.request.user)

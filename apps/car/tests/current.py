@@ -49,9 +49,9 @@ class TestCatalog(APITestCase):
         self.cities_count = City.objects.count()
 
         # Create users
-        self.user_1 = User.objects.make(phone='+79000000001', city=self.city_1)
-        self.user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        self.user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
+        self.user_1 = User.objects.make(phone='+79000000001')
+        self.user_2 = User.objects.make(phone='+79000000002')
+        self.user_3 = User.objects.make(phone='+79000000003')
         self.users_count = User.objects.count()
 
         # Create car brands

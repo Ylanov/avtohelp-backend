@@ -33,7 +33,7 @@ class TestProfile(APITestCase):
         self.city_3 = City.objects.create(name='Novosibirsk')
 
         # Create users
-        self.user_1 = User.objects.make(phone='+79000000001', city=self.city_1)
+        self.user_1 = User.objects.make(phone='+79000000001')
 
         # Create car brands
         self.toyota = CarMark.objects.create(name='Toyota')
@@ -116,7 +116,7 @@ class TestProfile(APITestCase):
         """Common test for retrieving profiles list"""
 
         # Create additional users
-        User.objects.make(phone='+79000000002', city=self.city_2)
+        User.objects.make(phone='+79000000002')
 
         # Authorize user 1
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -141,8 +141,8 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
 
         # Put user_2 in BlackList
         BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -167,8 +167,8 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -194,9 +194,9 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
-        user_4 = User.objects.make(phone='+79000000004', city=self.city_1)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+        user_4 = User.objects.make(phone='+79000000004')
 
         # Put user_2 in BlackList
         BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -220,8 +220,30 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Put user_3 in FriendList
+        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+        FriendList.objects.create(owner=self.user_1, friend=user_3, request=request)
+
+        api_path = '%s:userprofile:my-friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.all().not_approved().count())
+
+    def test_friend_requests_1(self):
+        """
+        Get all friend requests FROM user
+        """
+
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -230,8 +252,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:my-friendrequest-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), FriendRequest.objects.all().count())
-        self.assertEqual(response.data.get('results')[0].get('invited').get('id'), user_2.profile.id)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.all().not_approved().count())
 
     def test_my_friend_request_detail(self):
         """
@@ -243,8 +264,8 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
-        user_3 = User.objects.make(phone='+79000000003', city=self.city_3)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -264,15 +285,59 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1)
+        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
 
         api_path = '%s:userprofile:friendrequest-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('results')[0].get('invited').get('user_id'), self.user_1.id)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
+
+    def test_friend_request_to_user_2(self):
+        """
+        Get all friend requests TO user
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Put user_3 in FriendList
+        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
+        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
+
+    def test_friend_request_to_user_3(self):
+        """
+        Get all friend requests TO user
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Put user_3 in FriendList
+        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=False)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
 
     def test_friend_request_to_user_detail(self):
         """
@@ -283,7 +348,7 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
+        user_2 = User.objects.make(phone='+79000000002')
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
@@ -302,7 +367,7 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = User.objects.make(phone='+79000000002', city=self.city_2)
+        user_2 = User.objects.make(phone='+79000000002')
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
@@ -311,6 +376,86 @@ class TestProfile(APITestCase):
         response = self.client.patch(reverse(api_path, kwargs={'pk': request.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('approved'), True)
+
+    def test_list_blacklist_requests(self):
+        """
+        Get all user blacklist requests
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Before request
+        blacked_before = BlackList.objects.count()
+
+        # Put user_2 in BlackList
+        BlackList.objects.create(owner=self.user_1, foe=user_2)
+        blacked_after = BlackList.objects.count()
+
+        api_path = '%s:userprofile:blacklistrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(blacked_before, blacked_after)
+        self.assertEqual(response.data.get('count'), blacked_after)
+
+    def test_detail_blacklist_request_to_user(self):
+        """
+        Get detail user blacklist requests
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Put user_2 in BlackList
+        black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
+
+        api_path = '%s:userprofile:blacklistrequest-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': black_list.pk}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('id'), black_list.id)
+
+    def test_remove_user_blacklist_request(self):
+        """
+        Remove user black list
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Put user_2 in BlackList
+        black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
+
+        api_path = '%s:userprofile:blacklistrequest-remove' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': black_list.pk}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_create_blacklist_request(self):
+        """
+        Create user black list
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Before request
+        blacked_before = BlackList.objects.count()
+
+        api_path = '%s:userprofile:blacklistrequest-create' % self.VERSION
+        response = self.client.post(reverse(api_path), data={'user_id': user_2.id})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertNotEqual(blacked_before, BlackList.objects.count())
 
     def test_profile_cars(self):
         """Common test for retrieving list of profile cars"""

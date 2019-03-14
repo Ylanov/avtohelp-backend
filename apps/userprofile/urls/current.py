@@ -33,24 +33,30 @@ urlpatterns = [
     path('profile/friends/add', views.FriendRequestCreateView.as_view(),
          name='friendrequest-create'),
 
-    path('profile/friends/requests/', views.FriendRequestListView.as_view(),
+    path('profile/friends/requests/incoming', views.FriendRequestListView.as_view(),
          name='friendrequest-list'),
 
-    path('profile/friends/requests/<int:pk>', views.FriendRequestDetailView.as_view(),
+    path('profile/friends/requests/incoming/<int:pk>', views.FriendRequestDetailView.as_view(),
          name='friendrequest-detail'),
 
-    path('profile/friends/requests/<int:pk>/approve', views.FriendRequestApproveView.as_view(),
+    path('profile/friends/requests/incoming/<int:pk>/approve', views.FriendRequestApproveView.as_view(),
          name='friendrequest-approve'),
 
-    path('profile/friends/requests/my', views.MyFriendRequestListView.as_view(),
+    path('profile/friends/requests/outgoing', views.OutFriendRequestListView.as_view(),
          name='my-friendrequest-list'),
 
-    path('profile/friends/requests/my/<int:pk>', views.FriendRequestDetailView.as_view(),
+    path('profile/friends/requests/outgoing/<int:pk>', views.FriendRequestDetailView.as_view(),
          name='my-friendrequest-detail'),
 
     path('profile/blacklist', views.ProfileBlackListView.as_view(),
-         name='blacklist-list'),
+         name='blacklistrequest-list'),
 
-    path('profile/blacklist/add', views.BlackListCreateCreateView.as_view(),
+    path('profile/blacklist/add', views.BlackListCreateView.as_view(),
          name='blacklistrequest-create'),
+
+    path('profile/blacklist/<int:pk>', views.BlackListDetailView.as_view(),
+         name='blacklistrequest-detail'),
+
+    path('profile/blacklist/<int:pk>/remove', views.BlackListDestroyView.as_view(),
+         name='blacklistrequest-remove'),
 ]

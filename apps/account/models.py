@@ -26,22 +26,22 @@ class UserManager(AbstractUserManager):
 
     use_in_migrations = False
 
-    def make(self, phone, city):
+    def make(self, phone):
         """Default make-method for creating user"""
 
         obj = self.model(phone=phone)
         obj.save()
-        Profile.objects.create(user=obj, city=city)
+        Profile.objects.create(user=obj)
         ProfileLocation.objects.create(user=obj)
         return obj
 
-    def get_or_make(self, phone, city):
+    def get_or_make(self, phone):
         """Get user object or make new one"""
         qs = User.objects.filter(phone=phone)
         if qs.exists():
             obj = qs.first(), False
         else:
-            obj = self.make(phone=phone, city=city), True
+            obj = self.make(phone=phone), True
         return obj
 
 
