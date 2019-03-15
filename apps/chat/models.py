@@ -38,7 +38,7 @@ class ChatRoomManager(models.Manager):
             obj = public.first()
         else:
             # Check if private room exists
-            private = self.room(initiator=initiator, participant=participant)
+            private = self.by_paticipants(initiator=initiator, participant=participant)
             if not private:
                 obj = self.model(initiator, participant, is_public)
                 obj.save()
@@ -50,10 +50,20 @@ class ChatRoomManager(models.Manager):
 class ChatRoomQuerySet(models.QuerySet):
     """QuerySet for model ChatRoom"""
 
-    def room(self, initiator, participant):
+    def friendly(self, participant):
+        """Only friendly rooms"""
+        return self.exclude(models.Q(initiator__blacklist_owner__foe=participant) |
+                            models.Q(participant__blacked_user__owner=participant))
+
+    def by_paticipants(self, initiator, participant):
         """Find if room already exists"""
         return self.filter(models.Q(initiator=initiator, participant=participant) |
                            models.Q(initiator=participant, participant=initiator))
+
+    def by_participant(self, participant):
+        """Find room by participant"""
+        return self.friendly(participant).filter(models.Q(initiator=participant) |
+                                                 models.Q(participant=participant))
 
     def public(self):
         """Find if room already exists"""

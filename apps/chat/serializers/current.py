@@ -10,9 +10,18 @@ class MessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
-
         model = models.ChatMessage
         fields = ('id', 'created', 'modified', 'is_read', 'message')
+
+
+class ChatRoomListSerializer(serializers.ModelSerializer):
+    """Serializer for model ChatRoom"""
+
+    class Meta:
+        """Meta class"""
+        model = models.ChatRoom
+        fields = ('id', 'created', 'initiator',
+                  'participant', 'is_public')
 
 
 class ChatProfileDetailSerializer(serializers.ModelSerializer):

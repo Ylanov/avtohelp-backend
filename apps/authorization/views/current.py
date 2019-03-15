@@ -9,7 +9,7 @@ from utils import views as view_mixins
 class PhoneVerificationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIView):
     """
     View for verify user phone number
-    Request: {"phone": "+79000000000", "city": 1}
+    Request: {"phone": "+79000000000"}
     Response: {"detail": ""Sms was sent}
     :return: object
     """
