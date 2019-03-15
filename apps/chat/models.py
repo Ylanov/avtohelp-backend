@@ -52,8 +52,13 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(models.Q(initiator__blacklist_owner__foe=participant) |
-                            models.Q(participant__blacked_user__owner=participant))
+        return self.exclude(
+            #  Check if participant not in someone else's black list if so exclude him from list
+            models.Q(initiator__blacklist_owner__owner=participant) |
+            models.Q(participant__blacklist_owner__owner=participant) |
+
+            models.Q(initiator__blacked_user__foe=participant) |
+            models.Q(participant__blacked_user__foe=participant))
 
     def by_paticipants(self, initiator, participant):
         """Find if room already exists"""
@@ -62,8 +67,8 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def by_participant(self, participant):
         """Find room by participant"""
-        return self.friendly(participant).filter(models.Q(initiator=participant) |
-                                                 models.Q(participant=participant))
+        return self.filter(models.Q(initiator=participant) |
+                           models.Q(participant=participant)).friendly(participant)
 
     def public(self):
         """Find if room already exists"""

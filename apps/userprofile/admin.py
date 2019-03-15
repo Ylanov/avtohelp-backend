@@ -9,8 +9,8 @@ common_fields = ('id', 'user', 'created', 'modified')
 
 class ProfileModelAdmin(admin.ModelAdmin):
     """Custom admin page for Profile"""
-    readonly_fields = ('id', 'user', 'created', 'modified')
-    list_display = readonly_fields
+    readonly_fields = ('id', 'created', 'modified')
+    list_display = readonly_fields + ('user',)
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'first_name',
                                         'last_name', 'middle_name',
