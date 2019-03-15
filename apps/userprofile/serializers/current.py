@@ -181,7 +181,7 @@ class ProfileBlackListSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'foe')
+        fields = ('id', 'created')
 
 
 class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -254,7 +254,8 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
 
     # REQUEST
     user_id = serializers.PrimaryKeyRelatedField(queryset=account_models.User.objects.filter(),
-                                                 source='foe')
+                                                 source='foe',
+                                                 write_only=True)
 
     class Meta:
         """Meta class"""
@@ -279,3 +280,14 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
         """Override create method"""
         validated_data['owner'] = self.context.get('request').user
         return super().create(validated_data)
+
+
+class BlackListDetailSerializer(serializers.ModelSerializer):
+    """Serializer for model BlackList"""
+
+    foe = FriendRequestDetailSerializer(source='foe.profile', read_only=True)
+
+    class Meta:
+        """Meta class"""
+        model = models.BlackList
+        fields = ('id', 'created', 'foe')

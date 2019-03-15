@@ -36,8 +36,8 @@ class Profile(BaseMixin):
                                    null=True, default=None,
                                    verbose_name=_('Avatar'))
     city = models.ForeignKey('catalog.City',
-                             default=None,
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             blank=True, null=True, default=None)
 
     objects = ProfileQuerySet.as_manager()
 

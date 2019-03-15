@@ -30,8 +30,7 @@ class TestCatalog(APITestCase):
         self.city = catalog_models.City.objects.create(name='City 1')
 
         # Create user
-        self.user = account_models.User.objects.make(phone='+79000000000',
-                                                     city=self.city)
+        self.user = account_models.User.objects.make(phone='+79000000000')
 
         # Create PushNotifications
         self.notification = models.PushNotification.objects.create(title='Push 1',

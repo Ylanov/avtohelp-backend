@@ -43,7 +43,7 @@ class TestOrder(APITestCase):
         self.color_1 = car_models.CarColor.objects.create(name='White')
 
         # Create user
-        self.user_1 = account_models.User.objects.make(phone='+79000000000', city=self.city)
+        self.user_1 = account_models.User.objects.make(phone='+79000000000')
 
         # Create user cars
         self.car_1 = car_models.Car.objects.create(mark=self.toyota,
@@ -89,8 +89,8 @@ class TestOrder(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create additional users
-        user_2 = account_models.User.objects.make(phone='+79000000002', city=self.city)
-        user_3 = account_models.User.objects.make(phone='+79000000003', city=self.city)
+        user_2 = account_models.User.objects.make(phone='+79000000002')
+        user_3 = account_models.User.objects.make(phone='+79000000003')
 
         # Create assistance requests
         models.AssistanceRequest.objects.create(user=self.user_1,
