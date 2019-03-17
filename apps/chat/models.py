@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from utils.mixins import BaseMixin
 from asgiref.sync import async_to_sync
 
@@ -54,21 +55,28 @@ class ChatRoomQuerySet(models.QuerySet):
         """Only friendly rooms"""
         return self.exclude(
             #  Check if participant not in someone else's black list if so exclude him from list
-            models.Q(initiator__blacklist_owner__owner=participant) |
-            models.Q(participant__blacklist_owner__owner=participant) |
+            Q(initiator__blacklist_owner__owner=participant) |
+            Q(participant__blacklist_owner__owner=participant) |
 
-            models.Q(initiator__blacked_user__foe=participant) |
-            models.Q(participant__blacked_user__foe=participant))
+            Q(initiator__blacked_user__foe=participant) |
+            Q(participant__blacked_user__foe=participant))
+    
+    def friends(self, participant):
+        """Filter by friend flag"""
+        return self.filter(Q(participant__friendlist_user__friend=participant,
+                             participant__friendlist_user__request__approved=True) |
+                           Q(initiator__friendlist_owner__owner=participant,
+                             initiator__friendlist_owner__request__approved=True))
 
     def by_paticipants(self, initiator, participant):
         """Find if room already exists"""
-        return self.filter(models.Q(initiator=initiator, participant=participant) |
-                           models.Q(initiator=participant, participant=initiator))
+        return self.filter(Q(initiator=initiator, participant=participant) |
+                           Q(initiator=participant, participant=initiator))
 
     def by_participant(self, participant):
         """Find room by participant"""
-        return self.filter(models.Q(initiator=participant) |
-                           models.Q(participant=participant)).friendly(participant)
+        return self.filter(Q(initiator=participant) |
+                           Q(participant=participant)).friendly(participant)
 
     def public(self):
         """Find if room already exists"""
