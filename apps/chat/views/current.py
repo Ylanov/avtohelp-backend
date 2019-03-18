@@ -7,7 +7,6 @@ from rest_framework import generics
 from account.models import User
 from chat import models
 from chat.serializers import current as serializers
-from rest_framework.permissions import AllowAny
 
 
 class MessageListView(generics.ListAPIView):
@@ -35,9 +34,6 @@ class ChatRoomPrivateView(generics.GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         """Override get method."""
-        room = kwargs.get('room')
-        # check room
-        qs = models.ChatRoom.objects.by_participant(participant=self.request.user)
         return render(request, 'chat/private.html', {
             'room_json': mark_safe(json.dumps(kwargs.get('room')))
         })

@@ -1,7 +1,8 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from utils.mixins import BaseMixin
 from asgiref.sync import async_to_sync
+from userprofile import models as profile_models
 
 
 class ChatMessage(BaseMixin):
@@ -53,20 +54,13 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(
-            #  Check if participant not in someone else's black list if so exclude him from list
-            Q(initiator__blacklist_owner__owner=participant) |
-            Q(participant__blacklist_owner__owner=participant) |
-
-            Q(initiator__blacked_user__foe=participant) |
-            Q(participant__blacked_user__foe=participant))
+        return self.exclude(participant_id__in=Subquery(
+            profile_models.BlackList.objects.common(participant).values('foe_id')))
     
     def friends(self, participant):
         """Filter by friend flag"""
-        return self.filter(Q(participant__friendlist_user__friend=participant,
-                             participant__friendlist_user__request__approved=True) |
-                           Q(initiator__friendlist_owner__owner=participant,
-                             initiator__friendlist_owner__request__approved=True))
+        return self.filter(participant_id__in=Subquery(
+            profile_models.FriendList.objects.common(participant).values('friend_id')))
 
     def by_paticipants(self, initiator, participant):
         """Find if room already exists"""

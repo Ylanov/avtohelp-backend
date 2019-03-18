@@ -228,7 +228,8 @@ class BlackListQuerySet(models.QuerySet):
 
     def are_foes(self, owner, user):
         """Check if owner has an enemy"""
-        if self.filter(owner=owner, foe=user).exists():
+        if self.filter(Q(owner=owner, foe=user) |
+                       Q(owner=user, foe=owner)).exists():
             return True
         else:
             return False

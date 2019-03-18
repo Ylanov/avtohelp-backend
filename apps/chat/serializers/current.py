@@ -79,15 +79,21 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
         if attrs['initiator'] == attrs['participant']:
             raise api_exceptions.EqualIDError()
 
+        # Check if participant not in black list
+        are_foes = profile_models.BlackList.objects.are_foes(attrs['initiator'], attrs['participant'])
+        if are_foes:
+            raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
+
         # Check if participant is friend of mine
         friends = profile_models.FriendList.objects.are_friends(attrs['initiator'], attrs['participant'])
         if not friends:
-            raise api_exceptions.ArentFriends(attrs['initiator'], attrs['participant'])
+            raise api_exceptions.ArentFriendsError(attrs['initiator'], attrs['participant'])
 
         # Check if chat room is already exists
         room = models.ChatRoom.objects.by_paticipants(attrs['initiator'], attrs['participant'])
         if room.exists():
-            raise api_exceptions.ChatRoomAlreadyExists(attrs['initiator'], attrs['participant'])
+            raise api_exceptions.ChatRoomAlreadyExistsError(attrs['initiator'], attrs['participant'])
+
         return attrs
     
     def create(self, validated_data):

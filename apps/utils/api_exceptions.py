@@ -148,7 +148,7 @@ class EqualIDError(ValidationErrorMixin):
         super().__init__()
 
 
-class ArentFriends(ValidationErrorMixin):
+class ArentFriendsError(ValidationErrorMixin):
     """Users aren't friends"""
     default_detail = _('User ID %s and User ID %s aren\'t friends')
     extended_status_code = '%s.9' % ValidationErrorMixin.status_code
@@ -159,7 +159,7 @@ class ArentFriends(ValidationErrorMixin):
         super().__init__()
 
 
-class ChatRoomAlreadyExists(ValidationErrorMixin):
+class ChatRoomAlreadyExistsError(ValidationErrorMixin):
     """Chat room already exists"""
     default_detail = _('Chat room for User ID %s to User ID %s, already exists')
     extended_status_code = '%s.10' % ValidationErrorMixin.status_code
@@ -170,3 +170,12 @@ class ChatRoomAlreadyExists(ValidationErrorMixin):
         super().__init__()
 
 
+class AreFoesError(ValidationErrorMixin):
+    """Users aren foes"""
+    default_detail = _('User ID %s and User ID %s are foes')
+    extended_status_code = '%s.11' % ValidationErrorMixin.status_code
+
+    def __init__(self, owner, user):
+        self.default_detail = dict(detail=self.default_detail % (owner, user),
+                                   status_code=self.extended_status_code)
+        super().__init__()
