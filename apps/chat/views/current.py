@@ -30,7 +30,7 @@ class ChatRoomListView(generics.ListAPIView):
         return models.ChatRoom.objects.by_participant(participant=self.request.user)
 
 
-class RoomPrivateView(generics.GenericAPIView):
+class ChatRoomPrivateView(generics.GenericAPIView):
     """Private room view"""
 
     def get(self, request, *args, **kwargs):
@@ -41,3 +41,9 @@ class RoomPrivateView(generics.GenericAPIView):
         return render(request, 'chat/private.html', {
             'room_json': mark_safe(json.dumps(kwargs.get('room')))
         })
+
+
+class ChatRoomCreateView(generics.CreateAPIView):
+    """Create chat room"""
+
+    serializer_class = serializers.ChatRoomCreateSerializer

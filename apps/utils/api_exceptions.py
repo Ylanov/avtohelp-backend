@@ -159,4 +159,14 @@ class ArentFriends(ValidationErrorMixin):
         super().__init__()
 
 
+class ChatRoomAlreadyExists(ValidationErrorMixin):
+    """Chat room already exists"""
+    default_detail = _('Chat room for User ID %s to User ID %s, already exists')
+    extended_status_code = '%s.10' % ValidationErrorMixin.status_code
+
+    def __init__(self, initiator, participant):
+        self.default_detail = dict(detail=self.default_detail % (initiator, participant),
+                                   status_code=self.extended_status_code)
+        super().__init__()
+
 

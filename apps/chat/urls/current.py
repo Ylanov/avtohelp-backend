@@ -9,5 +9,6 @@ app_name = 'chat'
 
 urlpatterns = [
     path('', views.ChatRoomListView.as_view(), name='room-list'),
-    path('<int:room>', views.RoomPrivateView.as_view(), name='private_room')
+    path('<int:room>', views.ChatRoomPrivateView.as_view(), name='room-join'),
+    path('create', views.ChatRoomCreateView.as_view(), name='room-create')
 ]

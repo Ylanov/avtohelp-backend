@@ -177,7 +177,8 @@ class FriendListQuerySet(models.QuerySet):
 
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
-        if self.filter(Q(owner=owner, friend=user) | Q(owner=user, friend=owner)).exists():
+        if self.filter(Q(owner=owner, friend=user, request__approved=True) |
+                       Q(owner=user, friend=owner, request__approved=True)).exists():
             return True
         else:
             return False

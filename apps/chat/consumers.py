@@ -9,7 +9,7 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room']
         self.room_group_name = 'chat_%s' % self.room_id
-        qs = models.ChatRoom.objects.by_participant(participant=self.scope['user']).friends(participant=self.scope['user'])
+        qs = models.ChatRoom.objects.by_participant(self.scope['user']).friends(self.scope['user'])
         if qs.exists():
             if qs.first().id == self.room_id:
                 # Join room group
