@@ -200,7 +200,7 @@ STATICFILES_DIRS = (
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
-USE_CELERY = True
+USE_CELERY = False
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -259,7 +259,7 @@ SMS_EXPIRATION = 5  # minutes
 SMS_CODE_LENGTH = 4
 SMS_INPUT_ATTEMPTS = 2
 SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
-SEND_SMS = True  # Actual sms sending switcher
+SEND_SMS = False  # Actual sms sending switcher
 
 
 # ASSISTANCE REQUESTS
