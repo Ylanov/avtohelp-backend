@@ -8,7 +8,6 @@ from userprofile import models, filters
 from userprofile.serializers import current as serializers
 
 
-# Create your views here.
 class FCMDeviceViewSet(generics.GenericAPIView):
     """FCMDevice registration view.
 
@@ -42,6 +41,8 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         obj and self.check_object_permissions(self.request, obj)
         return obj
 
+# Profile
+
 
 class ProfileListView(generics.ListAPIView):
     """
@@ -65,7 +66,7 @@ class ProfileListView(generics.ListAPIView):
         ).friendly(self.request.user).order_by('first_name', 'last_name')
 
 
-class ProfileDetailView(generics.RetrieveUpdateAPIView):
+class MyProfileDetailView(generics.RetrieveUpdateAPIView):
     """
     View for retrieving or update user profile.
     Allowed HTTP-requests: (GET, PATCH, PUT)
@@ -101,6 +102,25 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         """Override get object method"""
         return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
+
+
+class ProfileDetailView(generics.RetrieveUpdateAPIView):
+    """
+    View for retrieving user profile.
+    Allowed HTTP-requests: (GET)
+    """
+
+    serializer_class = serializers.ProfileSerializer
+    queryset = models.Profile.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.Profile.objects.select_related(
+            'user'
+        ).friendly(self.request.user)
+
+
+# Car
 
 
 class ProfileCarCreateView(generics.CreateAPIView):
@@ -157,6 +177,9 @@ class ProfileCarListView(generics.ListAPIView):
                                                         'car__car_model__mark').filter(owner=self.request.user)
 
 
+# FriendList
+
+
 class ProfileFriendListView(generics.ListAPIView):
     """
     View for retrieve user friends
@@ -179,6 +202,21 @@ class FriendRequestCreateView(generics.CreateAPIView):
     """
     serializer_class = serializers.FriendRequestSerializer
     queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').all()
+
+
+class FriendListDestroyView(generics.DestroyAPIView):
+    """
+    View for destroy friendlist request
+    """
+
+    def perform_destroy(self, instance):
+        """Override perform_destroy method"""
+        instance.request.delete()
+        instance.delete()
+
+    def get_queryset(self):
+        """Override get queryset method"""
+        return models.FriendList.objects.my_list(user=self.request.user)
 
 
 class FriendRequestApproveView(generics.UpdateAPIView):
@@ -231,6 +269,9 @@ class FriendRequestDetailView(generics.RetrieveAPIView):
 
     serializer_class = serializers.FriendRequestSerializer
     queryset = models.FriendRequest.objects.all()
+
+
+# Blacklist
 
 
 class ProfileBlackListView(generics.ListAPIView):

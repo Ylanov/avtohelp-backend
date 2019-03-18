@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Subquery
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
@@ -11,6 +11,16 @@ from utils.mixins import BaseMixin
 class ProfileQuerySet(models.QuerySet):
     """Custom QuerySet for model Profile"""
 
+    # def friendly(self, user):
+    #     """
+    #     Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
+    #     :param user:
+    #     :type user: object
+    #     :return: ProfileQuerySet
+    #     """
+    #     return self.exclude(Q(user__blacklist_owner__owner=user) |
+    #                         Q(user__blacked_user__foe=user)).exclude(user=user)
+
     def friendly(self, user):
         """
         Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
@@ -18,8 +28,15 @@ class ProfileQuerySet(models.QuerySet):
         :type user: object
         :return: ProfileQuerySet
         """
-        return self.exclude(Q(user__blacklist_owner__foe=user) |
-                            Q(user__blacked_user__owner=user)).exclude(user=user)
+        return self.exclude(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id')))
+
+    def friends(self, user):
+        """
+        Queryset that return only friends
+        :param user:
+        :return: QuerySet
+        """
+        return self.filter(user_id__in=Subquery(FriendList.objects.common(user).values('friend')))
 
 
 class Profile(BaseMixin):

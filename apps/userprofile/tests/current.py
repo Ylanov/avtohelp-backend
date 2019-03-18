@@ -63,7 +63,7 @@ class TestProfile(APITestCase):
         self.token, created = Token.objects.get_or_create(user=self.user_1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        api_path = '%s:userprofile:my-profile-detail' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('id'), self.user_1.profile.id)
@@ -81,7 +81,7 @@ class TestProfile(APITestCase):
             "last_name": "Last name",
         }
 
-        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        api_path = '%s:userprofile:my-profile-detail' % self.VERSION
         response = self.client.patch(reverse(api_path), data=data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('id'), self.user_1.profile.id)
@@ -101,14 +101,14 @@ class TestProfile(APITestCase):
             "last_name": "Last name",
         }
 
-        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        api_path = '%s:userprofile:my-profile-detail' % self.VERSION
         response = self.client.put(reverse(api_path), data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_retrieving_profile_unauthorized_user(self):
         """Test view for retrieving unauthorized user profile"""
 
-        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        api_path = '%s:userprofile:my-profile-detail' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
@@ -125,7 +125,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), Profile.objects.all().exclude(user=self.user_1).count())
+        self.assertEqual(response.data.get('count'), Profile.objects.count())
 
     def test_profiles_list_2(self):
         """
@@ -133,7 +133,7 @@ class TestProfile(APITestCase):
             Users: user_1, user_2, user_3
             Authorized user: user_1
             Users in BlackList: user_2
-            Result retrieving profile list: user_3
+            Result retrieving profile list: user_1, user_3
         """
 
         # Authorize user_1
@@ -150,16 +150,15 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 1)
-        self.assertEqual(response.data.get('results')[0].get('user_id'), user_3.id)
+        self.assertEqual(response.data.get('count'), 2)
 
     def test_profiles_list_3(self):
         """
-        Test for retrieving profiles list w/o friends profiles
+        Test for retrieving profiles list w/ friends profiles
             Users: user_1, user_2, user_3
             Authorized user: user_1
             Users in FriendList: user_2
-            Result retrieving profile list: user_3
+            Result retrieving profile list: user_1, user_2, user_3
         """
 
         # Authorize user_1
@@ -177,7 +176,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 2)
+        self.assertEqual(response.data.get('count'), 3)
 
     def test_profiles_list_4(self):
         """
@@ -186,7 +185,7 @@ class TestProfile(APITestCase):
             Authorized user: user_1
             Users in FriendList: user_2
             Users in BlackList: user_3
-            Result retrieving profile list: user_4
+            Result retrieving profile list: user_1, user_2, user_4
         """
 
         # Authorize user_1
@@ -208,7 +207,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 2)
+        self.assertEqual(response.data.get('count'), 3)
 
     def test_friend_requests(self):
         """

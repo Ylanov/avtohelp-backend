@@ -57,6 +57,16 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         return obj
 
 
+class ProfileMinSerializer(serializers.ModelSerializer):
+    """Minimized profile information"""
+
+    class Meta:
+        """Meta class"""
+        model = profile_models.Profile
+        fields = ('id', 'created', 'first_name', 'last_name',
+                  'middle_name')
+
+
 class AuthorizationView(serializers.ModelSerializer):
     """Authentication serializer"""
 
@@ -66,11 +76,12 @@ class AuthorizationView(serializers.ModelSerializer):
 
     # RESPONSE
     token = serializers.CharField(read_only=True, source='user.auth_token')
+    profile = ProfileMinSerializer(read_only=True, source='user.profile')
 
     class Meta:
         """ Meta class """
         model = models.SMSCode
-        fields = ('token', 'phone', 'code')
+        fields = ('token', 'phone', 'code', 'profile')
 
     def validate(self, attrs):
         """Validation method"""

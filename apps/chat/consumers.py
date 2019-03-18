@@ -9,19 +9,25 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope['url_route']['kwargs']['room']
         self.room_group_name = 'chat_%s' % self.room_id
-        qs = models.ChatRoom.objects.by_participant(self.scope['user']).friends(self.scope['user'])
-        if qs.exists():
-            if qs.first().id == self.room_id:
-                # Join room group
-                await self.channel_layer.group_add(
-                    self.room_group_name,
-                    self.channel_name
-                )
-                await self.accept()
-            else:
-                await self.close()
-        else:
-            await self.close()
+        # Join room group
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+        # qs = models.ChatRoom.objects.by_participant(self.scope['user']).friends(self.scope['user'])
+        # if qs.exists():
+        #     if qs.first().id == self.room_id:
+        #         # Join room group
+        #         await self.channel_layer.group_add(
+        #             self.room_group_name,
+        #             self.channel_name
+        #         )
+        #         await self.accept()
+        #     else:
+        #         await self.close()
+        # else:
+        #     await self.close()
 
     async def disconnect(self, close_code):
         # Leave room group

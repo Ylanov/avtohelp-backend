@@ -12,8 +12,11 @@ urlpatterns = [
     path('profiles', views.ProfileListView.as_view(),
          name='profile-list'),
 
-    path('profile/detail', views.ProfileDetailView.as_view(),
+    path('profiles/<int:pk>', views.ProfileDetailView.as_view(),
          name='profile-detail'),
+
+    path('profile/detail', views.MyProfileDetailView.as_view(),
+         name='my-profile-detail'),
 
     path('profile/cars', views.ProfileCarListView.as_view(),
          name='profile-car-list'),
@@ -32,6 +35,9 @@ urlpatterns = [
 
     path('profile/friends/add', views.FriendRequestCreateView.as_view(),
          name='friendrequest-create'),
+
+    path('profile/friends/<int:pk>/remove', views.FriendListDestroyView.as_view(),
+         name='friendlist-remove'),
 
     path('profile/friends/requests/incoming', views.FriendRequestListView.as_view(),
          name='friendrequest-list'),

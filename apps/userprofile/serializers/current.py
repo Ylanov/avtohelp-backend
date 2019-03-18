@@ -187,7 +187,7 @@ class ProfileBlackListSerializer(serializers.ModelSerializer):
 class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for model FriendRequest"""
 
-    car = serializers.CharField(source='get_car_info')
+    car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
 
     class Meta:
         """Meta class"""
