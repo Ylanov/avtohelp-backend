@@ -31,9 +31,6 @@ for path in ('apps', 'libs'):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 
@@ -228,7 +225,7 @@ STATICFILES_DIRS = (
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://localhost:6379/1'
-USE_CELERY = True
+USE_CELERY = False
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -287,7 +284,7 @@ SMS_EXPIRATION = 5  # minutes
 SMS_CODE_LENGTH = 4
 SMS_INPUT_ATTEMPTS = 2
 SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
-SEND_SMS = True  # Actual sms sending switcher
+USE_SMS = False  # Actual sms sending switcher
 
 
 # ASSISTANCE REQUESTS

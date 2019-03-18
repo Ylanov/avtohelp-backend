@@ -79,8 +79,3 @@ LOGGING = {
         },
     }
 }
-
-
-USE_CELERY = True
-
-USE_SMS = False
