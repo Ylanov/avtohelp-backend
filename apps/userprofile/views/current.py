@@ -104,7 +104,7 @@ class MyProfileDetailView(generics.RetrieveUpdateAPIView):
         return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
 
 
-class ProfileDetailView(generics.RetrieveUpdateAPIView):
+class ProfileDetailView(generics.RetrieveAPIView):
     """
     View for retrieving user profile.
     Allowed HTTP-requests: (GET)
@@ -216,7 +216,7 @@ class FriendListDestroyView(generics.DestroyAPIView):
 
     def get_queryset(self):
         """Override get queryset method"""
-        return models.FriendList.objects.my_list(user=self.request.user)
+        return models.FriendList.objects.common(user=self.request.user)
 
 
 class FriendRequestApproveView(generics.UpdateAPIView):

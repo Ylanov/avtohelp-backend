@@ -33,10 +33,22 @@ class AssistanceRequestMixin(serializers.ModelSerializer):
 class AssistanceRequestListSerializer(AssistanceRequestMixin):
     """List of AssistanceRequest objects by user"""
 
+    profile_id = serializers.IntegerField(source='user.profile.id')
+
     class Meta:
         """Meta class"""
         model = models.AssistanceRequest
-        fields = ('id', 'created', 'user', 'issue', 'description', 'geo_lat', 'geo_lon')
+        fields = ('id', 'created', 'profile_id', 'issue', 'description', 'geo_lat', 'geo_lon')
+
+    def get_geo_lat(self, obj):
+        """Point(longitude, latitude)"""
+        if isinstance(obj.location, Point):
+            return obj.location.y
+
+    def get_geo_lon(self, obj):
+        """Point(longitude, latitude)"""
+        if isinstance(obj.location, Point):
+            return obj.location.x
 
 
 class AssistanceRequestCreateSerializer(serializers.ModelSerializer):

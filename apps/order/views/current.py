@@ -2,6 +2,7 @@ from rest_framework import generics
 
 from order import models
 from order.serializers import current as serializers
+from rest_framework.pagination import CursorPagination
 
 
 class AssistanceRequestMixin(object):
@@ -15,6 +16,7 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     Get user assistance request list
     """
     serializer_class = serializers.AssistanceRequestListSerializer
+    pagination_class = CursorPagination
 
     def get_queryset(self):
         """Override get_queryset method"""

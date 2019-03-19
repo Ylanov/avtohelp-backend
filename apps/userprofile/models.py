@@ -28,7 +28,7 @@ class ProfileQuerySet(models.QuerySet):
         :type user: object
         :return: ProfileQuerySet
         """
-        return self.exclude(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id')))
+        return self.exclude(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))).exclude(user=user)
 
     def friends(self, user):
         """
@@ -36,7 +36,7 @@ class ProfileQuerySet(models.QuerySet):
         :param user:
         :return: QuerySet
         """
-        return self.filter(user_id__in=Subquery(FriendList.objects.common(user).values('friend')))
+        return self.filter(user_id__in=Subquery(FriendList.objects.common(user).values('friend'))).exclude(user=user)
 
 
 class Profile(BaseMixin):

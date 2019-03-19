@@ -82,8 +82,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'profile_car'
-                  )
+                  'phone', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -130,8 +129,7 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
         model = models.ProfileCar
         fields = ('id', 'created', 'modified', 'color',
                   'mark', 'car_model', 'color_name', 'license_plate',
-                  'car'
-                  )
+                  'car')
 
     def create(self, validated_data):
         """Override validated data"""
@@ -161,7 +159,7 @@ class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'user_id', 'avatar',
+        fields = ('id', 'created', 'avatar',
                   'first_name', 'last_name', 'geo_lat',
                   'geo_lon')
 
@@ -169,19 +167,23 @@ class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
 class ProfileFriendListSerializer(serializers.ModelSerializer):
     """Serializer for model FriendList"""
 
+    profile_id = serializers.IntegerField(source='friend.profile.id')
+
     class Meta:
         """Meta class"""
         model = models.FriendList
-        fields = ('id', 'created', 'friend_id', 'request_id')
+        fields = ('id', 'created', 'profile_id', 'request_id')
 
 
 class ProfileBlackListSerializer(serializers.ModelSerializer):
     """Serializer for model BlackList"""
 
+    profile = serializers.IntegerField(source='foe.profile.id')
+
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created')
+        fields = ('id', 'created', 'profile')
 
 
 class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -192,18 +194,17 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'user_id', 'first_name',
-                  'last_name', 'car', 'geo_lat', 'geo_lon')
+        fields = ('id', 'created', 'first_name', 'last_name',
+                  'car', 'geo_lat', 'geo_lon')
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
     """Serializer for model FriendRequest"""
 
     # REQUEST
-    # invited user
-    user = serializers.PrimaryKeyRelatedField(queryset=account_models.User.objects.all(),
-                                              source='invited',
-                                              write_only=True)
+    # Profile of invited user
+    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.all(),
+                                                 write_only=True)
 
     # RESPONSE
     # detail of invited user
@@ -212,25 +213,25 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.FriendRequest
-        fields = ('id', 'created', 'invited', 'user', 'approved')
+        fields = ('id', 'created', 'invited', 'profile', 'approved')
 
     def validate(self, attrs):
         """Override validate method"""
-        user = self.context.get('request').user
-        invited = attrs.get('invited')
-        if user.id == invited.id:
+        attrs['owner'] = self.context.get('request').user
+        attrs['invited'] = attrs.pop('profile').user
+
+        if attrs['owner'].id == attrs['invited'].id:
             raise api_exceptions.EqualIDError()
         # Check existed request
-        in_pending = models.FriendRequest.objects.waiting(user=user,
-                                                          invited=invited)
+        in_pending = models.FriendRequest.objects.waiting(user=attrs['owner'],
+                                                          invited=attrs['invited'])
         if in_pending:
-            raise api_exceptions.FriendRequestAlreadyExists(owner=user.id,
-                                                            invited=invited.id)
+            raise api_exceptions.FriendRequestAlreadyExists(owner=attrs['owner'].id,
+                                                            invited=attrs['invited'].id)
         return attrs
 
     def create(self, validated_data):
         """Override create-method"""
-        validated_data['owner'] = self.context.get('request').user
         friend_request = models.FriendRequest.objects.make(owner=validated_data['owner'],
                                                            user=validated_data['invited'])
         return friend_request
@@ -253,41 +254,44 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
     """Serializer class for BlackListRequest"""
 
     # REQUEST
-    user_id = serializers.PrimaryKeyRelatedField(queryset=account_models.User.objects.filter(),
-                                                 source='foe',
+    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.all(),
                                                  write_only=True)
+
+    # RESPONSE
+    profile_id = serializers.IntegerField(source='foe.profile.id',
+                                          read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'user_id')
+        fields = ('id', 'created', 'profile', 'profile_id')
 
     def validate(self, attrs):
         """Override validate method"""
-        user = self.context.get('request').user
-        foe = attrs.get('foe')
-        if user.id == foe.id:
+        attrs['owner'] = self.context.get('request').user
+        attrs['foe'] = attrs.pop('profile').user
+
+        if attrs['owner'].id == attrs['foe'].id:
             raise api_exceptions.EqualIDError()
         # Check existed request
-        in_pending = models.BlackList.objects.are_foes(owner=user,
-                                                       user=foe)
+        in_pending = models.BlackList.objects.are_foes(owner=attrs['owner'],
+                                                       user=attrs['foe'])
         if in_pending:
-            raise api_exceptions.AlreadyBlacked(owner=user.id,
-                                                user=foe.id)
+            raise api_exceptions.AlreadyBlacked(owner=attrs['owner'].id,
+                                                user=attrs['foe'].id)
         return attrs
 
     def create(self, validated_data):
         """Override create method"""
-        validated_data['owner'] = self.context.get('request').user
         return super().create(validated_data)
 
 
 class BlackListDetailSerializer(serializers.ModelSerializer):
     """Serializer for model BlackList"""
 
-    foe = FriendRequestDetailSerializer(source='foe.profile', read_only=True)
+    profile_id = FriendRequestDetailSerializer(source='foe.profile', read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'foe')
+        fields = ('id', 'created', 'profile_id')

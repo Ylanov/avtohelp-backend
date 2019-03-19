@@ -17,11 +17,14 @@ class MessageListSerializer(serializers.ModelSerializer):
 class ChatRoomListSerializer(serializers.ModelSerializer):
     """Serializer for model ChatRoom"""
 
+    initiator_id = serializers.IntegerField(source='initiator.profile.id')
+    participant_id = serializers.IntegerField(source='participant.profile.id')
+
     class Meta:
         """Meta class"""
         model = models.ChatRoom
-        fields = ('id', 'created', 'initiator',
-                  'participant', 'is_public')
+        fields = ('id', 'created', 'initiator_id',
+                  'participant_id', 'is_public')
 
 
 class ChatProfileDetailSerializer(serializers.ModelSerializer):
@@ -64,7 +67,10 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
     """Serializer for create ChatRoom"""
 
     # REQUEST
-    participant = serializers.PrimaryKeyRelatedField(queryset=User.objects.filter(is_active=True))
+    participant = serializers.PrimaryKeyRelatedField(queryset=profile_models.Profile.objects.all())
+
+    # RESPONSE
+    initiator = serializers.IntegerField(source='initiator.profile.id', read_only=True, required=False)
 
     class Meta:
         """Meta class"""
@@ -74,6 +80,7 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """Override validate method"""
         attrs['initiator'] = self.context.get('request').user
+        attrs['participant'] = attrs.get('participant').user
 
         # Check if participant is not an initiator
         if attrs['initiator'] == attrs['participant']:
@@ -83,11 +90,6 @@ class ChatRoomCreateSerializer(serializers.ModelSerializer):
         are_foes = profile_models.BlackList.objects.are_foes(attrs['initiator'], attrs['participant'])
         if are_foes:
             raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
-
-        # Check if participant is friend of mine
-        friends = profile_models.FriendList.objects.are_friends(attrs['initiator'], attrs['participant'])
-        if not friends:
-            raise api_exceptions.ArentFriendsError(attrs['initiator'], attrs['participant'])
 
         # Check if chat room is already exists
         room = models.ChatRoom.objects.by_paticipants(attrs['initiator'], attrs['participant'])
