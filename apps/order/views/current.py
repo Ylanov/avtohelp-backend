@@ -21,8 +21,7 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        user = self.request.user
-        return self.queryset.ordinary(user)
+        return self.queryset.available(self.request.user)
 
 
 class AssistanceRequestCountView(views.APIView):
@@ -81,7 +80,7 @@ class AssistanceRequestDetailView(AssistanceRequestMixin, generics.RetrieveAPIVi
         return self.queryset.by_user(user=self.request.user)
 
 
-class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.RetrieveUpdateAPIView):
+class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):
     """
     Get detail information of assistance request
     """

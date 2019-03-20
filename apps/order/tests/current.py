@@ -173,8 +173,8 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}),
-                                   data={'status': models.AssistanceRequest.EXPIRED})
+        response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
+                                     data={'status': models.AssistanceRequest.EXPIRED})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('status'), models.AssistanceRequest.EXPIRED)
 
@@ -187,8 +187,9 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}),
-                                   data={'status': 9999})
+        import ipdb;ipdb.set_trace()
+        response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
+                                     data={'status': 9999})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_assistance_request(self):
