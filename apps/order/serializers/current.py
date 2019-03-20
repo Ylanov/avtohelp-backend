@@ -66,7 +66,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
 
         model = models.AssistanceRequest
         fields = ('id', 'created', 'issue', 'description',
-                  'geo_lat', 'geo_lon', 'profile', )
+                  'geo_lat', 'geo_lon', 'profile', 'status')
 
     def validate(self, attrs):
         """Override validate method"""
@@ -100,3 +100,14 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         # else:
         #     tasks.notify_users()
         return super(AssistanceRequestCreateSerializer, self).create(validated_data)
+
+
+class AssistanceRequestUpdateSerializer(serializers.ModelSerializer):
+    """Update object of AssistanceRequest by user"""
+
+    status = serializers.ChoiceField(choices=models.AssistanceRequest.STATUS_CHOCIES)
+
+    class Meta:
+        """Meta class"""
+        model = models.AssistanceRequest
+        fields = ('status',)

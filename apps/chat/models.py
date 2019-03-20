@@ -1,17 +1,30 @@
 from django.db import models
 from django.db.models import Q, Subquery
-from utils.mixins import BaseMixin
-from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
 from userprofile import models as profile_models
+from utils.mixins import BaseMixin
+from django.utils.translation import ugettext_lazy as _
+
+
+class ChatMessageManager(models.Manager):
+    """Custom manager for model ChatMessage"""
+
+    @database_sync_to_async
+    def make(self):
+        """Bulk create chat messages"""
+        pass
+
+
+class ChatMessageQuerySet(models.QuerySet):
+    """Custom queryset for model ChatMessage"""
+    pass
 
 
 class ChatMessage(BaseMixin):
     """Chat messages"""
-    sender = models.ForeignKey('account.User', on_delete=models.CASCADE, related_name='sender')
-    recipient = models.ForeignKey('account.User', on_delete=models.CASCADE, related_name='recipient')
-    message = models.TextField()
-    is_read = models.BooleanField(default=False)
     room = models.ForeignKey('ChatRoom', on_delete=models.CASCADE)
+
+    objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
 
     class Meta:
         ordering = ('created',)
@@ -56,7 +69,7 @@ class ChatRoomQuerySet(models.QuerySet):
         """Only friendly rooms"""
         return self.exclude(participant_id__in=Subquery(
             profile_models.BlackList.objects.common(participant).values('foe_id')))
-    
+
     def friends(self, participant):
         """Filter by friend flag"""
         return self.filter(participant_id__in=Subquery(
@@ -79,17 +92,34 @@ class ChatRoomQuerySet(models.QuerySet):
 
 class ChatRoom(BaseMixin):
     """Chat room"""
-    initiator = models.ForeignKey('account.User',
-                                  on_delete=models.CASCADE,
-                                  related_name='initiator',
-                                  blank=True, null=True)
-    participant = models.ForeignKey('account.User',
-                                    on_delete=models.CASCADE,
-                                    related_name='participant',
-                                    blank=True, null=True)
-    is_public = models.BooleanField(default=True)
+    name = models.CharField(max_length=24,
+                            blank=True, default=None, null=True)
+    participants = models.ManyToManyField('account.User',
+                                          related_name='participants')
+    is_public = models.BooleanField(default=False)
 
     objects = ChatRoomQuerySet.as_manager()
 
     def __str__(self):
         return f'{self.id}'
+
+
+class ChatRole(BaseMixin):
+    """Chat user role"""
+
+    MODERATOR = 0
+    PARTICIPANT = 1
+
+    ROLE_CHOICES = (
+        (MODERATOR, _('Moderator')),
+        (PARTICIPANT, _('Participant'))
+    )
+
+    user = models.ForeignKey('account.User',
+                             related_name='user_role',
+                             on_delete=models.CASCADE)
+    room = models.ForeignKey('ChatRoom',
+                             related_name='room_role',
+                             on_delete=models.CASCADE)
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, verbose_name=_('Role'),
+                                            default=PARTICIPANT, blank=True, null=True)
