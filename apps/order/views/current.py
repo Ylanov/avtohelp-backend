@@ -1,8 +1,8 @@
 from rest_framework import generics
+from rest_framework.pagination import CursorPagination
 
 from order import models
 from order.serializers import current as serializers
-from rest_framework.pagination import CursorPagination
 
 
 class AssistanceRequestMixin(object):
@@ -68,3 +68,24 @@ class AssistanceRequestDetailView(AssistanceRequestMixin, generics.RetrieveAPIVi
     def get_queryset(self):
         """Override get_queryset method"""
         return self.queryset.by_user(user=self.request.user)
+
+
+class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.RetrieveUpdateAPIView):
+    """
+    Get detail information of assistance request
+    """
+    serializer_class = serializers.AssistanceRequestUpdateSerializer
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.by_user(user=self.request.user).available()
+
+
+class AssistanceRequestDestroyView(generics.DestroyAPIView):
+    """
+   Delete assistance request
+    """
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.AssistanceRequest.objects.by_user(user=self.request.user)

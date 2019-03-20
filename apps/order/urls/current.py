@@ -7,5 +7,7 @@ app_name = 'order'
 urlpatterns = [
     path('', views.AssistanceRequestListView.as_view(), name='request-list'),
     path('create', views.AssistanceRequestCreateView.as_view(), name='request-create'),
-    path('<int:pk>', views.AssistanceRequestDetailView.as_view(), name='request-detail')
+    path('<int:pk>', views.AssistanceRequestDetailView.as_view(), name='request-detail'),
+    path('<int:pk>/update', views.AssistanceRequestUpdateView.as_view(), name='request-update'),
+    path('<int:pk>/delete', views.AssistanceRequestDestroyView.as_view(), name='request-delete')
 ]

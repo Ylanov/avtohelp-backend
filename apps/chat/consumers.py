@@ -42,6 +42,14 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
 
+        # models.ChatMessage.objects.bulk_create([
+        #     models.ChatMessage(sender=,
+        #                        recipient=,
+        #                        message=message,
+        #                        is_read=True,
+        #                        room=models.ChatRoom.objects.get(id=self.room_id))
+        # ])
+
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,

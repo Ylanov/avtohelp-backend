@@ -9,6 +9,7 @@ urlpatterns = [
     path('device', views.FCMDeviceViewSet.as_view(),
          name='device'),
 
+    # Profiles
     path('profiles', views.ProfileListView.as_view(),
          name='profile-list'),
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('profile/detail', views.MyProfileDetailView.as_view(),
          name='my-profile-detail'),
 
+    # Profile car
     path('profile/cars', views.ProfileCarListView.as_view(),
          name='profile-car-list'),
 
@@ -30,6 +32,7 @@ urlpatterns = [
     path('profile/cars/delete/<int:pk>', views.ProfileCarDeleteView.as_view(),
          name='profile-car-delete'),
 
+    # Friendlist
     path('profile/friends', views.ProfileFriendListView.as_view(),
          name='friendlist-list'),
 
@@ -54,6 +57,7 @@ urlpatterns = [
     path('profile/friends/requests/outgoing/<int:pk>', views.FriendRequestDetailView.as_view(),
          name='my-friendrequest-detail'),
 
+    # Blacklist
     path('profile/blacklist', views.ProfileBlackListView.as_view(),
          name='blacklistrequest-list'),
 
