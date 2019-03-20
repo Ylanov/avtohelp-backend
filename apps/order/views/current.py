@@ -1,9 +1,8 @@
-from rest_framework import generics, views
-from rest_framework.response import Response
-from rest_framework.pagination import CursorPagination
+from rest_framework import generics
 
 from order import models
 from order.serializers import current as serializers
+from rest_framework.pagination import CursorPagination
 
 
 class AssistanceRequestMixin(object):
@@ -21,17 +20,8 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.available(self.request.user)
-
-
-class AssistanceRequestCountView(views.APIView):
-    """
-    Return count of availbale assistance request
-    """
-
-    def get(self, request, *args, **kwargs):
-        """Get count of assistance requests"""
-        return Response({'count': models.AssistanceRequest.objects.available(user=request.user).count()})
+        user = self.request.user
+        return self.queryset.ordinary(user)
 
 
 class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):
@@ -78,24 +68,3 @@ class AssistanceRequestDetailView(AssistanceRequestMixin, generics.RetrieveAPIVi
     def get_queryset(self):
         """Override get_queryset method"""
         return self.queryset.by_user(user=self.request.user)
-
-
-class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):
-    """
-    Get detail information of assistance request
-    """
-    serializer_class = serializers.AssistanceRequestUpdateSerializer
-
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return self.queryset.by_user(user=self.request.user).available(user=self.request.user)
-
-
-class AssistanceRequestDestroyView(generics.DestroyAPIView):
-    """
-   Delete assistance request
-    """
-
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return models.AssistanceRequest.objects.by_user(user=self.request.user)

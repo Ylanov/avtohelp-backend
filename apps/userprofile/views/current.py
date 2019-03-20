@@ -41,7 +41,6 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         obj and self.check_object_permissions(self.request, obj)
         return obj
 
-
 # Profile
 
 
@@ -51,11 +50,9 @@ class ProfileListView(generics.ListAPIView):
     With filter by fields:
     :param first_name: Search profile by first_name
     :param last_name: Search profile by last_name
-    :param middle_name: Search profile by middle_name
     :param license_plate: Search profile by car license plate
     :type first_name: CharField Anatoly
     :type last_name: CharField Feteleu
-    :type middle_name: CharField Vyacheslavovich
     :type license_plate: CharField "aaa123бб 70"
     """
 
@@ -66,7 +63,7 @@ class ProfileListView(generics.ListAPIView):
         """Override get_queryset method"""
         return models.Profile.objects.select_related(
             'user'
-        ).friendly(self.request.user).order_by('first_name', 'last_name', 'middle_name')
+        ).friendly(self.request.user).order_by('first_name', 'last_name')
 
 
 class MyProfileDetailView(generics.RetrieveUpdateAPIView):

@@ -16,14 +16,6 @@ class AssistanceRequestQuerySet(models.QuerySet):
         """Filter by status"""
         return self.filter(status=status)
 
-    def available(self, user):
-        """Filter by valid requests"""
-        return self.ordinary(user=user).filter(status=AssistanceRequest.AVAILABLE)
-
-    def expired(self):
-        """Filter by valid requests"""
-        return self.filter(status=AssistanceRequest.EXPIRED)
-
     def ordinary(self, user):
         """
         Queryset that EXCLUDE requests in which user is owner of blacklist or he is a foe and excluded himself

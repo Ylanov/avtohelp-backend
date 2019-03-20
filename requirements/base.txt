@@ -51,10 +51,13 @@ channels_redis==2.3.3
 requests==2.21.0
 requests-toolbelt==0.9.1
 simplejson==3.16.0
+six==1.12.0
 traitlets==4.3.2
 uritemplate==3.0.0
 urllib3==1.24.1
 vine==1.2.0
+virtualenv==16.4.1
+virtualenv-clone==0.5.1
 wcwidth==0.1.7
 phonenumbers==8.10.6
 channels==2.1.7

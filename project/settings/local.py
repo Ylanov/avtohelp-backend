@@ -23,7 +23,7 @@ DATABASES = {
     }
 }
 
-ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49')
+ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '.ngrok.io', '10.0.0.120',)
 
 # Logging
 LOGGING = {
