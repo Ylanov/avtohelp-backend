@@ -1,4 +1,5 @@
-from rest_framework import generics
+from rest_framework import generics, views
+from rest_framework.response import Response
 from rest_framework.pagination import CursorPagination
 
 from order import models
@@ -22,6 +23,16 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
         """Override get_queryset method"""
         user = self.request.user
         return self.queryset.ordinary(user)
+
+
+class AssistanceRequestCountView(views.APIView):
+    """
+    Return count of availbale assistance request
+    """
+
+    def get(self, request, *args, **kwargs):
+        """Get count of assistance requests"""
+        return Response({'count': models.AssistanceRequest.objects.available(user=request.user).count()})
 
 
 class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):
@@ -78,7 +89,7 @@ class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.RetrieveUpdat
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.by_user(user=self.request.user).available()
+        return self.queryset.by_user(user=self.request.user).available(user=self.request.user)
 
 
 class AssistanceRequestDestroyView(generics.DestroyAPIView):

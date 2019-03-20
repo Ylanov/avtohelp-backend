@@ -110,7 +110,47 @@ class TestOrder(APITestCase):
 
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 2)
+
+    def test_count_created_assistance_requests(self):
+        """
+        Test count of created assurance requests
+        Users: user_1, user_2, user_3
+        Blacked users: user_2
+        Assistance requests: AssistanceRequest(user_1),
+                             AssistanceRequest(user_2),
+                             AssistanceRequest(user_3)
+        Result: {"count": 2}
+
+        """
+
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = account_models.User.objects.make(phone='+79000000002')
+        user_3 = account_models.User.objects.make(phone='+79000000003')
+
+        # Create assistance requests
+        models.AssistanceRequest.objects.create(user=self.user_1,
+                                                issue='Issue 1',
+                                                description='Description')
+        models.AssistanceRequest.objects.create(user=user_2,
+                                                issue='Issue 2',
+                                                description='Description')
+        models.AssistanceRequest.objects.create(user=user_3,
+                                                issue='Issue 3',
+                                                description='Description')
+
+        # Put user_2 in BlackList
+        profile_models.BlackList.objects.create(owner=self.user_1, foe=user_2)
+
+        api_path = '%s:order:requests-count' % self.VERSION
+
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'),
+                         models.AssistanceRequest.objects.available(user=self.user_1).count())
 
     def test_detail_assistance_request(self):
         """Test detail of created assurance requests"""
@@ -133,7 +173,7 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.id}),
+        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}),
                                    data={'status': models.AssistanceRequest.EXPIRED})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('status'), models.AssistanceRequest.EXPIRED)
@@ -147,8 +187,8 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.id}),
-                                   data={'status': 420})
+        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}),
+                                   data={'status': 9999})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_assistance_request(self):

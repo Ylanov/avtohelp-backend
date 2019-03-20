@@ -16,9 +16,9 @@ class AssistanceRequestQuerySet(models.QuerySet):
         """Filter by status"""
         return self.filter(status=status)
 
-    def available(self):
+    def available(self, user):
         """Filter by valid requests"""
-        return self.filter(status=AssistanceRequest.AVAILABLE)
+        return self.ordinary(user=user).filter(status=AssistanceRequest.AVAILABLE)
 
     def expired(self):
         """Filter by valid requests"""

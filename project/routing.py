@@ -22,8 +22,6 @@ application = ProtocolTypeRouter({
     # add users and sessions - see http://channels.readthedocs.io/en/latest/topics/authentication.html
     "websocket": AuthMiddlewareStack(
         URLRouter([
-            # URLRouter just takes standard Django path() or url() entries.
-            path('ws/chat/<int:room>', consumers.PrivateChatConsumer),
         ]),
     ),
 
