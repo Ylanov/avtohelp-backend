@@ -5,15 +5,6 @@ from userprofile import models as profile_models
 from utils import api_exceptions
 
 
-class MessageListSerializer(serializers.ModelSerializer):
-    """Serializer for model Message"""
-
-    class Meta:
-        """Meta class"""
-        model = models.ChatMessage
-        fields = ('id', 'created', 'modified', 'is_read', 'message')
-
-
 class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
     """Serializer for field participants in ChatRoom """
 
@@ -26,6 +17,18 @@ class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = User
         fields = ('id', 'first_name', 'last_name', 'middle_name', 'avatar')
+
+
+class ChatMessageListSerializer(serializers.ModelSerializer):
+    """Serializer for model Message"""
+
+    sender = ChatRoomParticipantsSerializer()
+
+    class Meta:
+        """Meta class"""
+        model = models.ChatMessage
+        fields = ('id', 'created', 'modified',
+                  'sender', 'room', 'message')
 
 
 class ChatRoomListSerializer(serializers.ModelSerializer):

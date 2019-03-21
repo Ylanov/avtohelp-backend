@@ -6,18 +6,12 @@ from utils.mixins import BaseMixin
 from django.utils.translation import ugettext_lazy as _
 
 
-class ChatMessageManager(models.Manager):
-    """Custom manager for model ChatMessage"""
-
-    @database_sync_to_async
-    def make(self):
-        """Bulk create chat messages"""
-        pass
-
-
 class ChatMessageQuerySet(models.QuerySet):
     """Custom queryset for model ChatMessage"""
-    pass
+
+    def by_room(self, room_id):
+        """Filter by room"""
+        return self.filter(room=room_id)
 
 
 class ChatMessage(BaseMixin):
@@ -28,7 +22,7 @@ class ChatMessage(BaseMixin):
                              on_delete=models.CASCADE)
     message = models.TextField()
 
-    objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
+    objects = ChatMessageQuerySet.as_manager()
 
     class Meta:
         ordering = ('created',)

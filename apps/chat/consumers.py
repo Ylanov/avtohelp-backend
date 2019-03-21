@@ -1,20 +1,29 @@
 import json
-
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.db import database_sync_to_async
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.utils import timezone
 from chat import models
+from utils import methods as utils_methods
+from chat import models as chat_models
 
 
-class PrivateChatConsumer(AsyncWebsocketConsumer):
+class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
+        """Connect to WebSocket"""
+        # Check if connected user isn't anonymous
+        if self.scope['user'].is_anonymous:
+            await self.close()
+
         self.room_id = self.scope['url_route']['kwargs']['room']
         self.room_group_name = 'chat_%s' % self.room_id
+
         # Join room group
         # await self.channel_layer.group_add(
         #     self.room_group_name,
         #     self.channel_name
         # )
         # await self.accept()
+
         # Check participants
         qs = models.ChatRoom.objects.by_participant(self.scope['user'])
         if qs.exists():
@@ -31,16 +40,20 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             await self.close()
 
     async def disconnect(self, close_code):
-        # Leave room group
+        """Leave room group"""
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
 
-    # Receive message from WebSocket
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+    async def receive_json(self, content):
+        """Receive message from WebSocket"""
+        message = content['message']
+
+        # Make a record in the DB
+        await utils_methods.create_chat_message(room=self.room_id,
+                                                message=message,
+                                                sender=self.scope['user'])
 
         # Send message to room group
         await self.channel_layer.group_send(
@@ -53,11 +66,10 @@ class PrivateChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    # Receive message from room group
     async def chat_message(self, event):
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
+        """Receive message from room group"""
+        await self.send_json({
             'message': event['message'],
             'datetime': event['datetime'],
             'user': f'{event["user"]}',
-        }))
+        })

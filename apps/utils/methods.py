@@ -33,3 +33,13 @@ def get_exception_body(exception):
     if hasattr(exception, 'extended_status_code'):
         return dict(detail=exception.default_detail, status_code=exception.extended_status_code)
     return dict(detail=exception.default_detail)
+
+
+@database_sync_to_async
+def create_chat_message(sender: object, room: int, message: str):
+    # Get room
+    room = chat_models.ChatRoom.objects.get(id=room)
+    # Make a record in the DB
+    obj = chat_models.ChatMessage.objects.create(sender=sender, room=room, message=message)
+    obj.save()
+    return obj

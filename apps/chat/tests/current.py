@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 from account.models import User
 from userprofile.models import BlackList, FriendList, FriendRequest
-from chat.models import ChatRoom
+from chat.models import ChatRoom, ChatMessage
 from utils import api_exceptions
 
 
@@ -62,6 +62,37 @@ class TestChat(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatRoom.objects.by_participant(self.user).count())
+
+    def test_chat_messages_list(self):
+        """Test view for messages of chat room"""
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+
+        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'room': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
+
+    def test_chat_messages_list_1(self):
+        """Test view for messages of chat room"""
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+
+        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'room': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_chat_create(self):
         """Test create chat room"""

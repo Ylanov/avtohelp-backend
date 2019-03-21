@@ -1,9 +1,11 @@
-from django.contrib import admin, messages
+from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
+
 from chat import models
 
 
-# Register your models here.
 class ChatRoomAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
     readonly_fields = ('id', 'created', 'modified')
@@ -14,32 +16,52 @@ class ChatRoomAdminModel(admin.ModelAdmin):
         (_('Room\'s data'), {'fields': ('name', 'participants', 'is_public')}),
     )
 
-    def save_model(self, request, obj, form, change):
-        """Override save action"""
-        # Private chat
-        if not form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
-            super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     """Override save action"""
+    #     # Private chat
+    #     if not form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
+    #         super().save_model(request, obj, form, change)
+    #
+    #     if form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
+    #         messages.error(request, _('Private room can not be public.'))
+    #
+    #     if not form.data.get('is_public') and form.data.get('name') and int(form.data.get('participants')) == 2:
+    #         messages.error(request, _('Private room can not have room name.'))
+    #
+    #     if not form.data.get('is_public') and not form.data.get('name') and (int(form.data.get('participants')) > 2 or
+    #                                                                          int(form.data.get('participants')) < 2):
+    #         messages.error(request, _('Private room can not contain more or less than two users.'))
+    #
+    #     # Public chat
+    #     if form.data.get('is_public') and form.data.get('name'):
+    #         super().save_model(request, obj, form, change)
+    #
+    #     if not form.data.get('is_public') and form.data.get('name'):
+    #         messages.error(request, _('Public room can not have correct flag.'))
+    #
+    #     if form.data.get('is_public') and not form.data.get('name'):
+    #         messages.error(request, _('Public room can contain room name'))
 
-        if form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
-            messages.error(request, _('Private room can not be public.'))
 
-        if not form.data.get('is_public') and form.data.get('name') and int(form.data.get('participants')) == 2:
-            messages.error(request, _('Private room can not have room name.'))
+class ChatMessageAdminModel(admin.ModelAdmin):
+    """Admin model for ChatRoom"""
+    readonly_fields = ('id', 'created', 'modified')
+    list_display = readonly_fields + ('get_room_link',)
+    fieldsets = (
+        (_('Info'), {'fields': ('id', 'created', 'modified')}),
+        (_('Room\'s data'), {'fields': ('name',)}),
+        (_('Sender'), {'fields': ('sender',)}),
+    )
 
-        if not form.data.get('is_public') and not form.data.get('name') and (int(form.data.get('participants')) > 2 or
-                                                                             int(form.data.get('participants')) < 2):
-            messages.error(request, _('Private room can not contain more or less than two users.'))
+    def get_room_link(self, instance):
+        """Get user for list_fields"""
+        url = reverse('admin:{}_{}_change'.format(instance.room._meta.app_label,
+                                                  instance.room._meta.model_name),
+                      args=(instance.room.id,))
+        return format_html('<a href="{}">{}</a>', url, instance.room if not instance.room.name else instance.room.name)
 
-        # Public chat
-        if form.data.get('is_public') and form.data.get('name'):
-            super().save_model(request, obj, form, change)
-
-        if not form.data.get('is_public') and form.data.get('name'):
-            messages.error(request, _('Public room can not have correct flag.'))
-
-        if form.data.get('is_public') and not form.data.get('name'):
-            messages.error(request, _('Public room can contain room name'))
+    get_room_link.short_description = _('Link to chat room')
 
 
-# admin.site.register(models.ChatRoom, ChatRoomAdminModel)
-admin.site.register(models.ChatRoom)
+admin.site.register(models.ChatRoom, ChatRoomAdminModel)
+admin.site.register(models.ChatMessage, ChatMessageAdminModel)
