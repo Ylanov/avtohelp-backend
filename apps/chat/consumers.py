@@ -1,10 +1,8 @@
-import json
-from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.utils import timezone
+
 from chat import models
 from utils import methods as utils_methods
-from chat import models as chat_models
 
 
 class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
@@ -17,25 +15,15 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
         self.room_id = self.scope['url_route']['kwargs']['room']
         self.room_group_name = 'chat_%s' % self.room_id
 
-        # Join room group
-        # await self.channel_layer.group_add(
-        #     self.room_group_name,
-        #     self.channel_name
-        # )
-        # await self.accept()
-
         # Check participants
-        qs = models.ChatRoom.objects.by_participant(self.scope['user'])
+        qs = models.ChatRoom.objects.by_participant(self.scope['user']).filter(id=self.room_id)
         if qs.exists():
-            if qs.first().id == self.room_id:
-                # Join room group
-                await self.channel_layer.group_add(
-                    self.room_group_name,
-                    self.channel_name
-                )
-                await self.accept()
-            else:
-                await self.close()
+            # Join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            await self.accept()
         else:
             await self.close()
 

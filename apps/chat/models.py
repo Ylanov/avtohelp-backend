@@ -1,9 +1,9 @@
 from django.db import models
-from django.db.models import Q, Subquery
-from channels.db import database_sync_to_async
+from django.db.models import Subquery
+from django.utils.translation import ugettext_lazy as _
+
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin
-from django.utils.translation import ugettext_lazy as _
 
 
 class ChatMessageQuerySet(models.QuerySet):
@@ -31,26 +31,6 @@ class ChatMessage(BaseMixin):
 class ChatRoomManager(models.Manager):
     """Manager for model ChatRoom"""
 
-    def get_or_create(self, initiator, participant, public):
-        """
-        Get or Create ChatRoom object for open private chat
-        :param initiator:
-        :param public:
-        :param participant:
-        :type initiator: Obj or Integer
-        :type public: Boolean
-        :type participant: Obj or Integer
-        :return: Obj
-        """
-        # Check if room exists
-        room_qs = self.by_participants(initiator=initiator, participant=participant, public=public)
-        if not room_qs:
-            obj = self.make(participants=[initiator, participant], public=public)
-            obj.save()
-        else:
-            obj = room_qs.first()
-        return obj
-
     def make(self, public: bool, participants):
         """Make ChatRoom object"""
         obj = self.model(is_public=public)
@@ -75,6 +55,7 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def by_participants(self, initiator, participant, public: bool):
         """Find if room already exists"""
+        # todo: fix is_public
         return self.filter(participants=initiator, is_public=public).filter(participants=participant, is_public=public)
 
     def by_participant(self, participant):
