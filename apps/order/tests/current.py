@@ -187,7 +187,6 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        import ipdb;ipdb.set_trace()
         response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
                                      data={'status': 9999})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
