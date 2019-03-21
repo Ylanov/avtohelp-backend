@@ -22,43 +22,47 @@ class ChatMessageQuerySet(models.QuerySet):
 
 class ChatMessage(BaseMixin):
     """Chat messages"""
-    room = models.ForeignKey('ChatRoom', on_delete=models.CASCADE)
+    sender = models.ForeignKey('account.User',
+                               on_delete=models.CASCADE)
+    room = models.ForeignKey('ChatRoom',
+                             on_delete=models.CASCADE)
+    message = models.TextField()
 
     objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
 
     class Meta:
         ordering = ('created',)
 
-    def __str__(self):
-        return self.message
-
 
 class ChatRoomManager(models.Manager):
     """Manager for model ChatRoom"""
 
-    def get_or_create(self, initiator=None, participant=None, is_public=False):
+    def get_or_create(self, initiator, participant, public):
         """
         Get or Create ChatRoom object for open private chat
         :param initiator:
-        :param is_public:
+        :param public:
         :param participant:
         :type initiator: Obj or Integer
-        :type is_public: Boolean
+        :type public: Boolean
         :type participant: Obj or Integer
         :return: Obj
         """
-        # If initiator and participant are set, then check existence of group chat
-        public = self.public()
-        if public.exists() and not (initiator and participant):
-            obj = public.first()
+        # Check if room exists
+        room_qs = self.by_participants(initiator=initiator, participant=participant, public=public)
+        if not room_qs:
+            obj = self.make(participants=[initiator, participant], public=public)
+            obj.save()
         else:
-            # Check if private room exists
-            private = self.by_paticipants(initiator=initiator, participant=participant)
-            if not private:
-                obj = self.model(initiator, participant, is_public)
-                obj.save()
-            else:
-                obj = private.first()
+            obj = room_qs.first()
+        return obj
+
+    def make(self, public: bool, participants):
+        """Make ChatRoom object"""
+        obj = self.model(is_public=public)
+        obj.save()
+        for participant in participants:
+            obj.participants.add(participant)
         return obj
 
 
@@ -67,23 +71,21 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(participant_id__in=Subquery(
+        return self.exclude(participants__id__in=Subquery(
             profile_models.BlackList.objects.common(participant).values('foe_id')))
 
     def friends(self, participant):
         """Filter by friend flag"""
-        return self.filter(participant_id__in=Subquery(
+        return self.filter(participants_id__in=Subquery(
             profile_models.FriendList.objects.common(participant).values('friend_id')))
 
-    def by_paticipants(self, initiator, participant):
+    def by_participants(self, initiator, participant, public: bool):
         """Find if room already exists"""
-        return self.filter(Q(initiator=initiator, participant=participant) |
-                           Q(initiator=participant, participant=initiator))
+        return self.filter(participants=initiator, is_public=public).filter(participants=participant, is_public=public)
 
     def by_participant(self, participant):
         """Find room by participant"""
-        return self.filter(Q(initiator=participant) |
-                           Q(participant=participant)).friendly(participant)
+        return self.filter(participants=participant).friendly(participant)
 
     def public(self):
         """Find if room already exists"""
@@ -98,10 +100,7 @@ class ChatRoom(BaseMixin):
                                           related_name='participants')
     is_public = models.BooleanField(default=False)
 
-    objects = ChatRoomQuerySet.as_manager()
-
-    def __str__(self):
-        return f'{self.id}'
+    objects = ChatRoomManager.from_queryset(ChatRoomQuerySet)()
 
 
 class ChatRole(BaseMixin):

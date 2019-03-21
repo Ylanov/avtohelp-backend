@@ -41,4 +41,5 @@ class ChatRoomAdminModel(admin.ModelAdmin):
             messages.error(request, _('Public room can contain room name'))
 
 
-admin.site.register(models.ChatRoom, ChatRoomAdminModel)
+# admin.site.register(models.ChatRoom, ChatRoomAdminModel)
+admin.site.register(models.ChatRoom)
