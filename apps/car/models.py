@@ -5,7 +5,6 @@ from django.contrib.gis.db import models as gis_models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-# Create your models here.
 class CarMark(BaseMixin, NameMixin):
     """Car brands model"""
     pass

@@ -75,7 +75,7 @@ class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
             raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
 
         # Check if chat room is already exists
-        room = models.ChatRoom.objects.by_participants(attrs['initiator'], attrs['participant'], public=False)
+        room = models.ChatRoom.objects.private(attrs['initiator'], attrs['participant'])
         if room.exists():
             raise api_exceptions.ChatRoomAlreadyExistsError(attrs['initiator'], attrs['participant'])
 

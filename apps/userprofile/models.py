@@ -11,16 +11,6 @@ from utils.mixins import BaseMixin
 class ProfileQuerySet(models.QuerySet):
     """Custom QuerySet for model Profile"""
 
-    # def friendly(self, user):
-    #     """
-    #     Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
-    #     :param user:
-    #     :type user: object
-    #     :return: ProfileQuerySet
-    #     """
-    #     return self.exclude(Q(user__blacklist_owner__owner=user) |
-    #                         Q(user__blacked_user__foe=user)).exclude(user=user)
-
     def friendly(self, user):
         """
         Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
@@ -83,7 +73,6 @@ class ProfileCarQuerySet(models.QuerySet):
 class ProfileCar(BaseMixin):
     """User profile car"""
 
-    # NOTE: ProfileCar with FK to User )
     owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
     car = models.ForeignKey('car.Car', on_delete=models.PROTECT)
     color = models.ForeignKey('car.CarColor', on_delete=models.CASCADE)
@@ -185,8 +174,7 @@ class FriendListQuerySet(models.QuerySet):
 
     def common(self, user):
         """Get user friends"""
-        return self.filter(Q(owner=user, request__approved=True) |
-                           Q(friend=user, request__approved=True))
+        return self.filter(Q(owner=user) | Q(friend=user) & Q(request__approved=True))
 
     def in_list(self, user):
         """User in someones friendlist"""
@@ -194,8 +182,7 @@ class FriendListQuerySet(models.QuerySet):
 
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
-        if self.filter(Q(owner=owner, friend=user, request__approved=True) |
-                       Q(owner=user, friend=owner, request__approved=True)).exists():
+        if self.filter(Q(owner=owner, friend=user) | Q(owner=user, friend=owner) & Q(request__approved=True)).exists():
             return True
         else:
             return False

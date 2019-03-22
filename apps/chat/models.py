@@ -53,10 +53,9 @@ class ChatRoomQuerySet(models.QuerySet):
         return self.filter(participants_id__in=Subquery(
             profile_models.FriendList.objects.common(participant).values('friend_id')))
 
-    def by_participants(self, initiator, participant, public: bool):
-        """Find if room already exists"""
-        # todo: fix is_public
-        return self.filter(participants=initiator, is_public=public).filter(participants=participant, is_public=public)
+    def private(self, initiator, participant):
+        """Filter by two participants for find private room"""
+        return self.filter(is_public=False).filter(participants=initiator).filter(participants=participant)
 
     def by_participant(self, participant):
         """Find room by participant"""
