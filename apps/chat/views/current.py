@@ -2,8 +2,10 @@ import json
 
 from django.shortcuts import render
 from django.utils.safestring import mark_safe
-from rest_framework import generics
+from rest_framework import generics, views
 from rest_framework.permissions import AllowAny
+from rest_framework.pagination import CursorPagination
+from rest_framework.response import Response
 
 from chat import models, filters, permissions
 from chat.serializers import current as serializers
@@ -15,6 +17,16 @@ class ChatMessageListView(generics.ListAPIView):
     queryset = models.ChatMessage.objects.all()
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
+    pagination_class = CursorPagination
+
+
+class ChatMessageCountView(views.APIView):
+    """MessageList view"""
+
+    def get(self, request, *args, **kwargs):
+        """Get count of assistance requests"""
+        return Response({
+            'count': models.ChatMessage.objects.filter(room=kwargs.get('pk')).count()})
 
 
 class ChatRoomDetailView(generics.RetrieveAPIView):

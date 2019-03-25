@@ -10,6 +10,7 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
         """Connect to WebSocket"""
         self.room_id = self.scope['url_route']['kwargs']['pk']
         self.room_group_name = 'chat_%s' % self.room_id
+        self.participants = set()
 
         # Check if connected user isn't anonymous
         if self.scope['user'].is_anonymous:
@@ -23,12 +24,14 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
                     self.room_group_name,
                     self.channel_name
                 )
+                self.participants.add(self.scope['user'].id)
                 await self.accept()
             else:
                 await self.close()
 
     async def disconnect(self, close_code):
         """Leave room group"""
+        self.participants.remove(self.scope['user'].id)
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
@@ -56,6 +59,7 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
                 'user': self.scope['user'].get_full_name(),
                 'message': message,
                 'datetime': f'{timezone.now()}',
+                'users': f'{self.participants}'
             }
         )
 
@@ -65,4 +69,5 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
             'message': event['message'],
             'datetime': event['datetime'],
             'user': f'{event["user"]}',
+            'users': f'{event["users"]}',
         })

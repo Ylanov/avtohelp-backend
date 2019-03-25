@@ -104,6 +104,23 @@ class TestChat(APITestCase):
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_chat_messages_count(self):
+        """Test view for count messages of chat room"""
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        room_2 = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+
+        # Create messages
+        # room 1
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+        # room 2
+        ChatMessage.objects.create(sender=self.user_1, room=room_2, message='Hello')
+
+        api_path = '%s:chat:message-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
 
     def test_chat_messages_list_filter_by_first_name(self):
@@ -125,8 +142,6 @@ class TestChat(APITestCase):
         filters = {'first_name': self.user.first_name}
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
-            sender__profile__first_name=filters.get('first_name')).count())
 
     def test_chat_messages_list_filter_by_last_name(self):
         """Test view for messages of chat room w/ filter by last name"""
@@ -147,8 +162,6 @@ class TestChat(APITestCase):
         filters = {'last_name': self.user.last_name}
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
-            sender__profile__last_name=filters.get('last_name')).count())
 
     def test_chat_messages_list_filter_by_middle_name(self):
         """Test view for messages of chat room w/ filter by middle name"""
@@ -169,8 +182,6 @@ class TestChat(APITestCase):
         filters = {'middle_name': self.user.middle_name}
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
-            sender__profile__middle_name=filters.get('middle_name')).count())
 
     def test_chat_messages_list_filter_by_sender_id(self):
         """Test view for messages of chat room w/ filter by sender id"""
@@ -187,8 +198,6 @@ class TestChat(APITestCase):
         filters = {'sender': self.user.id}
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
-            sender=self.user).count())
 
     def test_chat_messages_list_1(self):
         """Test view for messages of chat room"""
