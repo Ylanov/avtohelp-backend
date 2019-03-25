@@ -35,12 +35,11 @@ def get_exception_body(exception):
     return dict(detail=exception.default_detail)
 
 
-# This decorator turns this function from a synchronous function into an async one
-# we can call from our async consumers, that handles Django DBs correctly.
-# For more, see http://channels.readthedocs.io/en/latest/topics/databases.html
 @database_sync_to_async
-def get_room_or_error(initiator=None, participant=None, is_public=False):
-    """
-    Tries to fetch a room for the user.
-    """
-    return chat_models.ChatRoom.objects.get_or_create(initiator, participant, is_public)
+def create_chat_message(sender: object, room: int, message: str):
+    # Get room
+    room = chat_models.ChatRoom.objects.get(id=room)
+    # Make a record in the DB
+    obj = chat_models.ChatMessage.objects.create(sender=sender, room=room, message=message)
+    obj.save()
+    return obj

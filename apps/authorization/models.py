@@ -150,7 +150,6 @@ class SMSCode(BaseMixin):
 
     def fake(self):
         """Fake send sms method"""
-
         self.status = self.SENT
         self.save()
 

@@ -1,11 +1,9 @@
+from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import path
 
-from channels.http import AsgiHandler
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-
 from chat import consumers
-
+from chat.token_auth import TokenAuthMiddleware
+from channels.auth import AuthMiddlewareStack
 
 # The channel routing defines what connections get handled by what consumers,
 # selecting on either the connection type (ProtocolTypeRouter) or properties
@@ -20,8 +18,10 @@ application = ProtocolTypeRouter({
     # We actually don't need the URLRouter here, but we've put it in for
     # illustration. Also note the inclusion of the AuthMiddlewareStack to
     # add users and sessions - see http://channels.readthedocs.io/en/latest/topics/authentication.html
-    "websocket": AuthMiddlewareStack(
+    "websocket": TokenAuthMiddleware(
         URLRouter([
+            # URLRouter just takes standard Django path() or url() entries.
+            path('ws/chat/rooms/<int:pk>', consumers.PrivateChatConsumer),
         ]),
     ),
 
