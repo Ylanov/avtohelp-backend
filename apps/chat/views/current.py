@@ -12,13 +12,15 @@ from chat.serializers import current as serializers
 class ChatMessageListView(generics.ListAPIView):
     """MessageList view"""
     serializer_class = serializers.ChatMessageListSerializer
+    queryset = models.ChatMessage.objects.all()
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
 
-    def get_queryset(self):
-        """Override get_queryset method"""
-        qs = models.ChatMessage.objects.filter(room=self.kwargs.get('room'))
-        return qs
+
+class ChatRoomDetailView(generics.RetrieveAPIView):
+    """MessageList view"""
+    serializer_class = serializers.ChatRoomDetailSerializer
+    permission_classes = (permissions.ChatMessagePermission,)
 
 
 class ChatRoomListView(generics.ListAPIView):
@@ -38,7 +40,7 @@ class ChatRoomPrivateView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         """Override get method."""
         return render(request, 'chat/private.html', {
-            'room_json': mark_safe(json.dumps(kwargs.get('room')))
+            'room_json': mark_safe(json.dumps(kwargs.get('pk')))
         })
 
 

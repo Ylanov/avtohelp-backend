@@ -8,24 +8,24 @@ from utils import methods as utils_methods
 class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         """Connect to WebSocket"""
+        self.room_id = self.scope['url_route']['kwargs']['pk']
+        self.room_group_name = 'chat_%s' % self.room_id
+
         # Check if connected user isn't anonymous
         if self.scope['user'].is_anonymous:
             await self.close()
-
-        self.room_id = self.scope['url_route']['kwargs']['room']
-        self.room_group_name = 'chat_%s' % self.room_id
-
-        # Check participants
-        qs = models.ChatRoom.objects.by_participant(self.scope['user']).filter(id=self.room_id)
-        if qs.exists():
-            # Join room group
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
-            await self.accept()
         else:
-            await self.close()
+            # Check user in participants
+            qs = models.ChatRoom.objects.by_participant(self.scope['user']).filter(id=self.room_id)
+            if qs.exists():
+                # Join room group
+                await self.channel_layer.group_add(
+                    self.room_group_name,
+                    self.channel_name
+                )
+                await self.accept()
+            else:
+                await self.close()
 
     async def disconnect(self, close_code):
         """Leave room group"""
@@ -36,7 +36,12 @@ class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
 
     async def receive_json(self, content):
         """Receive message from WebSocket"""
-        message = content['message']
+        try:
+            # From web-browser
+            message = content['message']
+        except:
+            # Directly
+            message = content
 
         # Make a record in the DB
         await utils_methods.create_chat_message(room=self.room_id,

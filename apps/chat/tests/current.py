@@ -73,7 +73,7 @@ class TestChat(APITestCase):
         ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
 
@@ -94,7 +94,7 @@ class TestChat(APITestCase):
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
         filters = {'first_name': self.user.first_name}
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}), data=filters)
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
             sender__profile__first_name=filters.get('first_name')).count())
@@ -116,7 +116,7 @@ class TestChat(APITestCase):
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
         filters = {'last_name': self.user.last_name}
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}), data=filters)
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
             sender__profile__last_name=filters.get('last_name')).count())
@@ -138,7 +138,7 @@ class TestChat(APITestCase):
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
         filters = {'middle_name': self.user.middle_name}
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}), data=filters)
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
             sender__profile__middle_name=filters.get('middle_name')).count())
@@ -156,7 +156,7 @@ class TestChat(APITestCase):
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
         filters = {'sender': self.user.id}
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}), data=filters)
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(
             sender=self.user).count())
@@ -175,7 +175,7 @@ class TestChat(APITestCase):
         ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
 
         api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'room': room.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_chat_create(self):
