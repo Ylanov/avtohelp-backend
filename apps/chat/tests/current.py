@@ -63,6 +63,35 @@ class TestChat(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), ChatRoom.objects.by_participant(self.user).count())
 
+    def test_room_detail(self):
+        """Test view for getting detail info about room"""
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        ChatRoom.objects.make(participants=[self.user, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_3], public=False)
+
+        api_path = '%s:chat:room-detail' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('id'), room.id)
+
+    def test_room_detail_1(self):
+        """Test view for getting detail info about room"""
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        ChatRoom.objects.make(participants=[self.user, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_3], public=False)
+
+        api_path = '%s:chat:room-detail' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_chat_messages_list(self):
         """Test view for messages of chat room"""
         # Create Chat Room

@@ -21,6 +21,7 @@ class ChatRoomDetailView(generics.RetrieveAPIView):
     """MessageList view"""
     serializer_class = serializers.ChatRoomDetailSerializer
     permission_classes = (permissions.ChatMessagePermission,)
+    queryset = models.ChatRoom.objects.all()
 
 
 class ChatRoomListView(generics.ListAPIView):
