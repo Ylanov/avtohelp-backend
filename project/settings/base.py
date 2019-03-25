@@ -187,11 +187,11 @@ LOCALE_PATHS = (
 # STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
 MEDIA_URL = '/media/'
 
 STATICFILES_DIRS = (
-    os.path.join(PROJECT_ROOT, 'static'),
+    os.path.join(PUBLIC_ROOT, 'static'),
 )
 
 
