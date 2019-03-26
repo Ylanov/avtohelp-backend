@@ -1,5 +1,5 @@
 from rest_framework import generics, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from car import models, filters
 from car.serializers import current as serializers
@@ -20,11 +20,11 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class ColorsViewSet(viewsets.ReadOnlyModelViewSet):
+class ColorsViewSet(viewsets.ModelViewSet):
     """
     ViewSet for model ColorsViewSet
     """
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.CarColorDetailSerializer
     queryset = models.CarColor.objects.all()
     pagination_class = None
@@ -59,8 +59,6 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
     serializer_class = serializers.ServiceListSerializer
     queryset = models.CarService.objects.all()
-
-
 
 
 """

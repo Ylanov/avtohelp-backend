@@ -31,7 +31,7 @@ for path in ('apps', 'libs'):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1'
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['roadhelper.spider.ru',]
 
 
 # Application definition

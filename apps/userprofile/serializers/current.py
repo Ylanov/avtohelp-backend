@@ -82,7 +82,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'profile_car')
+                  'phone', 'avatar', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -167,12 +167,12 @@ class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
 class ProfileFriendListSerializer(serializers.ModelSerializer):
     """Serializer for model FriendList"""
 
-    profile_id = serializers.IntegerField(source='friend.profile.id')
+    profile = ProfileViewSerializer(source='friend.profile')
 
     class Meta:
         """Meta class"""
         model = models.FriendList
-        fields = ('id', 'created', 'profile_id', 'request_id')
+        fields = ('id', 'created', 'profile', 'request_id')
 
 
 class ProfileBlackListSerializer(serializers.ModelSerializer):
