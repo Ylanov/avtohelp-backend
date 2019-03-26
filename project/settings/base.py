@@ -31,7 +31,7 @@ for path in ('apps', 'libs'):
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1'
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru',]
+ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
 
 # Application definition
@@ -122,14 +122,21 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+CONFIG_FILE = f'{PROJECT_ROOT}/roadhelper.ini'
+db_settings = {}
+if os.path.exists(CONFIG_FILE):
+    for i in open(CONFIG_FILE):
+        parameter = i.rstrip().split('=')
+        db_settings.update({parameter[0]: parameter[1]})
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USERNAME'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOSTNAME'),
-        'PORT': os.environ.get('DB_PORT'),
+        'NAME': os.environ.get('DB_NAME', db_settings.get('DB_NAME')),
+        'USER': os.environ.get('DB_USERNAME', db_settings.get('DB_USERNAME')),
+        'PASSWORD': os.environ.get('DB_PASSWORD', db_settings.get('DB_PASSWORD')),
+        'HOST': os.environ.get('DB_HOSTNAME', db_settings.get('DB_HOSTNAME')),
+        'PORT': os.environ.get('DB_PORT', db_settings.get('DB_PORT')),
     }
 }
 

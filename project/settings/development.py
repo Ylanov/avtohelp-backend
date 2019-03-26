@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Local settings."""
 from .base import *
 
@@ -12,7 +11,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru',]
+ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
 # Logging
 LOGGING = {
