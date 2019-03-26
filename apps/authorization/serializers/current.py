@@ -28,19 +28,22 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         """Validate method."""
         phone = attrs.get('phone')
         # get sms-codes by user phone
-        qs = models.SMSCode.objects.by_phone(phone)
+        qs = models.SMSCode.objects.by_phone(phone).ready_to_go()
         if qs.exists():
             # if it was sent last 30 seconds deny it.
-            if qs.by_date().exists():
+            if qs.by_date().exists() and qs.count() < 3:
                 raise api_exceptions.TooOftenTriedError(detail={
                     'detail': api_exceptions.TooOftenTriedError.default_detail,
                     'remaining_time': qs.first().remain_before_resend
                 })
             elif qs.count() >= 3:
-                raise api_exceptions.TemporaryLockError(detail={
-                    'detail': api_exceptions.TooOftenTriedError.default_detail,
-                    'remaining_time': qs.first().remain_before_resend
-                })
+                if not timezone.now() > qs.first().datetime_before_unlock:
+                    raise api_exceptions.TemporaryLockError(detail={
+                        'detail': api_exceptions.TemporaryLockError.default_detail,
+                        'remaining_time': qs.first().remain_before_unlock
+                    })
+                else:
+                    models.SMSCode.objects.decline_all_by_phone(phone=phone)
         return attrs
 
     def create(self, validated_data):

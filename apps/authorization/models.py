@@ -46,6 +46,14 @@ class SMSCodeManager(models.Manager):
         # make them DECLINED
         qs.update(status=self.model.DECLINED)
 
+    def decline_all_by_phone(self, phone):
+        """Set status declined on all records."""
+        user = User.objects.get(phone=phone)
+        # find all other code records for this phone
+        qs = self.by_phone(user.phone).ready_to_go()
+        # make them DECLINED
+        qs.update(status=self.model.DECLINED)
+
 
 class SMSCodeQuerySet(models.query.QuerySet):
     """Extended queryset for SMSCode model."""
@@ -70,7 +78,7 @@ class SMSCodeQuerySet(models.query.QuerySet):
         delta = timezone.now() - timedelta(seconds=seconds)
         return self.filter(modified__gte=delta)
 
-    def expired(self, minutes=settings.SMS_EXPIRATION):
+    def expired(self, minutes=settings.SMS_BLOCKING_PERIOD):
         """Filter expired codes."""
         delta = timezone.now() - timedelta(minutes=minutes)
         return self.filter(created__lte=delta).ready_to_go()
