@@ -6,6 +6,11 @@ from django.utils.translation import ugettext_lazy as _
 from chat import models
 
 
+class ChatRoomInlineModel(admin.StackedInline):
+    """Inline for model ChatRoom"""
+    model = models.ChatRoom
+
+
 class ChatRoomAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
     readonly_fields = ('id', 'created', 'modified')
@@ -45,11 +50,11 @@ class ChatRoomAdminModel(admin.ModelAdmin):
 
 class ChatMessageAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
-    readonly_fields = ('id', 'created', 'modified')
-    list_display = readonly_fields + ('get_room_link',)
+    readonly_fields = ('id', 'created', 'modified', 'get_room_link', 'get_room_id')
+    list_display = readonly_fields[:-1]
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
-        (_('Room\'s data'), {'fields': ('name',)}),
+        (_('Room\'s data'), {'fields': ('get_room_id', 'get_room_link')}),
         (_('Sender'), {'fields': ('sender',)}),
     )
 
@@ -61,6 +66,12 @@ class ChatMessageAdminModel(admin.ModelAdmin):
         return format_html('<a href="{}">{}</a>', url, instance.room if not instance.room.name else instance.room.name)
 
     get_room_link.short_description = _('Link to chat room')
+
+    def get_room_id(self, instance):
+        """Get room id"""
+        return instance.room.id
+
+    get_room_id.short_description = _('Room ID')
 
 
 admin.site.register(models.ChatRoom, ChatRoomAdminModel)
