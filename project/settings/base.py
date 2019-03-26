@@ -114,7 +114,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis', 6379)],
+            "hosts": [('base', 6379)],
         },
     },
 }
@@ -203,7 +203,7 @@ STATICFILES_DIRS = (
 
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://localhost:6379/1'
+CELERY_BROKER_URL = 'redis://base:6379/13'
 USE_CELERY = False
 
 # Versioning
