@@ -43,3 +43,9 @@ def create_chat_message(sender: object, room: int, message: str):
     obj = chat_models.ChatMessage.objects.create(sender=sender, room=room, message=message)
     obj.save()
     return obj
+
+
+@database_sync_to_async
+def by_user_and_room_id(user, room_id):
+    """Find room by user and room id"""
+    return chat_models.ChatRoom.objects.by_participant(participant=user).filter(id=room_id).first()

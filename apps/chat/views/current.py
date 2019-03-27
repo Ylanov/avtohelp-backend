@@ -45,15 +45,16 @@ class ChatRoomListView(generics.ListAPIView):
         return models.ChatRoom.objects.by_participant(participant=self.request.user)
 
 
-class ChatRoomPrivateView(generics.GenericAPIView):
+class ChatView(generics.GenericAPIView):
     """Private room view"""
 
     permission_classes = (AllowAny, )
 
     def get(self, request, *args, **kwargs):
         """Override get method."""
+
         return render(request, 'chat/private.html', {
-            'room_json': mark_safe(json.dumps(kwargs.get('pk')))
+            'rooms': models.ChatRoom.objects.by_participant(participant=self.request.user)
         })
 
 

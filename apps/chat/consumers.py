@@ -3,71 +3,183 @@ from django.utils import timezone
 
 from chat import models
 from utils import methods as utils_methods
+from utils.api_exceptions import ClientError
 
 
-class PrivateChatConsumer(AsyncJsonWebsocketConsumer):
+class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         """Connect to WebSocket"""
-        self.room_id = self.scope['url_route']['kwargs']['pk']
-        self.room_group_name = 'chat_%s' % self.room_id
-        self.participants = set()
-
         # Check if connected user isn't anonymous
-        if self.scope['user'].is_anonymous:
+        # Are they logged in?
+        if self.scope["user"].is_anonymous:
+            # Reject the connection
             await self.close()
         else:
-            # Check user in participants
-            qs = models.ChatRoom.objects.by_participant(self.scope['user']).filter(id=self.room_id)
-            if qs.exists():
-                # Join room group
-                await self.channel_layer.group_add(
-                    self.room_group_name,
-                    self.channel_name
-                )
-                self.participants.add(self.scope['user'].id)
-                await self.accept()
-            else:
-                await self.close()
-
-    async def disconnect(self, close_code):
-        """Leave room group"""
-        self.participants.remove(self.scope['user'].id)
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+            # Accept the connection
+            await self.accept()
+        # Store which rooms the user has joined on this connection
+        self.rooms = set()
 
     async def receive_json(self, content):
         """Receive message from WebSocket"""
+        """
+        Called when we get a text frame. Channels will JSON-decode the payload
+        for us and pass it as the first argument.
+        """
+        # Messages will have a "command" key we can switch on
+        command = content.get("command", None)
         try:
-            # From web-browser
-            message = content['message']
-        except:
-            # Directly
-            message = content
+            if command == "join":
+                # Make them join the room
+                await self.join_room(content["room"])
+            elif command == "send":
+                await self.send_room(content["room"], content["message"])
+            elif command == "leave":
+                # Leave the room
+                await self.leave_room(content["room"])
+        except ClientError as e:
+            # Catch any errors and send it back
+            await self.send_json({"error": e.code})
 
+    async def disconnect(self, code):
+        """
+        Called when the WebSocket closes for any reason.
+        """
+        # Leave all the rooms we are still in
+        for room_id in list(self.rooms):
+            try:
+                await self.leave_room(room_id)
+            except ClientError:
+                pass
+
+    ##### Command helper methods called by receive_json
+
+    async def join_room(self, room_id):
+        """
+        Called by receive_json when someone sent a join command.
+        """
+        # The logged-in user is in our scope thanks to the authentication
+        # ASGI middleware
+        room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+        # Send a join message if it's turned on
+        if models.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
+            await self.channel_layer.group_send(
+                room.group_name,
+                {
+                    "type": "chat.join",
+                    "room_id": room_id,
+                    "user": self.scope["user"].id,
+                }
+            )
+        # Store that we're in the room
+        self.rooms.add(room_id)
+        # Add them to the group so they get room messages
+        await self.channel_layer.group_add(
+            room.group_name,
+            self.channel_name,
+        )
+        # Instruct their client to finish opening the room
+        await self.send_json({
+            "join": str(room.id),
+        })
+
+    async def leave_room(self, room_id):
+        """
+        Called by receive_json when someone sent a leave command.
+        """
+        # The logged-in user is in our scope thanks to the authentication
+        # ASGI middleware
+        room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+        # Send a leave message if it's turned on
+        if models.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
+            await self.channel_layer.group_send(
+                room.group_name,
+                {
+                    "type": "chat.leave",
+                    "room_id": room_id,
+                    "user": self.scope["user"].id,
+                }
+            )
+        # Remove that we're in the room
+        self.rooms.discard(room_id)
+        # Remove them from the group so they no longer get room messages
+        await self.channel_layer.group_discard(
+            room.group_name,
+            self.channel_name,
+        )
+        # Instruct their client to finish closing the room
+        await self.send_json({
+            "leave": str(room.id),
+        })
+
+    async def send_room(self, room_id, message):
+        """
+        Called by receive_json when someone sends a message to a room.
+        """
+        # Check they are in this room
+        if room_id not in self.rooms:
+            raise ClientError("ROOM_ACCESS_DENIED")
+        user = self.scope["user"]
+        # Get the room and send to the group about it
+        room = await utils_methods.by_user_and_room_id(user, room_id)
         # Make a record in the DB
-        await utils_methods.create_chat_message(room=self.room_id,
-                                                message=message,
-                                                sender=self.scope['user'])
-
-        # Send message to room group
+        letter = await utils_methods.create_chat_message(room=room_id,
+                                                         message=message,
+                                                         sender=user)
         await self.channel_layer.group_send(
-            self.room_group_name,
+            room.group_name,
             {
-                'type': 'chat_message',
-                'user': self.scope['user'].get_full_name(),
-                'message': message,
-                'datetime': f'{timezone.now()}',
-                'users': f'{self.participants}'
+                "type": "chat.message",
+                "room_id": room_id,
+                "user": user.id,
+                "full_name": user.get_full_name(),
+                'datetime': f'{letter.created}',
+                "message": message,
             }
         )
 
+    ##### Handlers for messages sent over the channel layer
+
+    # These helper methods are named by the types we send - so chat.join
+    # becomes chat_join
+    async def chat_join(self, event):
+        """
+        Called when someone has joined our chat.
+        """
+        # Send a message down to the client
+        await self.send_json(
+            {
+                "msg_type": models.MSG_TYPE_ENTER,
+                "room": event["room_id"],
+                "user": event["user"],
+            },
+        )
+
+    async def chat_leave(self, event):
+        """
+        Called when someone has left our chat.
+        """
+        # Send a message down to the client
+        await self.send_json(
+            {
+                "msg_type": models.MSG_TYPE_LEAVE,
+                "room": event["room_id"],
+                "user": event["user"],
+            },
+        )
+
     async def chat_message(self, event):
-        """Receive message from room group"""
-        await self.send_json({
-            'message': event['message'],
-            'datetime': event['datetime'],
-            'user': f'{event["user"]}',
-            'users': f'{event["users"]}',
-        })
+        """
+        Called when someone has messaged our chat.
+        """
+        # Send a message down to the client
+        await self.send_json(
+            {
+                "msg_type": models.MSG_TYPE_MESSAGE,
+                "room": event["room_id"],
+                "user": event["user"],
+                "full_name": event["full_name"],
+                'datetime': event["datetime"],
+                "message": event["message"],
+            },
+        )

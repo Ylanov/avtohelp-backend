@@ -21,7 +21,7 @@ application = ProtocolTypeRouter({
     "websocket": TokenAuthMiddleware(
         URLRouter([
             # URLRouter just takes standard Django path() or url() entries.
-            path('ws/chat/rooms/<int:pk>', consumers.PrivateChatConsumer),
+            path('chat/stream', consumers.ChatConsumer),
         ]),
     ),
 

@@ -240,17 +240,16 @@ REST_DATETIME_FORMAT = '%m-%d-%Y %H:%M:%S'
 # Thumbnail settings
 THUMBNAIL_ALIASES = {
     '': {
-        'tiny': {'size': (100, 0), },
-        'small': {'size': (480, 0), },
-        'middle': {'size': (700, 0), },
-        'large': {'size': (1500, 0), },
-        'default': {'size': (300, 200), 'crop': True},
-        'gallery': {'size': (240, 160), 'crop': True},
-        'news_large': {'size': (1500, 1000), 'crop': True},
-        'news_tiny': {'size': (300, 200), 'crop': True}
+        'tiny': {'size': (240, 124), 'crop': True},
+        'small': {'size': (320, 165), 'crop': True},
+        'average': {'size': (480, 248), 'crop': True},
+        'medium': {'size': (640, 330), 'crop': True},
+        'big': {'size': (960, 495), 'crop': True},
+        'large': {'size': (1280, 660), 'crop': True},
+        'gallery': {'size': (280, 186), 'crop': False},
+        'icon': {'size': (72, 72), 'crop': True}
     },
 }
-
 
 # CORS Config
 CORS_ORIGIN_ALLOW_ALL = True
