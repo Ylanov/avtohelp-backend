@@ -132,11 +132,11 @@ if os.path.exists(CONFIG_FILE):
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DB_NAME', db_settings.get('DB_NAME')),
-        'USER': os.environ.get('DB_USERNAME', db_settings.get('DB_USERNAME')),
-        'PASSWORD': os.environ.get('DB_PASSWORD', db_settings.get('DB_PASSWORD')),
-        'HOST': os.environ.get('DB_HOSTNAME', db_settings.get('DB_HOSTNAME')),
-        'PORT': os.environ.get('DB_PORT', db_settings.get('DB_PORT')),
+        'NAME': db_settings.get('DB_NAME', os.environ.get('DB_NAME')),
+        'USER': db_settings.get('DB_USERNAME', os.environ.get('DB_USERNAME')),
+        'PASSWORD': db_settings.get('DB_PASSWORD', os.environ.get('DB_PASSWORD')),
+        'HOST': db_settings.get('DB_HOSTNAME', os.environ.get('DB_HOSTNAME')),
+        'PORT': db_settings.get('DB_PORT', os.environ.get('DB_PORT')),
     }
 }
 
