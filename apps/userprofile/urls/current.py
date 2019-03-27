@@ -32,6 +32,22 @@ urlpatterns = [
     path('profile/cars/delete/<int:pk>', views.ProfileCarDeleteView.as_view(),
          name='profile-car-delete'),
 
+    # Profile gallery
+    path('profile/gallery', views.ProfileGalleryListView.as_view(),
+         name='profile-gallery-list'),
+
+    path('profile/gallery/<int:pk>', views.ProfileGalleryDetailView.as_view(),
+         name='profile-gallery-detail'),
+
+    path('profile/gallery/<int:pk>/set_main', views.ProfileGallerySetMainView.as_view(),
+         name='profile-gallery-set_main'),
+
+    path('profile/gallery/add', views.ProfileGalleryCreateView.as_view(),
+         name='profile-gallery-create'),
+
+    path('profile/gallery/<int:pk>/delete', views.ProfileGalleryDeleteView.as_view(),
+         name='profile-gallery-delete'),
+
     # Friendlist
     path('profile/friends', views.ProfileFriendListView.as_view(),
          name='friendlist-list'),
@@ -67,6 +83,6 @@ urlpatterns = [
     path('profile/blacklist/<int:pk>', views.BlackListDetailView.as_view(),
          name='blacklistrequest-detail'),
 
-    path('profile/blacklist/<int:pk>/remove', views.BlackListDestroyView.as_view(),
-         name='blacklistrequest-remove'),
+    path('profile/blacklist/<int:pk>/delete', views.BlackListDestroyView.as_view(),
+         name='blacklistrequest-delete'),
 ]

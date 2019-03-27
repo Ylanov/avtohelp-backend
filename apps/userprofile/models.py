@@ -2,6 +2,7 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.db.models import Q, Subquery
 from django.utils.translation import ugettext_lazy as _
+from django.utils.html import mark_safe
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from utils import methods
@@ -39,9 +40,6 @@ class Profile(BaseMixin):
                                  default=None, verbose_name=_('Last name'))
     middle_name = models.CharField(max_length=255, null=True, blank=True,
                                    default=None, verbose_name=_('Middle name'))
-    avatar = ThumbnailerImageField(upload_to=methods.image_path, blank=True,
-                                   null=True, default=None,
-                                   verbose_name=_('Avatar'))
     city = models.ForeignKey('catalog.City',
                              on_delete=models.CASCADE,
                              blank=True, null=True, default=None)
@@ -97,6 +95,77 @@ class ProfileLocation(BaseMixin):
 
         verbose_name = _('Profile location')
         verbose_name_plural = _('Profile locations')
+
+
+class ProfileGalleryQuerySet(models.QuerySet):
+    """ProfileGallery queryset"""
+
+    def by_user(self, user):
+        """Show user profile gallery"""
+        return self.filter(profile__user=user)
+
+    def by_profile(self, profile):
+        """Show user profile gallery"""
+        return self.filter(profile=profile)
+
+    def get_avatar(self, profile):
+        """Show user profile avatar"""
+        return self.filter(profile=profile, is_main=True)
+
+    def by_status(self, switcher=False):
+        """Filter ProfileGallery objects by flag is_main"""
+        return self.filter(is_main=switcher)
+
+
+class ProfileGalleryManager(models.Manager):
+    """ProfileGallery manager"""
+
+    def reset_status(self, profile):
+        """Reset status is_main"""
+        return ProfileGallery.objects.by_profile(profile=profile).by_status(switcher=True).update(is_main=False)
+
+
+class ProfileGallery(BaseMixin):
+    """Profile gallery"""
+    THUMBNAIL_KEY = 'gallery'
+
+    profile = models.ForeignKey(
+        'Profile',
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.CASCADE,
+        related_name='gallery')
+    image = ThumbnailerImageField(upload_to=methods.image_path,
+                                  blank=True, null=True, default=None,
+                                  verbose_name=_('Image'))
+    is_main = models.BooleanField(default=False)
+
+    objects = ProfileGalleryManager.from_queryset(ProfileGalleryQuerySet)()
+
+    class Meta:
+        """Meta class."""
+
+        verbose_name = _('Gallery item')
+        verbose_name_plural = _('Gallery items')
+
+    def get_image(self, key=None):
+        """Get thumbnailed image file."""
+        return self.image[key or self.THUMBNAIL_KEY] if self.image else None
+
+    def get_image_url(self, key=None):
+        """Get image thumbnail url."""
+        return self.get_image(key).url if self.image else None
+
+    def image_tag(self):
+        """Admin preview tag."""
+        if self.image:
+            return mark_safe('<img src="%s" />' % self.get_image_url())
+        else:
+            return None
+
+    image_tag.short_description = _('Image')
+    image_tag.allow_tags = True
 
 
 class FriendRequestQuerySet(models.QuerySet):

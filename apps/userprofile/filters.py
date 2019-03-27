@@ -14,3 +14,14 @@ class ProfileListFilterSet(django_filters.FilterSet):
         fields = [
             'first_name', 'last_name', 'middle_name', 'license_plate',
         ]
+
+
+class ProfileGalleryListFilterSet(django_filters.FilterSet):
+    """Med org filter set."""
+    class Meta:
+        """Meta class."""
+
+        model = models.ProfileGallery
+        fields = [
+            'is_main', 'profile',
+        ]

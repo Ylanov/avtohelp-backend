@@ -87,10 +87,6 @@ class User(AbstractUser, BaseMixin):
         """Return user middle_name"""
         return self.profile.middle_name if self.profile else None
 
-    def get_avatar(self):
-        """Return user avatar"""
-        return self.profile.avatar if self.profile else None
-
     def get_full_name(self):
         """Return user middle_name"""
         return f'{self.profile.first_name} {self.profile.last_name} {self.profile.middle_name}' if self.profile else None

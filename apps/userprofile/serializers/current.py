@@ -1,15 +1,13 @@
-from django.contrib.gis.geos import Point
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, Subquery
+from os.path import exists
+
 from fcm_django.models import FCMDevice
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, exceptions
 
-from account import models as account_models
-from catalog import models as catalog_models
 from car import models as car_models
-from catalog.serializers import current as catalog_serializers
 from car.serializers import current as car_serializers
+from catalog import models as catalog_models
+from catalog.serializers import current as catalog_serializers
 from userprofile import models
 from utils import api_exceptions
 from utils.serializers import GeoPositonMixin
@@ -58,6 +56,9 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
         return instance
 
 
+# Profile
+
+
 class ProfileCarDetailSerializer(serializers.ModelSerializer):
     """Serializer for ProfileCar"""
 
@@ -82,7 +83,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'avatar', 'profile_car')
+                  'phone', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -96,6 +97,7 @@ class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
     # car = serializers.CharField(source='get_car_info')
 
     # REQUEST
+
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
                                               write_only=True)
 
@@ -104,7 +106,7 @@ class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'avatar', 'city', 'city_detail',
+                  'phone', 'city', 'city_detail',
                   'car', 'geo_lat', 'geo_lon')
 
 
@@ -153,37 +155,95 @@ class ProfileCarListSerializer(serializers.ModelSerializer):
                   'license_plate', 'car')
 
 
+class ProfileAvatarSerializer(serializers.ModelSerializer):
+    """Serializer method for ProfileGallery model"""
+
+    tiny = serializers.SerializerMethodField()
+    small = serializers.SerializerMethodField()
+    average = serializers.SerializerMethodField()
+    medium = serializers.SerializerMethodField()
+    big = serializers.SerializerMethodField()
+    large = serializers.SerializerMethodField()
+
+    class Meta:
+        """Meta class"""
+        model = models.ProfileGallery
+        fields = ('id', 'created', 'tiny', 'small',
+                  'average', 'medium', 'big', 'large', 'is_main')
+
+    def get_tiny(self, obj):
+        """Get image with size tiny"""
+        return obj.image['tiny'].url if obj.image and exists(obj.image.path) else None
+
+    def get_small(self, obj):
+        """Get image with size small"""
+        return obj.image['small'].url if obj.image and exists(obj.image.path) else None
+
+    def get_average(self, obj):
+        """Get image with size average"""
+        return obj.image['average'].url if obj.image and exists(obj.image.path) else None
+
+    def get_medium(self, obj):
+        """Get image with size medium"""
+        return obj.image['medium'].url if obj.image and exists(obj.image.path) else None
+
+    def get_big(self, obj):
+        """Get image with size big"""
+        return obj.image['big'].url if obj.image and exists(obj.image.path) else None
+
+    def get_large(self, obj):
+        """Get image with size large"""
+        return obj.image['large'].url if obj.image and exists(obj.image.path) else None
+
+
+class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
+    """Serializer for ProfileGalleryCreateView"""
+
+    image = serializers.ImageField(required=True)
+
+    class Meta:
+        model = models.ProfileGallery
+        fields = ('id', 'created', 'profile', 'image', 'is_main')
+
+    def create(self, validated_data):
+        """Override create method"""
+        validated_data['profile'] = self.context.get('request').user.profile
+        return super(ProfileGalleryCreateSerializer, self).create(validated_data)
+
+
+class ProfileGallerySetMainSerializer(serializers.ModelSerializer):
+    """Serializer for ProfileGalleryCreateView"""
+    class Meta:
+        model = models.ProfileGallery
+        fields = ('is_main',)
+
+    def update(self, instance, validated_data):
+        """Override update method"""
+        validated_data['is_main'] = True
+        models.ProfileGallery.objects.reset_status(profile=self.context.get('request').user.profile)
+        return super(ProfileGallerySetMainSerializer, self).update(instance, validated_data)
+
+
+class ProfileGalleryListSerializer(serializers.ModelSerializer):
+    """Serializer for ProfileGalleryListView"""
+    class Meta:
+        model = models.ProfileGallery
+        fields = ('id', 'created', 'profile', 'image', 'is_main')
+
+
 class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for ProfileListView"""
+
+    gallery = ProfileAvatarSerializer(many=True)
 
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'avatar',
-                  'first_name', 'last_name', 'geo_lat',
-                  'geo_lon')
+        fields = ('id', 'created', 'first_name', 'last_name',
+                  'geo_lat', 'geo_lon', 'gallery')
 
 
-class ProfileFriendListSerializer(serializers.ModelSerializer):
-    """Serializer for model FriendList"""
-
-    profile = ProfileViewSerializer(source='friend.profile')
-
-    class Meta:
-        """Meta class"""
-        model = models.FriendList
-        fields = ('id', 'created', 'profile', 'request_id')
-
-
-class ProfileBlackListSerializer(serializers.ModelSerializer):
-    """Serializer for model BlackList"""
-
-    profile = serializers.IntegerField(source='foe.profile.id')
-
-    class Meta:
-        """Meta class"""
-        model = models.BlackList
-        fields = ('id', 'created', 'profile')
+# Friend list
 
 
 class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
@@ -250,6 +310,20 @@ class FriendRequestApproveSerializer(serializers.ModelSerializer):
         return instance.approve(owner=instance.owner, invited=instance.invited)
 
 
+class ProfileFriendListSerializer(serializers.ModelSerializer):
+    """Serializer for model FriendList"""
+
+    profile = ProfileViewSerializer(source='friend.profile')
+
+    class Meta:
+        """Meta class"""
+        model = models.FriendList
+        fields = ('id', 'created', 'profile', 'request_id')
+
+
+# Black list
+
+
 class BlackListCreateSerializer(serializers.ModelSerializer):
     """Serializer class for BlackListRequest"""
 
@@ -295,3 +369,14 @@ class BlackListDetailSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.BlackList
         fields = ('id', 'created', 'profile_id')
+
+
+class ProfileBlackListSerializer(serializers.ModelSerializer):
+    """Serializer for model BlackList"""
+
+    profile = serializers.IntegerField(source='foe.profile.id')
+
+    class Meta:
+        """Meta class"""
+        model = models.BlackList
+        fields = ('id', 'created', 'profile')

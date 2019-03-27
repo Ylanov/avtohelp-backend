@@ -8,7 +8,8 @@ from account.models import User
 from catalog.models import City
 from car.models import CarColor, CarMark, CarModel, Car
 from userprofile.models import (Profile, BlackList, FriendList,
-                                FriendRequest, ProfileCar)
+                                FriendRequest, ProfileCar,
+                                ProfileGallery)
 
 
 class TestProfile(APITestCase):
@@ -474,7 +475,7 @@ class TestProfile(APITestCase):
         # Put user_2 in BlackList
         black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
 
-        api_path = '%s:userprofile:blacklistrequest-remove' % self.VERSION
+        api_path = '%s:userprofile:blacklistrequest-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'pk': black_list.pk}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -578,3 +579,214 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-car-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'pk': self.car_user_1.id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_profile_gallery(self):
+        """Common test for retrieving list of profile gallery images"""
+
+        # Create images for gallery
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ProfileGallery.objects.count())
+
+    def test_profile_gallery_1(self):
+        """Common test for retrieving list of profile gallery images"""
+
+        # Create images for gallery
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        api_path = '%s:userprofile:profile-gallery-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_profile_gallery_2(self):
+        """Common test for retrieving list of profile gallery images"""
+
+        # Create additional user
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Create images for gallery
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=user_2.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 2
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ProfileGallery.objects.count())
+
+    def test_profile_gallery_detail(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('id'), profile_image.id)
+
+    def test_profile_gallery_detail_1(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create additional user
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_profile_gallery_detail_2(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        api_path = '%s:userprofile:profile-gallery-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_profile_gallery_detail_3(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create images for gallery
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': 420}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_profile_gallery_update(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-set_main' % self.VERSION
+        response = self.client.patch(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('is_main'), True)
+        self.assertEqual(ProfileGallery.objects.by_status(True).first().id, profile_image.id)
+
+    def test_profile_gallery_update_1(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create additional user
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 2
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-set_main' % self.VERSION
+        response = self.client.patch(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_profile_gallery_update_2(self):
+        """Common test for retrieving detail of profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        api_path = '%s:userprofile:profile-gallery-set_main' % self.VERSION
+        response = self.client.patch(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_profile_gallery_delete(self):
+        """Common test delete profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        gallery_count_old = ProfileGallery.objects.by_user(self.user_1).count()
+
+        # Authorize user 1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-delete' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertNotEqual(gallery_count_old, ProfileGallery.objects.by_user(self.user_1).count())
+
+    def test_profile_gallery_delete_1(self):
+        """Common test delete profile gallery object"""
+
+        # Create additional user
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        # Authorize user 2
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:profile-gallery-delete' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_profile_gallery_delete_2(self):
+        """Common test delete profile gallery object"""
+
+        # Create images for gallery
+        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+        ProfileGallery.objects.create(profile=self.user_1.profile)
+
+        api_path = '%s:userprofile:profile-gallery-delete' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': profile_image.id}))
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

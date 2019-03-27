@@ -207,7 +207,7 @@ class TestOrder(APITestCase):
         """Test wrong delete created assurance requests"""
 
         api_path = '%s:order:request-delete' % self.VERSION
-        assistance_request = models.AssistanceRequest.objects.create(
+        models.AssistanceRequest.objects.create(
             user=self.user_1,
             issue='Issue 1',
             description='Issue description'
