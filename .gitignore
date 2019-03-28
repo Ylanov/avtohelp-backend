@@ -10,7 +10,7 @@ __pycache__/
 
 # Django stuff:
 project/settings/custom.py
-media/
+media/media/
 logs/
 
 # celery beat schedule file
