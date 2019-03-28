@@ -1,5 +1,4 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.utils import timezone
 
 from chat import models
 from utils import methods as utils_methods
@@ -123,7 +122,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Get the room and send to the group about it
         room = await utils_methods.by_user_and_room_id(user, room_id)
         # Make a record in the DB
-        letter = await utils_methods.create_chat_message(room=room_id,
+        letter = await utils_methods.create_chat_message(room_id=room_id,
                                                          message=message,
                                                          sender=user)
         await self.channel_layer.group_send(

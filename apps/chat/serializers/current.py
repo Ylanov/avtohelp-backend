@@ -8,6 +8,7 @@ from utils import api_exceptions
 class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
     """Serializer for field participants in ChatRoom """
 
+    id = serializers.IntegerField(source='profile.id')
     first_name = serializers.CharField(source='get_first_name')
     last_name = serializers.CharField(source='get_last_name')
     middle_name = serializers.CharField(source='get_middle_name')

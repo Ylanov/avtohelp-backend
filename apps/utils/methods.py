@@ -36,11 +36,9 @@ def get_exception_body(exception):
 
 
 @database_sync_to_async
-def create_chat_message(sender: object, room: int, message: str):
-    # Get room
-    room = chat_models.ChatRoom.objects.get(id=room)
+def create_chat_message(sender: object, room_id: int, message: str):
     # Make a record in the DB
-    obj = chat_models.ChatMessage.objects.create(sender=sender, room=room, message=message)
+    obj = chat_models.ChatMessage.objects.make(sender=sender, room_id=room_id, message=message)
     obj.save()
     return obj
 

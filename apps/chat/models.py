@@ -43,6 +43,16 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.filter(room=room_id)
 
 
+class ChatMessageManager(models.Manager):
+    """Custom manager for model ChatMessage"""
+
+    def make(self, sender, room_id, message):
+        """Create chat message"""
+        obj = self.model(sender=sender, room_id=room_id, message=message)
+        obj.save()
+        return obj
+
+
 class ChatMessage(BaseMixin):
     """Chat messages"""
     sender = models.ForeignKey('account.User',
@@ -51,9 +61,10 @@ class ChatMessage(BaseMixin):
                              on_delete=models.CASCADE)
     message = models.TextField()
 
-    objects = ChatMessageQuerySet.as_manager()
+    objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
 
     class Meta:
+        """Meta class"""
         ordering = ('created',)
 
 
@@ -133,3 +144,20 @@ class ChatRole(BaseMixin):
                              on_delete=models.CASCADE)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, verbose_name=_('Role'),
                                             default=PARTICIPANT, blank=True, null=True)
+
+
+class ChatReadMessage(BaseMixin):
+    """Model for fixation read/unread messages in room"""
+
+    room = models.ForeignKey('ChatRoom',
+                             on_delete=models.CASCADE,
+                             related_name='readmessage')
+    reader = models.ForeignKey('account.User',
+                               on_delete=models.CASCADE)
+    is_read = models.BooleanField(default=False,
+                                  null=True, blank=True,
+                                  verbose_name=_('Status'))
+
+    class Meta:
+        """Meta class"""
+        ordering = ('created',)

@@ -19,6 +19,10 @@ class ChatMessageListView(generics.ListAPIView):
     filter_class = filters.ChatMessageFilterSet
     pagination_class = CursorPagination
 
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk'))
+
 
 class ChatMessageCountView(views.APIView):
     """MessageList view"""
@@ -39,6 +43,7 @@ class ChatRoomDetailView(generics.RetrieveAPIView):
 class ChatRoomListView(generics.ListAPIView):
     """Chat room list view"""
     serializer_class = serializers.ChatRoomListSerializer
+    filter_class = filters.ChatRoomListFilterSet
 
     def get_queryset(self):
         """Override get queryset method"""
