@@ -29,6 +29,19 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.filter(user_id__in=Subquery(FriendList.objects.common(user).values('friend'))).exclude(user=user)
 
+    def annotate_online_status(self):
+        """
+        Annotate online status
+        :return: QuerySet object
+        """
+        return self.annotate(
+            online=models.Case(
+                models.When(user__onlineuseractivity__isnull=False, then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
 
 class Profile(BaseMixin):
     """Profile model"""

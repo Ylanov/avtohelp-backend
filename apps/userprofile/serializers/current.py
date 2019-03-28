@@ -233,14 +233,13 @@ class ProfileGalleryListSerializer(serializers.ModelSerializer):
 
 class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for ProfileListView"""
-
-    gallery = ProfileAvatarSerializer(many=True)
+    online = serializers.BooleanField()
 
     class Meta:
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'geo_lat', 'geo_lon', 'gallery')
+                  'geo_lat', 'geo_lon', 'online')
 
 
 # Friend list

@@ -75,6 +75,7 @@ EXTERNAL_APPS = [
     'inline_actions',
     'django_object_actions',
     'multiselectfield',
+    'online_users',
 
 ]
 
@@ -88,6 +89,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'online_users.middleware.OnlineNowMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'

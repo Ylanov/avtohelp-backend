@@ -64,7 +64,7 @@ class ProfileListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.Profile.objects.select_related(
+        return models.Profile.objects.annotate_online_status().select_related(
             'user'
         ).friendly(self.request.user).order_by('first_name', 'last_name', 'middle_name')
 
