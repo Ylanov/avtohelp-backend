@@ -215,6 +215,11 @@ AVAILABLE_VERSIONS = {
 }
 
 
+# DjangoRestFramework settings
+REST_DATE_FORMAT = '%d-%m-%Y'
+REST_DATETIME_FORMAT = '%d-%m-%Y %H:%M %Z'
+
+
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
@@ -233,10 +238,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DATE_FORMAT': REST_DATE_FORMAT,
+    'DATETIME_FORMAT': REST_DATETIME_FORMAT,
 }
-
-REST_DATE_FORMAT = '%m-%d-%Y'
-REST_DATETIME_FORMAT = '%m-%d-%Y %H:%M:%S'
 
 
 # Thumbnail settings
