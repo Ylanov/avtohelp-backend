@@ -6,6 +6,7 @@ class ProfileListFilterSet(django_filters.FilterSet):
     """Med org filter set."""
 
     license_plate = django_filters.CharFilter(field_name='user__car__license_plate')
+    online = django_filters.BooleanFilter()
 
     class Meta:
         """Meta class."""
@@ -13,6 +14,7 @@ class ProfileListFilterSet(django_filters.FilterSet):
         model = models.Profile
         fields = [
             'first_name', 'last_name', 'middle_name', 'license_plate',
+            'online'
         ]
 
 

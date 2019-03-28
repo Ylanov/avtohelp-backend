@@ -1,9 +1,10 @@
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.db.models import Q, Subquery
-from django.utils.translation import ugettext_lazy as _
 from django.utils.html import mark_safe
+from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
+from online_users.models import OnlineUserActivity as online_activity
 
 from utils import methods
 from utils.mixins import BaseMixin
@@ -36,7 +37,8 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.annotate(
             online=models.Case(
-                models.When(user__onlineuseractivity__isnull=False, then=True),
+                models.When(user_id__in=Subquery(online_activity.get_user_activities().values('user_id')),
+                            then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
             )
