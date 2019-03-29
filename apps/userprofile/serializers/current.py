@@ -234,12 +234,13 @@ class ProfileGalleryListSerializer(serializers.ModelSerializer):
 class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
     """Serializer for ProfileListView"""
     online = serializers.BooleanField()
+    friend = serializers.BooleanField()
 
     class Meta:
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'geo_lat', 'geo_lon', 'online')
+                  'geo_lat', 'geo_lon', 'online', 'friend')
 
 
 # Friend list
@@ -257,7 +258,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin
                   'car', 'geo_lat', 'geo_lon')
 
 
-class FriendRequestSerializer(serializers.ModelSerializer):
+class FriendRequestInSerializer(serializers.ModelSerializer):
     """Serializer for model FriendRequest"""
 
     # REQUEST
@@ -267,12 +268,48 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     # RESPONSE
     # detail of invited user
-    invited = FriendRequestDetailSerializer(source='invited.profile', read_only=True)
+    owner = FriendRequestDetailSerializer(source='owner.profile', read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.FriendRequest
-        fields = ('id', 'created', 'invited', 'profile', 'approved')
+        fields = ('id', 'created', 'owner', 'profile', 'approved')
+
+
+class FriendRequestOutSerializer(serializers.ModelSerializer):
+    """Serializer for model FriendRequest"""
+
+    # REQUEST
+    # Profile of invited user
+    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.all(),
+                                                 write_only=True)
+
+    # RESPONSE
+    # detail of invited user
+    owner = FriendRequestDetailSerializer(source='invited.profile', read_only=True)
+
+    class Meta:
+        """Meta class"""
+        model = models.FriendRequest
+        fields = ('id', 'created', 'owner', 'profile', 'approved')
+
+
+class FriendRequestCreateSerializer(serializers.ModelSerializer):
+    """Serializer for model FriendRequest"""
+
+    # REQUEST
+    # Profile of invited user
+    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.all(),
+                                                 write_only=True)
+
+    # RESPONSE
+    # detail of invited user
+    owner = FriendRequestDetailSerializer(source='invited.profile', read_only=True)
+
+    class Meta:
+        """Meta class"""
+        model = models.FriendRequest
+        fields = ('id', 'created', 'owner', 'profile', 'approved')
 
     def validate(self, attrs):
         """Override validate method"""

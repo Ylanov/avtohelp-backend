@@ -57,6 +57,9 @@ class ChatMessage(BaseMixin):
     """Chat messages"""
     sender = models.ForeignKey('account.User',
                                on_delete=models.CASCADE)
+    # reader = models.ManyToManyField('account.User',
+    #                                 through_fields='ChatReadMessage.user',
+    #                                 related_name='sender')
     room = models.ForeignKey('ChatRoom',
                              on_delete=models.CASCADE)
     message = models.TextField()
@@ -146,17 +149,40 @@ class ChatRole(BaseMixin):
                                             default=PARTICIPANT, blank=True, null=True)
 
 
+# class ChatReadMessageQuerySet(models.QuerySet):
+#     """QuerySets for model ChatReadMessage"""
+#     pass
+#
+#
+# class ChatReadMessageManager(models.Manager):
+#     """Manager for model ChatReadMessage"""
+#
+#     def make(self, room_id, user, is_read=False):
+#         """Create a new object"""
+#         obj = self.model(room_id=room_id, reader=user, is_read=is_read)
+#         obj.save()
+#         return obj
+#
+#     def get_or_make(self, room_id, user, is_read):
+#         """Get object or create a new ones"""
+#         qs = ChatReadMessage.objects.filter(room_id=room_id, reader=user, is_read=is_read)
+#         if not qs.exists():
+#             obj = self.make(room_id, user, is_read)
+#         else:
+#             obj = qs.first()
+#         return obj
+
+
 class ChatReadMessage(BaseMixin):
     """Model for fixation read/unread messages in room"""
-
-    room = models.ForeignKey('ChatRoom',
+    user = models.ForeignKey('account.User',
                              on_delete=models.CASCADE,
-                             related_name='readmessage')
-    reader = models.ForeignKey('account.User',
-                               on_delete=models.CASCADE)
+                             related_name='reader')
     is_read = models.BooleanField(default=False,
                                   null=True, blank=True,
                                   verbose_name=_('Status'))
+
+    # objects = ChatReadMessageManager.from_queryset(ChatReadMessageQuerySet)()
 
     class Meta:
         """Meta class"""

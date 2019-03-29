@@ -4,7 +4,8 @@ from django.db.models import Q, Subquery
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
-from online_users.models import OnlineUserActivity as online_activity
+from online_users.models import OnlineUserActivity as activity
+from django.contrib.postgres.search import SearchVector
 
 from utils import methods
 from utils.mixins import BaseMixin
@@ -33,15 +34,39 @@ class ProfileQuerySet(models.QuerySet):
     def annotate_online_status(self):
         """
         Annotate online status
-        :return: QuerySet object
+        :return: annotate field online status
         """
         return self.annotate(
             online=models.Case(
-                models.When(user_id__in=Subquery(online_activity.get_user_activities().values('user_id')),
+                models.When(user_id__in=Subquery(activity.get_user_activities().values('user_id')),
                             then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
             )
+        )
+
+    def annotate_friend_status(self, user):
+        """
+        Annotate friend status
+        :return: annotated field
+        """
+        return self.annotate(
+            friend=models.Case(
+                models.When(user_id__in=Subquery(FriendList.objects.my_list(user).values('friend__id')),
+                            then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
+    def annotate_full_search(self, *args, **kwargs):
+        return self.annotate(
+            search=SearchVector(
+                'first_name',
+                'last_name',
+                'middle_name',
+                'user__profilecar__license_plate'
+            ),
         )
 
 

@@ -3,23 +3,32 @@ from userprofile import models
 
 
 class ProfileListFilterSet(django_filters.FilterSet):
-    """Med org filter set."""
+    """ProfileList filter set."""
 
-    license_plate = django_filters.CharFilter(field_name='user__car__license_plate')
     online = django_filters.BooleanFilter()
+    friend = django_filters.BooleanFilter()
+    search = django_filters.CharFilter(method='search_filter')
 
     class Meta:
         """Meta class."""
 
         model = models.Profile
         fields = [
-            'first_name', 'last_name', 'middle_name', 'license_plate',
-            'online'
+            'online',
+            'friend',
+            'search'
         ]
+
+    def search_filter(self, queryset, name, value):
+        """Full text search"""
+        qs = queryset.annotate_full_search().filter(search=value)
+        if not qs.exists() and len(value) > 3:
+            qs = queryset.annotate_full_search().filter(search__icontains=value)
+        return qs
 
 
 class ProfileGalleryListFilterSet(django_filters.FilterSet):
-    """Med org filter set."""
+    """ProfileGallery filter set."""
     class Meta:
         """Meta class."""
 

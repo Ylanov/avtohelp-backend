@@ -3,6 +3,7 @@ from utils.mixins import BaseMixin, NameMixin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.db import models as gis_models
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.gis.db.models.functions import Distance
 
 
 class CarMark(BaseMixin, NameMixin):
@@ -63,6 +64,19 @@ class Car(BaseMixin):
         verbose_name_plural = _('Cars')
 
 
+class CarServiceManager(models.Manager):
+    """Manager for model CarServiceManager"""
+    pass
+
+
+class CarServiceQuerySet(models.QuerySet):
+    """QuerySet for model CarService"""
+
+    def annotate_distance(self, position):
+        """Annotate service distance from position"""
+        return self.annotate(distance=Distance('location', position))
+
+
 class CarService(NameMixin, BaseMixin):
     """Service model"""
 
@@ -74,6 +88,8 @@ class CarService(NameMixin, BaseMixin):
         verbose_name=_('Service contact phone'),
         error_messages={'unique': _("A service with that phone already exists.")},
     )
+
+    objects = CarServiceManager.from_queryset(CarServiceQuerySet)()
 
     class Meta:
         """Meta class"""

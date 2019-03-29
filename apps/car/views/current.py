@@ -2,6 +2,8 @@ from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from car import models, filters
+from django.db.models import ExpressionWrapper, IntegerField, F
+from django.contrib.gis.geos import Point
 from car.serializers import current as serializers
 
 
@@ -58,7 +60,17 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
     """
     permission_classes = (AllowAny,)
     serializer_class = serializers.ServiceListSerializer
+    filter_class = filters.ServiceStationsFilterSet
     queryset = models.CarService.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        query = self.request.query_params.get('position')
+        if query:
+            position_x = float(query.split(',')[0])
+            position_y = float(query.split(',')[1])
+            position = Point(position_x, position_y, srid=4326)
+            return self.queryset.annotate_distance(position)
 
 
 """

@@ -217,7 +217,7 @@ AVAILABLE_VERSIONS = {
 
 # DjangoRestFramework settings
 REST_DATE_FORMAT = '%d-%m-%Y'
-REST_DATETIME_FORMAT = '%d-%m-%Y %H:%M %Z'
+REST_DATETIME_FORMAT = '%d-%m-%Y %H:%M:%S %Z'
 
 
 # REST Framework

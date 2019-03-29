@@ -81,6 +81,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             "join": str(room.id),
         })
+        # Update Read/Unread flag
+        await utils_methods.read_message(room_id=room_id, reader=self.scope['user'])
 
     async def leave_room(self, room_id):
         """

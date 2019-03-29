@@ -49,14 +49,12 @@ class ProfileListView(generics.ListAPIView):
     """
     View for list of user profiles
     With filter by fields:
-    :param first_name: Search profile by first_name
-    :param last_name: Search profile by last_name
-    :param middle_name: Search profile by middle_name
-    :param license_plate: Search profile by car license plate
-    :type first_name: CharField Anatoly
-    :type last_name: CharField Feteleu
-    :type middle_name: CharField Vyacheslavovich
-    :type license_plate: CharField "aaa123бб 70"
+    :param online: Search profile by online status
+    :param friend: Search profile by friend status
+    :param search: Search profile by fields - first name, last name, middle name, license plate
+    :type online: Boolean True
+    :type friend: Boolean False
+    :type search: CharField aa000aa 123
     """
 
     serializer_class = serializers.ProfileListSerializer
@@ -64,7 +62,7 @@ class ProfileListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.Profile.objects.annotate_online_status().select_related(
+        return models.Profile.objects.annotate_online_status().annotate_friend_status(self.request.user).select_related(
             'user'
         ).friendly(self.request.user).order_by('first_name', 'last_name', 'middle_name')
 
@@ -271,7 +269,7 @@ class FriendRequestCreateView(generics.CreateAPIView):
     RESPONSE:
     {}
     """
-    serializer_class = serializers.FriendRequestSerializer
+    serializer_class = serializers.FriendRequestCreateSerializer
     queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').all()
 
 
@@ -310,7 +308,7 @@ class FriendRequestListView(generics.ListAPIView):
     Friend requests FROM ME to adding to my list
     """
 
-    serializer_class = serializers.FriendRequestSerializer
+    serializer_class = serializers.FriendRequestInSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -323,7 +321,7 @@ class OutFriendRequestListView(generics.ListAPIView):
     My friend requests FOR ADDING SMBD to my list
     """
 
-    serializer_class = serializers.FriendRequestSerializer
+    serializer_class = serializers.FriendRequestOutSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -335,7 +333,7 @@ class FriendRequestDetailView(generics.RetrieveAPIView):
     View for retrieve user friend request
     """
 
-    serializer_class = serializers.FriendRequestSerializer
+    serializer_class = serializers.FriendRequestOutSerializer
     queryset = models.FriendRequest.objects.all()
 
 

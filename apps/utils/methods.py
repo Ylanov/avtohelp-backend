@@ -37,8 +37,10 @@ def get_exception_body(exception):
 
 @database_sync_to_async
 def create_chat_message(sender: object, room_id: int, message: str):
-    # Make a record in the DB
-    obj = chat_models.ChatMessage.objects.make(sender=sender, room_id=room_id, message=message)
+    """Make a record in the DB"""
+    obj = chat_models.ChatMessage.objects.make(sender=sender,
+                                               room_id=room_id,
+                                               message=message)
     obj.save()
     return obj
 
@@ -47,3 +49,9 @@ def create_chat_message(sender: object, room_id: int, message: str):
 def by_user_and_room_id(user, room_id):
     """Find room by user and room id"""
     return chat_models.ChatRoom.objects.by_participant(participant=user).filter(id=room_id).first()
+
+
+@database_sync_to_async
+def read_message(room_id, reader):
+    """Set read flag is true by user"""
+    return chat_models.ChatReadMessage.objects.get_or_make(room_id=room_id, user=reader, is_read=True)
