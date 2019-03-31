@@ -23,12 +23,13 @@ class ChatMessageListSerializer(serializers.ModelSerializer):
     """Serializer for model Message"""
 
     sender = ChatRoomParticipantsSerializer()
+    read = serializers.BooleanField()
 
     class Meta:
         """Meta class"""
         model = models.ChatMessage
         fields = ('id', 'created', 'modified',
-                  'sender', 'room', 'message')
+                  'sender', 'room', 'message', 'read')
 
 
 class ChatRoomDetailSerializer(serializers.ModelSerializer):

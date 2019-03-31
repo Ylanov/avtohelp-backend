@@ -6,16 +6,15 @@ from userprofile import models as profile_models
 class ChatMessageFilterSet(django_filters.FilterSet):
     """Filters for ChatMessage"""
 
-    first_name = django_filters.CharFilter(field_name='sender__profile__first_name')
-    last_name = django_filters.CharFilter(field_name='sender__profile__last_name')
-    middle_name = django_filters.CharFilter(field_name='sender__profile__middle_name')
+    read = django_filters.BooleanFilter()
+    created = django_filters.DateFromToRangeFilter()
 
     class Meta:
         """Meta class."""
 
         model = models.ChatMessage
         fields = [
-            'sender', 'first_name', 'last_name', 'middle_name'
+            'created', 'read'
         ]
 
 

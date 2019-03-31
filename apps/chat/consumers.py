@@ -33,6 +33,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.join_room(content["room"])
             elif command == "send":
                 await self.send_room(content["room"], content["message"])
+            elif command == "read":
+                await self.read_message(content["room_id"], content["message_id"])
             elif command == "leave":
                 # Leave the room
                 await self.leave_room(content["room"])
@@ -81,8 +83,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json({
             "join": str(room.id),
         })
-        # Update Read/Unread flag
-        await utils_methods.read_message(room_id=room_id, reader=self.scope['user'])
 
     async def leave_room(self, room_id):
         """
@@ -133,11 +133,26 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "type": "chat.message",
                 "room_id": room_id,
                 "user": user.id,
+                "avatar": (user.profile.gallery.filter(is_main=True).first().image.url
+                           if user.profile.gallery.filter(is_main=True).exists()
+                           else None),
                 "full_name": user.get_full_name(),
                 'datetime': f'{letter.created}',
                 "message": message,
+                "message_id": f'{letter.id}'
             }
         )
+
+    async def read_message(self, room_id, message_id):
+        """
+        Called by receive_json for read incoming message.
+        """
+        # Check they are in this room
+        if room_id not in self.rooms:
+            raise ClientError("ROOM_ACCESS_DENIED")
+        # Make a record in the DB
+        await utils_methods.read_message(message_id=message_id, reader=self.scope["user"])
+
 
     ##### Handlers for messages sent over the channel layer
 
@@ -179,8 +194,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "msg_type": models.MSG_TYPE_MESSAGE,
                 "room": event["room_id"],
                 "user": event["user"],
+                "avatar": event["avatar"],
                 "full_name": event["full_name"],
                 'datetime': event["datetime"],
                 "message": event["message"],
+                "message_id": event["message_id"],
             },
         )

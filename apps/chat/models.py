@@ -4,8 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin
-from channels.db import database_sync_to_async
-
+from utils.api_exceptions import MessageNotFound
 
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
 
@@ -42,6 +41,17 @@ class ChatMessageQuerySet(models.QuerySet):
         """Filter by room"""
         return self.filter(room=room_id)
 
+    def annotate_read_status(self, user):
+        return self.annotate(
+            read=models.Case(
+                models.When(
+                    id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
+                    then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
 
 class ChatMessageManager(models.Manager):
     """Custom manager for model ChatMessage"""
@@ -57,9 +67,6 @@ class ChatMessage(BaseMixin):
     """Chat messages"""
     sender = models.ForeignKey('account.User',
                                on_delete=models.CASCADE)
-    # reader = models.ManyToManyField('account.User',
-    #                                 through_fields='ChatReadMessage.user',
-    #                                 related_name='sender')
     room = models.ForeignKey('ChatRoom',
                              on_delete=models.CASCADE)
     message = models.TextField()
@@ -149,40 +156,29 @@ class ChatRole(BaseMixin):
                                             default=PARTICIPANT, blank=True, null=True)
 
 
-# class ChatReadMessageQuerySet(models.QuerySet):
-#     """QuerySets for model ChatReadMessage"""
-#     pass
-#
-#
-# class ChatReadMessageManager(models.Manager):
-#     """Manager for model ChatReadMessage"""
-#
-#     def make(self, room_id, user, is_read=False):
-#         """Create a new object"""
-#         obj = self.model(room_id=room_id, reader=user, is_read=is_read)
-#         obj.save()
-#         return obj
-#
-#     def get_or_make(self, room_id, user, is_read):
-#         """Get object or create a new ones"""
-#         qs = ChatReadMessage.objects.filter(room_id=room_id, reader=user, is_read=is_read)
-#         if not qs.exists():
-#             obj = self.make(room_id, user, is_read)
-#         else:
-#             obj = qs.first()
-#         return obj
+class ChatReadMessageQuerySet(models.QuerySet):
+    """QuerySets for model ChatReadMessage"""
+    pass
+
+
+class ChatReadMessageManager(models.Manager):
+    """Manager for model ChatReadMessage"""
+
+    def read(self, user, message_id):
+        """Create a new object"""
+        obj = self.model(user=user, message_id=message_id)
+        obj.save()
+        return obj
 
 
 class ChatReadMessage(BaseMixin):
     """Model for fixation read/unread messages in room"""
     user = models.ForeignKey('account.User',
-                             on_delete=models.CASCADE,
-                             related_name='reader')
-    is_read = models.BooleanField(default=False,
-                                  null=True, blank=True,
-                                  verbose_name=_('Status'))
+                             on_delete=models.CASCADE)
+    message = models.ForeignKey('ChatMessage',
+                                on_delete=models.CASCADE)
 
-    # objects = ChatReadMessageManager.from_queryset(ChatReadMessageQuerySet)()
+    objects = ChatReadMessageManager.from_queryset(ChatReadMessageQuerySet)()
 
     class Meta:
         """Meta class"""

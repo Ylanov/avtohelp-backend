@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from chat import models as chat_models
+from utils import api_exceptions
 
 
 def generate_image_name():
@@ -52,6 +53,10 @@ def by_user_and_room_id(user, room_id):
 
 
 @database_sync_to_async
-def read_message(room_id, reader):
+def read_message(message_id, reader):
     """Set read flag is true by user"""
-    return chat_models.ChatReadMessage.objects.get_or_make(room_id=room_id, user=reader, is_read=True)
+    qs = chat_models.ChatMessage.objects.filter(id=message_id)
+    if qs.exists():
+        return chat_models.ChatReadMessage.objects.read(user=reader, message_id=message_id)
+    else:
+        raise api_exceptions.MessageNotFound()

@@ -73,28 +73,35 @@ class ChatMessageAdminModel(admin.ModelAdmin):
     get_room_id.short_description = _('Room ID')
 
 
-# class ChatReadMessageAdminModel(admin.ModelAdmin):
-#     """Admin model for ChatReadMessage"""
-#     readonly_fields = ('id', 'created', 'modified',
-#                        'room', 'reader', 'is_read')
-#     list_display = readonly_fields
-#     fieldsets = (
-#         (_('Info'), {'fields': ('id', 'is_read')}),
-#         (_('Date\'s'), {'fields': ('created', 'modified')}),
-#         (_('Room\'s data'), {'fields': ('room', 'get_room_link')}),
-#         (_('Sender'), {'fields': ('reader',)}),
-#     )
-#
-#     def get_room_link(self, instance):
-#         """Get user for list_fields"""
-#         url = reverse('admin:{}_{}_change'.format(instance.room._meta.app_label,
-#                                                   instance.room._meta.model_name),
-#                       args=(instance.room.id,))
-#         return format_html('<a href="{}">{}</a>', url, instance.room if not instance.room.name else instance.room.name)
-#
-#     get_room_link.short_description = _('Link to chat room')
-#
-#
+class ChatReadMessageAdminModel(admin.ModelAdmin):
+    """Admin model for ChatReadMessage"""
+    readonly_fields = ('id', 'created', 'modified',
+                       'message', 'user', 'get_message_link',
+                       'get_message_text')
+    list_display = readonly_fields
+    fieldsets = (
+        (_('Info'), {'fields': ('id', 'message')}),
+        (_('Date\'s'), {'fields': ('created', 'modified')}),
+        (_('Message\'s data'), {'fields': ('get_message_link', 'get_message_text')}),
+        (_('Sender'), {'fields': ('user',)}),
+    )
+
+    def get_message_link(self, instance):
+        """Get user for list_fields"""
+        url = reverse('admin:{}_{}_change'.format(instance.message._meta.app_label,
+                                                  instance.message._meta.model_name),
+                      args=(instance.message.id,))
+        return format_html('<a href="{}">{}</a>', url, instance.message)
+
+    get_message_link.short_description = _('Link to chat message')
+
+    def get_message_text(self, instance):
+        """Get user for list_fields"""
+        return instance.message.message
+
+    get_message_text.short_description = _('Message text')
+
+
 admin.site.register(models.ChatRoom, ChatRoomAdminModel)
 admin.site.register(models.ChatMessage, ChatMessageAdminModel)
-# admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
+admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)

@@ -1,10 +1,7 @@
-import json
-
 from django.shortcuts import render
-from django.utils.safestring import mark_safe
 from rest_framework import generics, views
-from rest_framework.permissions import AllowAny
 from rest_framework.pagination import CursorPagination
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from chat import models, filters, permissions
@@ -21,7 +18,7 @@ class ChatMessageListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk'))
+        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk')).annotate_read_status(user=self.request.user)
 
 
 class ChatMessageCountView(views.APIView):
@@ -31,7 +28,6 @@ class ChatMessageCountView(views.APIView):
         """Get count of assistance requests"""
         return Response({
             'count': models.ChatMessage.objects.filter(room=kwargs.get('pk')).count()})
-
 
 class ChatRoomDetailView(generics.RetrieveAPIView):
     """MessageList view"""

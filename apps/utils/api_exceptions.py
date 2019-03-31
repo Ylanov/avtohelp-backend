@@ -52,12 +52,19 @@ class UserNotFound(exceptions.APIException):
     extended_status_code = '%s.1' % status.HTTP_404_NOT_FOUND
 
 
+class MessageNotFound(exceptions.APIException):
+    """Message not found."""
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = _('Message not found')
+    extended_status_code = '%s.2' % status.HTTP_404_NOT_FOUND
+
+
 class CityNotFound(exceptions.APIException):
     """User not found."""
 
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = _('City with ID %s, not found')
-    extended_status_code = '%s.1' % status.HTTP_404_NOT_FOUND
+    extended_status_code = '%s.3' % status.HTTP_404_NOT_FOUND
 
     def __init__(self, city_id):
         self.default_detail = dict(detail=self.default_detail % city_id,
