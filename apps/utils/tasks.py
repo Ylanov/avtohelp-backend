@@ -8,8 +8,10 @@ from django.utils import timezone
 from fcm_django.models import FCMDevice
 from django.utils.translation import ugettext_lazy as _
 
+from django.db import models
 from authorization import models as auth_models
 from order import models as order_models
+from chat import models as chat_models
 
 logger = logging.getLogger('CELERY')
 
@@ -98,3 +100,32 @@ def notify_users(title=None, body=None):
         logger.info(f'Users notified: {count}')
     else:
         logger.info(f'Error was occurred when sending PUSH-notifications')
+
+
+# @periodic_task(run_every=crontab(minute=15))
+def notify_unread_messages(title=None, body=None):
+    """Notify users about unread messages"""
+    if not (title or body) or not (title and body):
+        title = _('Unread messages')
+        body = _('You have unread messages')
+    rooms = chat_models.ChatRoom.objects.all()
+    for room in rooms:
+        notify = list()
+        for participant in room.participants.all():
+            message_count = room.chatmessage_set.exclude(sender=participant).count()
+            read_messages = chat_models.ChatReadMessage.objects.filter(user=participant).count()
+            if (message_count - read_messages) > settings.LIMIT_UNREAD_MESSAGES:
+                notify.append(participant)
+            # for message in room.chatmessage_set.all():
+            #     qs = chat_models.ChatReadMessage.objects.filter(message=message, user=participant)
+            #     if not qs.exists():
+            #         notify.append(participant)
+        if notify:
+            for user in notify:
+                devices = FCMDevice.objects.filter(user=user)
+                count = devices.send_message(title=title, body=body)
+                if count > 0:
+                    logger.info(f'Users notified: {count}')
+                else:
+                    logger.info(f'Error was occurred when sending PUSH-notifications')
+        notify.clear()

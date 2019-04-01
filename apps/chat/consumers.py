@@ -34,7 +34,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             elif command == "send":
                 await self.send_room(content["room"], content["message"])
             elif command == "read":
-                await self.read_message(content["room_id"], content["message_id"])
+                await self.read_message(content["room_id"], content["messages"])
             elif command == "leave":
                 # Leave the room
                 await self.leave_room(content["room"])
@@ -143,7 +143,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    async def read_message(self, room_id, message_id):
+    async def read_message(self, room_id, messages):
         """
         Called by receive_json for read incoming message.
         """
@@ -151,7 +151,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if room_id not in self.rooms:
             raise ClientError("ROOM_ACCESS_DENIED")
         # Make a record in the DB
-        await utils_methods.read_message(message_id=message_id, reader=self.scope["user"])
+        await utils_methods.read_message(message_list=messages, reader=self.scope["user"])
 
 
     ##### Handlers for messages sent over the channel layer

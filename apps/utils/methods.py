@@ -53,10 +53,11 @@ def by_user_and_room_id(user, room_id):
 
 
 @database_sync_to_async
-def read_message(message_id, reader):
+def read_message(message_list, reader):
     """Set read flag is true by user"""
-    qs = chat_models.ChatMessage.objects.filter(id=message_id)
+    qs = chat_models.ChatMessage.objects.filter(id__in=message_list)
     if qs.exists():
-        return chat_models.ChatReadMessage.objects.read(user=reader, message_id=message_id)
+        for message in qs:
+            chat_models.ChatReadMessage.objects.read(user=reader, message=message)
     else:
         raise api_exceptions.MessageNotFound()

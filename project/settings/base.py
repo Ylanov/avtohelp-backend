@@ -275,6 +275,10 @@ USE_SMS = False  # Actual sms sending switcher
 REQUEST_RELEVANCE = 30  # minutes
 
 
+# PUSH-NOTIFICATIONS
+LIMIT_UNREAD_MESSAGES = 3
+
+
 # Django Rest Swagger
 SWAGGER_SETTINGS = {
     'JSON_EDITOR': False,

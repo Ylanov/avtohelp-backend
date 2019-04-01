@@ -164,9 +164,9 @@ class ChatReadMessageQuerySet(models.QuerySet):
 class ChatReadMessageManager(models.Manager):
     """Manager for model ChatReadMessage"""
 
-    def read(self, user, message_id):
+    def read(self, user, message):
         """Create a new object"""
-        obj = self.model(user=user, message_id=message_id)
+        obj = self.model(user=user, message=message)
         obj.save()
         return obj
 

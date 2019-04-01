@@ -29,6 +29,17 @@ class ChatMessageCountView(views.APIView):
         return Response({
             'count': models.ChatMessage.objects.filter(room=kwargs.get('pk')).count()})
 
+
+class ChatUnreadMessageCountView(views.APIView):
+    """MessageList view"""
+
+    def get(self, request, *args, **kwargs):
+        """Get count of assistance requests"""
+        return Response({
+            'count': models.ChatMessage.objects.annotate_read_status(
+                user=self.request.user).filter(room=kwargs.get('pk'), read=False).count()})
+
+
 class ChatRoomDetailView(generics.RetrieveAPIView):
     """MessageList view"""
     serializer_class = serializers.ChatRoomDetailSerializer
