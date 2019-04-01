@@ -102,7 +102,7 @@ def notify_users(title=None, body=None):
         logger.info(f'Error was occurred when sending PUSH-notifications')
 
 
-# @periodic_task(run_every=crontab(minute=15))
+@periodic_task(run_every=crontab(minute=settings.MESSAGES_UPDATE_PERIOD))
 def notify_unread_messages(title=None, body=None):
     """Notify users about unread messages"""
     if not (title or body) or not (title and body):
