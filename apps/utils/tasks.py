@@ -1,17 +1,16 @@
 import logging
 
-from celery import shared_task
 from celery.schedules import crontab
 from celery.task import periodic_task
 from django.conf import settings
 from django.utils import timezone
-from fcm_django.models import FCMDevice
 from django.utils.translation import ugettext_lazy as _
+from fcm_django.models import FCMDevice
 
-from django.db import models
 from authorization import models as auth_models
-from order import models as order_models
+from celery import shared_task
 from chat import models as chat_models
+from order import models as order_models
 
 logger = logging.getLogger('CELERY')
 

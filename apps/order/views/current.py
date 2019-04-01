@@ -75,10 +75,6 @@ class AssistanceRequestDetailView(AssistanceRequestMixin, generics.RetrieveAPIVi
     """
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return self.queryset.by_user(user=self.request.user)
-
 
 class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):
     """

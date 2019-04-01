@@ -60,4 +60,4 @@ def read_message(message_list, reader):
         for message in qs:
             chat_models.ChatReadMessage.objects.read(user=reader, message=message)
     else:
-        raise api_exceptions.MessageNotFound()
+        raise api_exceptions.MessagesNotFound()

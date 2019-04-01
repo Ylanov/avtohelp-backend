@@ -102,7 +102,7 @@ class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
 
     def get_distance(self, obj):
         """Get distance in meters"""
-        return obj.distance.m
+        return obj.distance.m if hasattr(obj, 'distance') else None
 
 
 class ServiceDetailSerializer(serializers.ModelSerializer, CoordinatesSerializer):

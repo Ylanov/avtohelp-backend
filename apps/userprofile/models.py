@@ -211,11 +211,11 @@ class ProfileGallery(BaseMixin):
 class FriendRequestQuerySet(models.QuerySet):
     """Custom QuerySet for model FriendRequest"""
 
-    def my_requests(self, owner):
+    def from_me(self, owner):
         """My requests to add SOMEONE in my friend list"""
         return self.filter(owner=owner)
 
-    def requests(self, invited):
+    def to_me(self, invited):
         """Request to add ME in friend list"""
         return self.filter(invited=invited)
 

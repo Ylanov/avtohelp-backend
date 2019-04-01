@@ -78,7 +78,7 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
     readonly_fields = ('id', 'created', 'modified',
                        'message', 'user', 'get_message_link',
                        'get_message_text')
-    list_display = readonly_fields
+    list_display = ('id', 'created', 'modified', 'user', 'get_message_link')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'message')}),
         (_('Date\'s'), {'fields': ('created', 'modified')}),

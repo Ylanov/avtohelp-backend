@@ -64,7 +64,7 @@ class ProfileListView(generics.ListAPIView):
         """Override get_queryset method"""
         return models.Profile.objects.annotate_online_status().annotate_friend_status(self.request.user).select_related(
             'user'
-        ).friendly(self.request.user).order_by('first_name', 'last_name', 'middle_name')
+        ).friendly(self.request.user).order_by('first_name', 'last_name')
 
 
 class MyProfileDetailView(generics.RetrieveUpdateAPIView):
@@ -209,6 +209,10 @@ class ProfileGalleryDeleteView(ProfileGalleryViewMixin, generics.DestroyAPIView)
     :return: None
     """
 
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.ProfileGallery.objects.filter(profile__user=self.request.user)
+
 
 class ProfileGalleryDetailView(ProfileGalleryViewMixin, generics.RetrieveAPIView):
     """
@@ -217,6 +221,10 @@ class ProfileGalleryDetailView(ProfileGalleryViewMixin, generics.RetrieveAPIView
     """
     serializer_class = serializers.ProfileGalleryCreateSerializer
     queryset = models.ProfileGallery.objects.select_related('profile').all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.filter(profile__user=self.request.user)
 
 
 class ProfileGalleryListView(generics.ListAPIView):
@@ -227,6 +235,10 @@ class ProfileGalleryListView(generics.ListAPIView):
     serializer_class = serializers.ProfileGalleryListSerializer
     queryset = models.ProfileGallery.objects.select_related('profile').all()
     filter_class = filters.ProfileGalleryListFilterSet
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.filter(profile__user=self.request.user)
 
 
 class ProfileGallerySetMainView(generics.UpdateAPIView):
@@ -299,20 +311,23 @@ class FriendRequestApproveView(generics.UpdateAPIView):
     }
     """
     serializer_class = serializers.FriendRequestApproveSerializer
-    queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').not_approved()
+    queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile')
+
+    def get_queryset(self):
+        return self.queryset.to_me(invited=self.request.user).not_approved()
 
 
-class FriendRequestListView(generics.ListAPIView):
+class InFriendRequestListView(generics.ListAPIView):
     """
     View for request for adding ME to FriendList
     Friend requests FROM ME to adding to my list
     """
 
-    serializer_class = serializers.FriendRequestInSerializer
+    serializer_class = serializers.FriendRequestSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.requests(invited=self.request.user).not_approved()
+        return models.FriendRequest.objects.to_me(invited=self.request.user).not_approved()
 
 
 class OutFriendRequestListView(generics.ListAPIView):
@@ -321,11 +336,11 @@ class OutFriendRequestListView(generics.ListAPIView):
     My friend requests FOR ADDING SMBD to my list
     """
 
-    serializer_class = serializers.FriendRequestOutSerializer
+    serializer_class = serializers.FriendRequestSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.my_requests(owner=self.request.user).not_approved()
+        return models.FriendRequest.objects.from_me(owner=self.request.user).not_approved()
 
 
 class FriendRequestDetailView(generics.RetrieveAPIView):
@@ -333,8 +348,18 @@ class FriendRequestDetailView(generics.RetrieveAPIView):
     View for retrieve user friend request
     """
 
-    serializer_class = serializers.FriendRequestOutSerializer
+    serializer_class = serializers.FriendRequestSerializer
     queryset = models.FriendRequest.objects.all()
+
+
+class FriendRequestDeleteView(generics.DestroyAPIView):
+    """
+    View for delete user friend request
+    """
+
+    def get_queryset(self):
+        """Override get queryset method"""
+        return models.FriendRequest.objects.from_me(owner=self.request.user)
 
 
 # Blacklist
@@ -345,7 +370,7 @@ class ProfileBlackListView(generics.ListAPIView):
     View for retrieve user blacklist
     """
 
-    serializer_class = serializers.ProfileBlackListSerializer
+    serializer_class = serializers.BlackListSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""

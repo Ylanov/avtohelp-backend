@@ -4,7 +4,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin
-from utils.api_exceptions import MessageNotFound
 
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
 

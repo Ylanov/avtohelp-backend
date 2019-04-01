@@ -281,7 +281,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:my-friendrequest-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': request.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('invited').get('id'), user_2.profile.id)
+        self.assertEqual(response.data.get('person').get('id'), user_2.profile.id)
 
     def test_friend_request_to_user(self):
         """
@@ -363,11 +363,11 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:friendrequest-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': request.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('invited').get('id'), self.user_1.profile.id)
+        self.assertEqual(response.data.get('person').get('id'), user_2.profile.id)
 
     def test_friend_request_to_user_approve(self):
         """
-        Get all friend requests TO user
+        Get all friend requests TO usertest_my_friend_request_detail
         """
         # Authorize user_1
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -376,8 +376,7 @@ class TestProfile(APITestCase):
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
 
-        # Put user_3 in FriendList
-        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+        request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
 
         api_path = '%s:userprofile:friendrequest-approve' % self.VERSION
         response = self.client.patch(reverse(api_path, kwargs={'pk': request.id}))
@@ -627,7 +626,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-gallery-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ProfileGallery.objects.count())
+        self.assertEqual(response.data.get('count'), user_2.profile.gallery.count())
 
     def test_profile_gallery_detail(self):
         """Common test for retrieving detail of profile gallery object"""

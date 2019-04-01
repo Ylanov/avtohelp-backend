@@ -34,7 +34,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             elif command == "send":
                 await self.send_room(content["room"], content["message"])
             elif command == "read":
-                await self.read_message(content["room_id"], content["messages"])
+                await self.read_message(content["room"], content["messages"])
             elif command == "leave":
                 # Leave the room
                 await self.leave_room(content["room"])

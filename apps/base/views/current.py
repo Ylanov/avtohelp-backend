@@ -20,6 +20,10 @@ class NewsViewSet(viewsets.ModelViewSet):
     queryset = models.Newsletter.objects.all()
     serializer_class = serializers.NewsDetailSerializer
 
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.order_by('-publish', '-publish_date')
+
 
 class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewSet):
     """

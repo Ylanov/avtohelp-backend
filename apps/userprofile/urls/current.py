@@ -58,7 +58,7 @@ urlpatterns = [
     path('profile/friends/<int:pk>/remove', views.FriendListDestroyView.as_view(),
          name='friendlist-remove'),
 
-    path('profile/friends/requests/incoming', views.FriendRequestListView.as_view(),
+    path('profile/friends/requests/incoming', views.InFriendRequestListView.as_view(),
          name='friendrequest-list'),
 
     path('profile/friends/requests/incoming/<int:pk>', views.FriendRequestDetailView.as_view(),
@@ -72,6 +72,9 @@ urlpatterns = [
 
     path('profile/friends/requests/outgoing/<int:pk>', views.FriendRequestDetailView.as_view(),
          name='my-friendrequest-detail'),
+
+    path('profile/friends/requests/outgoing/<int:pk>/delete', views.FriendRequestDeleteView.as_view(),
+         name='my-friendrequest-delete'),
 
     # Blacklist
     path('profile/blacklist', views.ProfileBlackListView.as_view(),

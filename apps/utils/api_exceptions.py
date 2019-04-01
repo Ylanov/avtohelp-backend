@@ -52,7 +52,7 @@ class UserNotFound(exceptions.APIException):
     extended_status_code = '%s.1' % status.HTTP_404_NOT_FOUND
 
 
-class MessageNotFound(exceptions.APIException):
+class MessagesNotFound(exceptions.APIException):
     """Message not found."""
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = _('Message not found')

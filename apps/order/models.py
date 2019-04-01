@@ -39,12 +39,14 @@ class AssistanceRequestQuerySet(models.QuerySet):
 class AssistanceRequest(BaseMixin):
     """Assistance request model"""
 
-    AVAILABLE = 1
     EXPIRED = 0
+    AVAILABLE = 1
+    CANCELED = 2
 
-    STATUS_CHOCIES = (
+    STATUS_CHOICES = (
         (AVAILABLE, _('Assistance request is available')),
-        (EXPIRED, _('Assistance request was expired'))
+        (EXPIRED, _('Assistance request was expired')),
+        (CANCELED, _('Assistance request was canceled'))
     )
 
     user = models.ForeignKey('account.User',
@@ -57,7 +59,7 @@ class AssistanceRequest(BaseMixin):
     location = gis_models.PointField(_('Location'),
                                      blank=True, null=True, default=None)
     status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
-                                              default=AVAILABLE, choices=STATUS_CHOCIES)
+                                              default=AVAILABLE, choices=STATUS_CHOICES)
 
     objects = AssistanceRequestQuerySet.as_manager()
 

@@ -92,20 +92,11 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
             setattr(instance, 'geo_lon', float(0))
         return super().to_representation(instance)
 
-    def create(self, validated_data):
-        """Override create method"""
-        #  todo: provide the api_key in the google-services.json file
-        # if settings.USE_CELERY:
-        #     tasks.notify_users.delay()
-        # else:
-        #     tasks.notify_users()
-        return super(AssistanceRequestCreateSerializer, self).create(validated_data)
-
 
 class AssistanceRequestUpdateSerializer(serializers.ModelSerializer):
     """Update object of AssistanceRequest by user"""
 
-    status = serializers.ChoiceField(choices=models.AssistanceRequest.STATUS_CHOCIES)
+    status = serializers.ChoiceField(choices=models.AssistanceRequest.STATUS_CHOICES)
 
     class Meta:
         """Meta class"""
