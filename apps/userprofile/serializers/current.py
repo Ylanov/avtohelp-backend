@@ -155,7 +155,7 @@ class ProfileCarListSerializer(serializers.ModelSerializer):
                   'license_plate', 'car')
 
 
-class ProfileAvatarSerializer(serializers.ModelSerializer):
+class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
     """Serializer method for ProfileGallery model"""
 
     tiny = serializers.SerializerMethodField()
@@ -168,7 +168,7 @@ class ProfileAvatarSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.ProfileGallery
-        fields = ('id', 'created', 'tiny', 'small',
+        fields = ('id', 'created', 'profile', 'is_main', 'tiny', 'small',
                   'average', 'medium', 'big', 'large', 'is_main')
 
     def get_tiny(self, obj):

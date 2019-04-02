@@ -219,7 +219,7 @@ class ProfileGalleryDetailView(ProfileGalleryViewMixin, generics.RetrieveAPIView
     View for retrieve profile gallery
     :return: object
     """
-    serializer_class = serializers.ProfileGalleryCreateSerializer
+    serializer_class = serializers.ProfileGalleryDetailSerializer
     queryset = models.ProfileGallery.objects.select_related('profile').all()
 
     def get_queryset(self):

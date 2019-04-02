@@ -133,10 +133,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "type": "chat.message",
                 "room_id": room_id,
                 "user": user.id,
-                "avatar": (user.profile.gallery.filter(is_main=True).first().image.url
+                "first_name": user.get_first_name(),
+                "last_name": user.get_last_name(),
+                "middle_name": user.get_middle_name(),
+                "avatar": (user.profile.gallery.filter(is_main=True).first().image['tiny'].url
                            if user.profile.gallery.filter(is_main=True).exists()
                            else None),
-                "full_name": user.get_full_name(),
                 'datetime': f'{letter.created}',
                 "message": message,
                 "message_id": letter.id
@@ -194,7 +196,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "room": event["room_id"],
                 "user": event["user"],
                 "avatar": event["avatar"],
-                "full_name": event["full_name"],
+                "first_name": event["first_name"],
+                "last_name": event["last_name"],
+                "middle_name": event["middle_name"],
                 'datetime': event["datetime"],
                 "message": event["message"],
                 "message_id": event["message_id"],
