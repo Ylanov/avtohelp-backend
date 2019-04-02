@@ -135,14 +135,14 @@
                     $(this).removeClass("joined");
                     socket.send(JSON.stringify({
                         "command": "leave",
-                        "room": roomId
+                        "room": +roomId
                     }));
                 } else {
                     // Join room
                     $(this).addClass("joined");
                     socket.send(JSON.stringify({
                         "command": "join",
-                        "room": roomId
+                        "room": +roomId
                     }));
                 }
             });

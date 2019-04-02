@@ -123,7 +123,7 @@ def notify_unread_messages(title=None, body=None):
             for user in notify:
                 devices = FCMDevice.objects.filter(user=user)
                 count = devices.send_message(title=title, body=body)
-                if count > 0:
+                if count and count > 0:
                     logger.info(f'Users notified: {count}')
                 else:
                     logger.info(f'Error was occurred when sending PUSH-notifications')

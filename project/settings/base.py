@@ -215,11 +215,6 @@ AVAILABLE_VERSIONS = {
 }
 
 
-# DjangoRestFramework settings
-REST_DATE_FORMAT = '%d-%m-%Y'
-REST_DATETIME_FORMAT = '%d-%m-%Y %H:%M:%S %Z'
-
-
 # REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
@@ -238,8 +233,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'DATE_FORMAT': REST_DATE_FORMAT,
-    'DATETIME_FORMAT': REST_DATETIME_FORMAT,
 }
 
 
@@ -276,6 +269,12 @@ REQUEST_RELEVANCE = 30  # minutes
 
 
 # PUSH-NOTIFICATIONS
+# Django FCM (Firebase push notifications)
+FCM_DJANGO_SETTINGS = {
+    'FCM_SERVER_KEY': (
+        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"
+    ),
+}
 LIMIT_UNREAD_MESSAGES = 3
 MESSAGES_UPDATE_PERIOD = 15
 

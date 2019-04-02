@@ -81,7 +81,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
         # Instruct their client to finish opening the room
         await self.send_json({
-            "join": str(room.id),
+            "join": room.id,
         })
 
     async def leave_room(self, room_id):
@@ -110,7 +110,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
         # Instruct their client to finish closing the room
         await self.send_json({
-            "leave": str(room.id),
+            "leave": room.id,
         })
 
     async def send_room(self, room_id, message):
@@ -139,7 +139,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "full_name": user.get_full_name(),
                 'datetime': f'{letter.created}',
                 "message": message,
-                "message_id": f'{letter.id}'
+                "message_id": letter.id
             }
         )
 
@@ -152,7 +152,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             raise ClientError("ROOM_ACCESS_DENIED")
         # Make a record in the DB
         await utils_methods.read_message(message_list=messages, reader=self.scope["user"])
-
 
     ##### Handlers for messages sent over the channel layer
 
