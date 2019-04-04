@@ -139,7 +139,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "avatar": (user.profile.gallery.filter(is_main=True).first().image.url
                            if user.profile.gallery.filter(is_main=True).exists()
                            else None),
-                'datetime': f'{letter.created}',
+                'datetime': f'{letter.created.isoformat()}',
                 "message": message,
                 "message_id": letter.id
             }
