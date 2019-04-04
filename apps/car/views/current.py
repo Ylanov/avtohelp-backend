@@ -5,6 +5,7 @@ from car import models, filters
 from django.db.models import ExpressionWrapper, IntegerField, F
 from django.contrib.gis.geos import Point
 from car.serializers import current as serializers
+from utils.paginations import CustomCursorPagination
 
 
 """
@@ -19,7 +20,7 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CarDetailSerializer
     filter_class = filters.CarListFilterSet
     queryset = models.Car.objects.select_related('mark', 'car_model__mark').all()
-    pagination_class = None
+    pagination_class = CustomCursorPagination
 
 
 class ColorsViewSet(viewsets.ModelViewSet):

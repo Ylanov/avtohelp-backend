@@ -53,7 +53,7 @@ class CarModelDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarModel
-        fields = ('id', 'created', 'name', 'mark')
+        fields = ('id', 'created', 'name')
 
 
 class CarColorListSerializer(serializers.ModelSerializer):
@@ -79,14 +79,14 @@ class CarColorDetailSerializer(serializers.ModelSerializer):
 class CarDetailSerializer(serializers.ModelSerializer):
     """Car detail serializer"""
 
-    mark_name = serializers.CharField(source='mark.name')
-    model_name = serializers.CharField(source='car_model.name')
+    mark = CarMarkDetailSerializer()
+    model = CarModelDetailSerializer(source='car_model')
 
     class Meta:
         """Meta model"""
 
         model = models.Car
-        fields = ('id', 'created', 'mark_name', 'model_name')
+        fields = ('id', 'created', 'mark', 'model')
 
 
 class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
@@ -98,7 +98,7 @@ class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
         """Meta model"""
 
         model = models.CarService
-        fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon', 'category', 'distance')
+        fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon', 'category_id', 'distance')
 
     def get_distance(self, obj):
         """Get distance in meters"""
@@ -113,5 +113,5 @@ class ServiceDetailSerializer(serializers.ModelSerializer, CoordinatesSerializer
 
         model = models.CarService
         fields = ('id', 'created', 'modified', 'name',
-                  'category', 'description', 'geo_lat',
+                  'category_id', 'description', 'geo_lat',
                   'geo_lon', 'phone')

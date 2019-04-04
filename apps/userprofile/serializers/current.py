@@ -201,7 +201,7 @@ class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProfileGallery
-        fields = ('id', 'created', 'profile', 'image', 'is_main')
+        fields = ('id', 'created', 'profile_id', 'image', 'is_main')
 
     def create(self, validated_data):
         """Override create method"""

@@ -10,6 +10,7 @@ class CarListFilterSet(django_filters.FilterSet):
 
     mark_name = django_filters.CharFilter(field_name='mark__name')
     model_name = django_filters.CharFilter(field_name='car_model__name')
+    model = django_filters.NumberFilter(field_name='car_model')
 
     class Meta:
         """Meta class."""
@@ -17,7 +18,7 @@ class CarListFilterSet(django_filters.FilterSet):
         model = models.Car
         fields = [
             'mark_name', 'model_name',
-            'car_model', 'mark'
+            'model', 'mark'
         ]
 
 
