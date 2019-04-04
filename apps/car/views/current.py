@@ -1,12 +1,10 @@
+from django.contrib.gis.geos import Point
 from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from car import models, filters
-from django.db.models import ExpressionWrapper, IntegerField, F
-from django.contrib.gis.geos import Point
 from car.serializers import current as serializers
 from utils.paginations import CustomCursorPagination
-
 
 """
 VIEWSETS
@@ -63,6 +61,7 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.ServiceListSerializer
     filter_class = filters.ServiceStationsFilterSet
     queryset = models.CarService.objects.all()
+    pagination_class = None
 
     def get_queryset(self):
         """Override get_queryset method"""

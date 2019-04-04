@@ -2,10 +2,10 @@ from fcm_django.models import FCMDevice
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from django.db.models import Q, Subquery
 
 from userprofile import models, filters
 from userprofile.serializers import current as serializers
+from utils.paginations import CustomCursorPagination
 
 
 class FCMDeviceViewSet(generics.GenericAPIView):
@@ -59,6 +59,7 @@ class ProfileListView(generics.ListAPIView):
 
     serializer_class = serializers.ProfileListSerializer
     filter_class = filters.ProfileListFilterSet
+    pagination_class = CustomCursorPagination
 
     def get_queryset(self):
         """Override get_queryset method"""
