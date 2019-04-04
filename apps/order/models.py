@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from utils.mixins import BaseMixin
+from django.contrib.gis.db.models.functions import Distance
 
 
 class AssistanceRequestQuerySet(models.QuerySet):
@@ -34,6 +35,10 @@ class AssistanceRequestQuerySet(models.QuerySet):
         return self.exclude(
             Q(user__blacklist_owner__foe=user) |
             Q(user__blacked_user__owner=user))
+
+    def annotate_distance(self, position):
+        """Annotate service distance from position"""
+        return self.annotate(distance=Distance('location', position))
 
 
 class AssistanceRequest(BaseMixin):

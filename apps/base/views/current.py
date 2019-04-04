@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from base import models
 from base.serializers import current as serializers
 from utils import views as view_mixins
+from utils.paginations import NewsCursorPagination
 
 
 """
@@ -19,17 +20,13 @@ class NewsViewSet(viewsets.ModelViewSet):
     model = models.Newsletter
     queryset = models.Newsletter.objects.all()
     serializer_class = serializers.NewsDetailSerializer
-
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return self.queryset.order_by('-publish', '-publish_date')
+    pagination_class = NewsCursorPagination
 
 
 class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewSet):
     """
     ViewSet for model Notification
     """
-
     serializer_class = serializers.NotificationDetailSerializer
 
     def get_queryset(self):

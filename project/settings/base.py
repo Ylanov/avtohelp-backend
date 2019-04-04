@@ -214,6 +214,8 @@ AVAILABLE_VERSIONS = {
     'current': '1.0.0',
 }
 
+# DjangoRestFramework settings
+REST_DATE_FORMAT = '%d-%m-%Y'
 
 # REST Framework
 REST_FRAMEWORK = {

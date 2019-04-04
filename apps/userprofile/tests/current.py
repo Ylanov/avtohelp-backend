@@ -626,7 +626,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-gallery-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), user_2.profile.gallery.count())
+        self.assertEqual(response.data.get('count'), ProfileGallery.objects.all().count())
 
     def test_profile_gallery_detail(self):
         """Common test for retrieving detail of profile gallery object"""

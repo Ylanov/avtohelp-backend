@@ -1,14 +1,11 @@
 from django.contrib.gis.db import models as gis_models
+from django.contrib.postgres.search import SearchVector
 from django.db import models
 from django.db.models import Q, Subquery
-from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
-from easy_thumbnails.fields import ThumbnailerImageField
 from online_users.models import OnlineUserActivity as activity
-from django.contrib.postgres.search import SearchVector
 
-from utils import methods
-from utils.mixins import BaseMixin
+from utils.mixins import BaseMixin, ImageMixin
 
 
 class ProfileQuerySet(models.QuerySet):
@@ -67,6 +64,13 @@ class ProfileQuerySet(models.QuerySet):
                 'middle_name',
                 'user__profilecar__license_plate'
             ),
+        )
+
+    def annotate_avatar(self):
+        """Annotate profile avatar"""
+        gallery = ProfileGallery.objects.filter(profile=models.OuterRef('id'), is_main=True)
+        return self.annotate(
+            avatar=models.Subquery(gallery.values('image')[:1])
         )
 
 
@@ -165,9 +169,8 @@ class ProfileGalleryManager(models.Manager):
         return ProfileGallery.objects.by_profile(profile=profile).by_status(switcher=True).update(is_main=False)
 
 
-class ProfileGallery(BaseMixin):
+class ProfileGallery(BaseMixin, ImageMixin):
     """Profile gallery"""
-    THUMBNAIL_KEY = 'gallery'
 
     profile = models.ForeignKey(
         'Profile',
@@ -176,9 +179,6 @@ class ProfileGallery(BaseMixin):
         default=None,
         on_delete=models.CASCADE,
         related_name='gallery')
-    image = ThumbnailerImageField(upload_to=methods.image_path,
-                                  blank=True, null=True, default=None,
-                                  verbose_name=_('Image'))
     is_main = models.BooleanField(default=False)
 
     objects = ProfileGalleryManager.from_queryset(ProfileGalleryQuerySet)()
@@ -188,24 +188,6 @@ class ProfileGallery(BaseMixin):
 
         verbose_name = _('Gallery item')
         verbose_name_plural = _('Gallery items')
-
-    def get_image(self, key=None):
-        """Get thumbnailed image file."""
-        return self.image[key or self.THUMBNAIL_KEY] if self.image else None
-
-    def get_image_url(self, key=None):
-        """Get image thumbnail url."""
-        return self.get_image(key).url if self.image else None
-
-    def image_tag(self):
-        """Admin preview tag."""
-        if self.image:
-            return mark_safe('<img src="%s" />' % self.get_image_url())
-        else:
-            return None
-
-    image_tag.short_description = _('Image')
-    image_tag.allow_tags = True
 
 
 class FriendRequestQuerySet(models.QuerySet):

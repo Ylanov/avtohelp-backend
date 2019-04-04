@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from chat import models, filters, permissions
 from chat.serializers import current as serializers
+from utils.paginations import CustomCursorPagination
 
 
 class ChatMessageListView(generics.ListAPIView):
@@ -14,7 +15,7 @@ class ChatMessageListView(generics.ListAPIView):
     queryset = models.ChatMessage.objects.all()
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
-    pagination_class = CursorPagination
+    pagination_class = CustomCursorPagination
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -51,10 +52,12 @@ class ChatRoomListView(generics.ListAPIView):
     """Chat room list view"""
     serializer_class = serializers.ChatRoomListSerializer
     filter_class = filters.ChatRoomListFilterSet
+    pagination_class = CustomCursorPagination
 
     def get_queryset(self):
         """Override get queryset method"""
-        return models.ChatRoom.objects.by_participant(participant=self.request.user)
+        return models.ChatRoom.objects.by_participant(
+            participant=self.request.user)
 
 
 class ChatView(generics.GenericAPIView):

@@ -61,7 +61,7 @@ class TestChat(APITestCase):
         api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatRoom.objects.by_participant(self.user).count())
+        self.assertEqual(len(response.data.get('results')), ChatRoom.objects.by_participant(self.user).count())
 
     def test_room_detail(self):
         """Test view for getting detail info about room"""

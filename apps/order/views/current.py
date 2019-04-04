@@ -2,8 +2,9 @@ from rest_framework import generics, views
 from rest_framework.response import Response
 from rest_framework.pagination import CursorPagination
 
-from order import models
+from order import models, filters
 from order.serializers import current as serializers
+from django.contrib.gis.geos import Point
 
 
 class AssistanceRequestMixin(object):
@@ -18,17 +19,24 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     """
     serializer_class = serializers.AssistanceRequestListSerializer
     pagination_class = CursorPagination
+    filter_class = filters.AssistanceRequestFitlerSet
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.available(self.request.user)
+        qs = self.queryset.available(self.request.user)
+        query = self.request.query_params.get('position')
+        if query:
+            position_x = float(query.split(',')[0])
+            position_y = float(query.split(',')[1])
+            position = Point(position_x, position_y, srid=4326)
+            return qs.annotate_distance(position)
+        return qs
 
 
 class AssistanceRequestCountView(views.APIView):
     """
     Return count of availbale assistance request
     """
-
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
         return Response({'count': models.AssistanceRequest.objects.available(user=request.user).count()})

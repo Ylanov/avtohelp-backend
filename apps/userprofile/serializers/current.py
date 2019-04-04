@@ -10,7 +10,6 @@ from catalog import models as catalog_models
 from catalog.serializers import current as catalog_serializers
 from userprofile import models
 from utils import api_exceptions
-from utils.serializers import GeoPositonMixin
 
 
 class FCMDeviceSerializer(serializers.ModelSerializer):
@@ -86,7 +85,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
                   'phone', 'profile_car')
 
 
-class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
+class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for retrieving user profile"""
 
     # RESPONSE
@@ -106,8 +105,7 @@ class ProfileSerializer(serializers.ModelSerializer, GeoPositonMixin):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'city', 'city_detail',
-                  'car', 'geo_lat', 'geo_lon')
+                  'phone', 'city', 'city_detail', 'car')
 
 
 class ProfileCarCreateSerializer(serializers.ModelSerializer):
@@ -231,24 +229,30 @@ class ProfileGalleryListSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'profile', 'image', 'is_main')
 
 
-class ProfileListSerializer(serializers.ModelSerializer, GeoPositonMixin):
+class ProfileListSerializer(serializers.ModelSerializer):
     """Serializer for ProfileListView"""
     online = serializers.BooleanField()
     friend = serializers.BooleanField()
     license_plate = serializers.CharField(source='user.get_car_license_plate')
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'middle_name', 'geo_lat', 'geo_lon', 'online',
-                  'friend', 'license_plate')
+                  'middle_name', 'online', 'friend', 'license_plate',
+                  'avatar')
 
+    def get_avatar(self, obj):
+        """Get profile avatar"""
+        return (obj.gallery.filter(is_main=True).first().image.url
+                if obj.gallery.filter(is_main=True).exists()
+                else None)
 
 # Friend list
 
 
-class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin):
+class FriendRequestDetailSerializer(serializers.ModelSerializer):
     """Serializer for model FriendRequest"""
 
     car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
@@ -256,8 +260,7 @@ class FriendRequestDetailSerializer(serializers.ModelSerializer, GeoPositonMixin
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name',
-                  'car', 'geo_lat', 'geo_lon')
+        fields = ('id', 'created', 'first_name', 'last_name', 'car')
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
@@ -384,12 +387,18 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
 class BlackListDetailSerializer(serializers.ModelSerializer):
     """Serializer for model BlackList"""
 
-    profile_id = FriendRequestDetailSerializer(source='foe.profile', read_only=True)
+    foe = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'profile_id')
+        fields = ('id', 'created', 'foe')
+
+    def get_foe(self, obj):
+        if obj.owner == self.context.get('request').user:
+            return ProfileViewSerializer(obj.foe.profile).data
+        else:
+            return ProfileViewSerializer(obj.owner.profile).data
 
 
 class BlackListSerializer(serializers.ModelSerializer):

@@ -34,11 +34,12 @@ class AssistanceRequestListSerializer(AssistanceRequestMixin):
     """List of AssistanceRequest objects by user"""
 
     profile_id = serializers.IntegerField(source='user.profile.id')
+    distance = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
         model = models.AssistanceRequest
-        fields = ('id', 'created', 'profile_id', 'issue', 'description', 'geo_lat', 'geo_lon')
+        fields = ('id', 'created', 'profile_id', 'issue', 'description', 'geo_lat', 'geo_lon', 'distance')
 
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
@@ -49,6 +50,10 @@ class AssistanceRequestListSerializer(AssistanceRequestMixin):
         """Point(longitude, latitude)"""
         if isinstance(obj.location, Point):
             return obj.location.x
+
+    def get_distance(self, obj):
+        """Get distance in meters"""
+        return obj.distance.m if hasattr(obj, 'distance') else None
 
 
 class AssistanceRequestCreateSerializer(serializers.ModelSerializer):

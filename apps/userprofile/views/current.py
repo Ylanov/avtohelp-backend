@@ -62,7 +62,7 @@ class ProfileListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.Profile.objects.annotate_online_status().annotate_friend_status(self.request.user).select_related(
+        return models.Profile.objects.annotate_online_status().annotate_friend_status(self.request.user).annotate_avatar().select_related(
             'user'
         ).friendly(self.request.user).order_by('first_name', 'last_name')
 
@@ -222,9 +222,9 @@ class ProfileGalleryDetailView(ProfileGalleryViewMixin, generics.RetrieveAPIView
     serializer_class = serializers.ProfileGalleryDetailSerializer
     queryset = models.ProfileGallery.objects.select_related('profile').all()
 
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return self.queryset.filter(profile__user=self.request.user)
+    # def get_queryset(self):
+    #     """Override get_queryset method"""
+    #     return self.queryset.filter(profile__user=self.request.user)
 
 
 class ProfileGalleryListView(generics.ListAPIView):
@@ -236,9 +236,9 @@ class ProfileGalleryListView(generics.ListAPIView):
     queryset = models.ProfileGallery.objects.select_related('profile').all()
     filter_class = filters.ProfileGalleryListFilterSet
 
-    def get_queryset(self):
-        """Override get_queryset method"""
-        return self.queryset.filter(profile__user=self.request.user)
+    # def get_queryset(self):
+    #     """Override get_queryset method"""
+    #     return self.queryset.filter(profile__user=self.request.user)
 
 
 class ProfileGallerySetMainView(generics.UpdateAPIView):

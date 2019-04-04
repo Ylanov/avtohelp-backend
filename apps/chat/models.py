@@ -3,7 +3,7 @@ from django.db.models import Subquery
 from django.utils.translation import ugettext_lazy as _
 
 from userprofile import models as profile_models
-from utils.mixins import BaseMixin
+from utils.mixins import BaseMixin, ImageMixin
 
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
 
@@ -115,7 +115,7 @@ class ChatRoomQuerySet(models.QuerySet):
         return self.filter(is_public=True)
 
 
-class ChatRoom(BaseMixin):
+class ChatRoom(BaseMixin, ImageMixin):
     """Chat room"""
     name = models.CharField(max_length=24,
                             blank=True, default=None, null=True)

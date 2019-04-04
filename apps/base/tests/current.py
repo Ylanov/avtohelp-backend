@@ -46,7 +46,7 @@ class TestCatalog(APITestCase):
         api_path = '%s:base:newsletter-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), models.Newsletter.objects.count())
+        self.assertEqual(len(response.data.get('results')), models.Newsletter.objects.count())
 
     def test_news_detail(self):
         """Test news detail view"""

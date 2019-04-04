@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from userprofile.models import Profile, ProfileLocation
+from userprofile.models import Profile, ProfileLocation, ProfileGallery
 from utils.mixins import BaseMixin
 
 
@@ -19,6 +19,13 @@ class UserQuerySet(models.QuerySet):
     def by_phone(self, phone):
         """Queryset by user phone"""
         return self.filter(phone=phone)
+
+    def annotate_profile_avatar(self):
+        """Annotate profile avatar"""
+        gallery = ProfileGallery.objects.filter(profile=models.OuterRef('user__profile'), is_main=True)
+        return self.annotate(
+            avatar=models.Subquery(gallery.values('image')[:1])
+        )
 
 
 class UserManager(AbstractUserManager):
