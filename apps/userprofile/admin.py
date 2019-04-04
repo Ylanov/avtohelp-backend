@@ -60,9 +60,10 @@ class ProfileGalleryModelAdmin(admin.ModelAdmin):
 
 # Register your models here.
 admin.site.register(Profile, ProfileModelAdmin)
-admin.site.register(ProfileLocation, ProfileLocationModelAdmin)
 admin.site.register(ProfileGallery, ProfileGalleryModelAdmin)
 admin.site.register(FriendRequest, FriendRequestModelAdmin)
 admin.site.register(FriendList, FriendListModelAdmin)
 admin.site.register(BlackList, BlackListModelAdmin)
 admin.site.register(ProfileCar, ProfileCarModelAdmin)
+# admin.site.register(ProfileLocation, ProfileLocationModelAdmin)
+

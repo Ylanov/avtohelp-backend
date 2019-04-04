@@ -3,8 +3,6 @@ from rest_framework import serializers
 
 from order import models
 from userprofile.serializers import current as profile_serializers
-from utils import tasks
-from django.conf import settings
 
 
 class AssistanceRequestMixin(serializers.ModelSerializer):

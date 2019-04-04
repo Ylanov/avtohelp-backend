@@ -5,7 +5,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from userprofile.models import Profile, ProfileLocation, ProfileGallery
+from userprofile.models import Profile, ProfileGallery
 from utils.mixins import BaseMixin
 
 
@@ -39,7 +39,6 @@ class UserManager(AbstractUserManager):
         obj = self.model(phone=phone)
         obj.save()
         Profile.objects.create(user=obj)
-        ProfileLocation.objects.create(user=obj)
         return obj
 
     def get_or_make(self, phone):
