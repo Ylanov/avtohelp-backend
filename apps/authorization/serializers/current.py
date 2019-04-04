@@ -59,6 +59,12 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
             tasks.send_verification_sms(sms_code_id=obj.id)
         return obj
 
+    def to_representation(self, instance):
+        """Override to_representation method"""
+        import os
+        if os.environ.get('SETTINGS_CONFIGURATION') == ('local' or 'development'):
+            return {'code': instance.code}
+
 
 class ProfileMinSerializer(serializers.ModelSerializer):
     """Minimized profile information"""
