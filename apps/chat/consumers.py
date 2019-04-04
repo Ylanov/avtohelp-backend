@@ -69,7 +69,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 {
                     "type": "chat.join",
                     "room_id": room_id,
-                    "user": self.scope["user"].id,
+                    "profile_id": self.scope["user"].profile.id,
                 }
             )
         # Store that we're in the room
@@ -98,7 +98,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 {
                     "type": "chat.leave",
                     "room_id": room_id,
-                    "user": self.scope["user"].id,
+                    "profile_id": self.scope["user"].profile.id,
                 }
             )
         # Remove that we're in the room
@@ -132,7 +132,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             {
                 "type": "chat.message",
                 "room_id": room_id,
-                "user": user.id,
+                "profile_id": user.profile.id,
                 "first_name": user.get_first_name(),
                 "last_name": user.get_last_name(),
                 "middle_name": user.get_middle_name(),
@@ -168,7 +168,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": models.MSG_TYPE_ENTER,
                 "room": event["room_id"],
-                "user": event["user"],
+                "profile_id": event["profile_id"],
             },
         )
 
@@ -181,7 +181,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": models.MSG_TYPE_LEAVE,
                 "room": event["room_id"],
-                "user": event["user"],
+                "profile_id": event["profile_id"],
             },
         )
 
@@ -194,7 +194,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             {
                 "msg_type": models.MSG_TYPE_MESSAGE,
                 "room": event["room_id"],
-                "user": event["user"],
+                "profile_id": event["profile_id"],
                 "avatar": event["avatar"],
                 "first_name": event["first_name"],
                 "last_name": event["last_name"],
