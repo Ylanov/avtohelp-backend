@@ -64,6 +64,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         import os
         if os.environ.get('SETTINGS_CONFIGURATION') == ('local' or 'development'):
             return {'code': instance.code}
+        return super(PhoneVerificationSerializer, self).to_representation(instance)
 
 
 class ProfileMinSerializer(serializers.ModelSerializer):
