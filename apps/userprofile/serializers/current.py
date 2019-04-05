@@ -74,15 +74,13 @@ class ProfileCarDetailSerializer(serializers.ModelSerializer):
 class ProfileViewSerializer(serializers.ModelSerializer):
     """Profile serializer for Requests"""
 
-    phone = serializers.CharField(source='user.phone')
     profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'first_name', 'last_name', 'middle_name',
-                  'phone', 'profile_car')
+        fields = ('id', 'first_name', 'last_name', 'middle_name', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -229,10 +227,9 @@ class ProfileGalleryListSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'profile', 'image', 'is_main')
 
 
-class ProfileListSerializer(serializers.ModelSerializer):
+class FullProfileSerializer(serializers.ModelSerializer):
     """Serializer for ProfileListView"""
     online = serializers.BooleanField()
-    friend = serializers.BooleanField()
     license_plate = serializers.CharField(source='user.get_car_license_plate')
     avatar = serializers.SerializerMethodField()
 
@@ -240,7 +237,7 @@ class ProfileListSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'middle_name', 'online', 'friend', 'license_plate',
+                  'middle_name', 'online', 'license_plate',
                   'avatar')
 
     def get_avatar(self, obj):
@@ -249,18 +246,40 @@ class ProfileListSerializer(serializers.ModelSerializer):
                 if obj.gallery.filter(is_main=True).exists()
                 else None)
 
-# Friend list
 
+class ProfileListSerializer(FullProfileSerializer):
+    """Serializer for ProfileListView"""
 
-class FriendRequestDetailSerializer(serializers.ModelSerializer):
-    """Serializer for model FriendRequest"""
-
-    car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
+    friend = serializers.BooleanField()
 
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name', 'car')
+        fields = ('id', 'created', 'first_name', 'last_name',
+                  'middle_name', 'online', 'friend', 'license_plate',
+                  'avatar')
+
+
+class ProfileBaseSerializer(serializers.ModelSerializer):
+    """Serializer for model FriendRequest"""
+
+    car_id = serializers.SerializerMethodField()
+
+    class Meta:
+        """Meta class"""
+        model = models.Profile
+        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name', 'car_id')
+
+    def get_car_id(self, obj):
+        """Get car id"""
+        cars = obj.user.profilecar_set
+        if cars.first():
+            return cars.first().id
+        else:
+            return None
+
+
+# Friend list
 
 
 class FriendRequestSerializer(serializers.ModelSerializer):
@@ -276,9 +295,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     def get_person(self, obj):
         if obj.owner == self.context.get('request').user:
-            return FriendRequestDetailSerializer(obj.invited.profile).data
+            return ProfileBaseSerializer(obj.invited.profile).data
         else:
-            return FriendRequestDetailSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile).data
 
 
 class FriendRequestCreateSerializer(serializers.ModelSerializer):
@@ -291,7 +310,7 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
 
     # RESPONSE
     # detail of invited user
-    person = FriendRequestDetailSerializer(source='invited.profile', read_only=True)
+    person = ProfileBaseSerializer(source='invited.profile', read_only=True)
 
     class Meta:
         """Meta class"""
@@ -335,18 +354,19 @@ class FriendRequestApproveSerializer(serializers.ModelSerializer):
 class ProfileFriendListSerializer(serializers.ModelSerializer):
     """Serializer for model FriendList"""
 
-    friend = serializers.SerializerMethodField()
+    person = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
         model = models.FriendList
-        fields = ('id', 'created', 'friend', 'request_id')
+        fields = ('id', 'created', 'person', 'request_id')
 
-    def get_friend(self, obj):
+    def get_person(self, obj):
+        """Serializer method for get friend profile"""
         if obj.owner == self.context.get('request').user:
-            return ProfileViewSerializer(obj.friend.profile).data
+            return ProfileBaseSerializer(obj.friend.profile).data
         else:
-            return ProfileViewSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile).data
 
 
 # Black list
@@ -387,32 +407,15 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
 class BlackListDetailSerializer(serializers.ModelSerializer):
     """Serializer for model BlackList"""
 
-    foe = serializers.SerializerMethodField()
+    person = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
         model = models.BlackList
-        fields = ('id', 'created', 'foe')
+        fields = ('id', 'created', 'person')
 
-    def get_foe(self, obj):
+    def get_person(self, obj):
         if obj.owner == self.context.get('request').user:
-            return ProfileViewSerializer(obj.foe.profile).data
+            return ProfileBaseSerializer(obj.foe.profile).data
         else:
-            return ProfileViewSerializer(obj.owner.profile).data
-
-
-class BlackListSerializer(serializers.ModelSerializer):
-    """Serializer for model BlackList"""
-
-    foe = serializers.SerializerMethodField()
-
-    class Meta:
-        """Meta class"""
-        model = models.BlackList
-        fields = ('id', 'created', 'foe')
-
-    def get_foe(self, obj):
-        if obj.owner == self.context.get('request').user:
-            return ProfileViewSerializer(obj.foe.profile).data
-        else:
-            return ProfileViewSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile).data

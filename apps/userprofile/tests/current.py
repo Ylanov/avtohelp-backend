@@ -126,7 +126,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), Profile.objects.exclude(user=self.user_1).count())
+        self.assertEqual(len(response.data.get('results')), Profile.objects.exclude(user=self.user_1).count())
 
     def test_profiles_list_2(self):
         """
@@ -151,7 +151,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 1)
+        self.assertEqual(len(response.data.get('results')), 1)
 
     def test_profiles_list_3(self):
         """
@@ -177,7 +177,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 2)
+        self.assertEqual(len(response.data.get('results')), 2)
 
     def test_profiles_list_4(self):
         """
@@ -208,7 +208,7 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 2)
+        self.assertEqual(len(response.data.get('results')), 2)
 
     def test_profile_detail(self):
         """Test profile detail"""
@@ -397,7 +397,7 @@ class TestProfile(APITestCase):
         friend = FriendList.objects.create(owner=self.user_1, friend=user_2, request=friend_request)
 
         api_path = '%s:userprofile:friendlist-remove' % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={'pk': friend.pk}))
+        response = self.client.delete(reverse(api_path, kwargs={'profile_id': user_2.profile.id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_remove_friend_from_friendlist_1(self):
@@ -414,7 +414,7 @@ class TestProfile(APITestCase):
         friend = FriendList.objects.create(owner=self.user_1, friend=user_2, request=friend_request)
 
         api_path = '%s:userprofile:friendlist-remove' % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={'pk': 420}))
+        response = self.client.delete(reverse(api_path, kwargs={'profile_id': 420}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_blacklist_requests(self):
@@ -475,7 +475,7 @@ class TestProfile(APITestCase):
         black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
 
         api_path = '%s:userprofile:blacklistrequest-delete' % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={'pk': black_list.pk}))
+        response = self.client.delete(reverse(api_path, kwargs={'profile_id': user_2.profile.id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_blacklist_request(self):

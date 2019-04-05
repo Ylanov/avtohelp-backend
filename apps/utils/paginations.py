@@ -5,13 +5,26 @@ from collections import namedtuple
 
 from django.utils.encoding import force_str
 from django.utils.six.moves.urllib import parse as urlparse
-from rest_framework.pagination import CursorPagination
+from rest_framework.pagination import CursorPagination, _positive_int
 
 Cursor = namedtuple('Cursor', ['offset', 'reverse', 'position'])
 
 
 class CustomCursorPagination(CursorPagination):
     """Custom cursor pagination"""
+
+    def get_page_size(self, request):
+        if self.page_size_query_param:
+            try:
+                return _positive_int(
+                    request.query_params[self.page_size_query_param],
+                    strict=True,
+                    cutoff=self.max_page_size
+                )
+            except (KeyError, ValueError):
+                pass
+
+        return self.page_size
 
     def replace_query_param(self, url, key, val):
         """

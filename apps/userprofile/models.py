@@ -261,19 +261,24 @@ class FriendListQuerySet(models.QuerySet):
 
     def my_list(self, user):
         """Get user friends"""
-        return self.filter(owner=user, request__approved=True)
+        return self.filter(owner=user)
 
     def common(self, user):
         """Get user friends"""
-        return self.filter(Q(owner=user) | Q(friend=user) & Q(request__approved=True))
+        return self.filter(Q(owner=user) | Q(friend=user))
+
+    def by_profiles(self, owner, friend):
+        """Get user friend"""
+        return self.filter(Q(owner__profile=owner) & Q(friend__profile=friend) |
+                           Q(owner__profile=friend) & Q(friend__profile=owner))
 
     def in_list(self, user):
         """User in someones friendlist"""
-        return self.filter(friend=user, request__approved=True)
+        return self.filter(friend=user)
 
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
-        if self.filter(Q(owner=owner, friend=user) | Q(owner=user, friend=owner) & Q(request__approved=True)).exists():
+        if self.filter(Q(owner=owner, friend=user) | Q(owner=user, friend=owner)).exists():
             return True
         else:
             return False
@@ -317,6 +322,10 @@ class BlackListQuerySet(models.QuerySet):
     def in_list(self, user):
         """User in someones blacklist"""
         return self.filter(foe=user)
+
+    def in_my_list(self, owner, foe):
+        """User in my blacklist"""
+        return self.filter(owner__profile=owner, foe__profile=foe)
 
     def common(self, user):
         return self.filter(models.Q(owner=user) | models.Q(foe=user))

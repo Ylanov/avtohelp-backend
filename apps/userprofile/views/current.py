@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from fcm_django.models import FCMDevice
 from rest_framework import generics, status
 from rest_framework.generics import get_object_or_404
@@ -63,7 +64,8 @@ class ProfileListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.Profile.objects.annotate_online_status().annotate_friend_status(self.request.user).annotate_avatar().select_related(
+        return models.Profile.objects.annotate_online_status().annotate_friend_status(
+            self.request.user).annotate_avatar().select_related(
             'user'
         ).friendly(self.request.user).order_by('first_name', 'last_name')
 
@@ -296,9 +298,10 @@ class FriendListDestroyView(generics.DestroyAPIView):
         instance.request.delete()
         instance.delete()
 
-    def get_queryset(self):
-        """Override get queryset method"""
-        return models.FriendList.objects.common(user=self.request.user)
+    def get_object(self):
+        """Override get_object method"""
+        return get_object_or_404(models.FriendList.objects.by_profiles(
+            self.request.user.profile, self.kwargs.get('profile_id')))
 
 
 class FriendRequestApproveView(generics.UpdateAPIView):
@@ -371,7 +374,7 @@ class ProfileBlackListView(generics.ListAPIView):
     View for retrieve user blacklist
     """
 
-    serializer_class = serializers.BlackListSerializer
+    serializer_class = serializers.BlackListDetailSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -407,6 +410,7 @@ class BlackListDestroyView(generics.DestroyAPIView):
     View for destroy blacklist request
     """
 
-    def get_queryset(self):
-        """Override get queryset method"""
-        return models.BlackList.objects.my_list(user=self.request.user)
+    def get_object(self):
+        """Override get_object method"""
+        return get_object_or_404(models.BlackList.objects.in_my_list(
+            owner=self.request.user.profile, foe=self.kwargs.get('profile_id')))
