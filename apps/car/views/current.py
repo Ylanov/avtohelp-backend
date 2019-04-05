@@ -28,6 +28,7 @@ class ColorsViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.CarColorDetailSerializer
     queryset = models.CarColor.objects.all()
+    filter_class = filters.CarColorFilterSet
     pagination_class = None
 
 
@@ -50,7 +51,6 @@ class CarModelsViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = serializers.CarModelDetailSerializer
     queryset = models.CarModel.objects.all()
     filter_class = filters.CarModelListFilterSet
-    pagination_class = None
 
 
 class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):

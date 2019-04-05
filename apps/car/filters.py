@@ -10,15 +10,30 @@ class CarListFilterSet(django_filters.FilterSet):
 
     mark_name = django_filters.CharFilter(field_name='mark__name')
     model_name = django_filters.CharFilter(field_name='car_model__name')
-    model = django_filters.NumberFilter(field_name='car_model')
+    model_id = django_filters.NumberFilter(field_name='car_model')
+    mark_id = django_filters.NumberFilter(field_name='mark')
 
     class Meta:
         """Meta class."""
 
         model = models.Car
         fields = [
-            'mark_name', 'model_name',
-            'model', 'mark'
+            'mark_name',
+            'model_name',
+            'model_id',
+            'mark_id'
+        ]
+
+
+class CarColorFilterSet(django_filters.FilterSet):
+    """Filters for CarList"""
+
+    class Meta:
+        """Meta class."""
+
+        model = models.CarColor
+        fields = [
+            'name',
         ]
 
 
@@ -33,7 +48,9 @@ class CarMarkListFilterSet(django_filters.FilterSet):
 
         model = models.CarMark
         fields = [
-            'model_name', 'model_id',
+            'name',
+            'model_name',
+            'model_id',
         ]
 
 
@@ -48,7 +65,9 @@ class CarModelListFilterSet(django_filters.FilterSet):
 
         model = models.CarModel
         fields = [
-            'mark_name', 'mark_id',
+            'name',
+            'mark_name',
+            'mark_id',
         ]
 
 
