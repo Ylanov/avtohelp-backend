@@ -124,21 +124,14 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-CONFIG_FILE = f'{PROJECT_ROOT}/roadhelper.ini'
-db_settings = {}
-if os.path.exists(CONFIG_FILE):
-    for i in open(CONFIG_FILE):
-        parameter = i.rstrip().split('=')
-        db_settings.update({parameter[0]: parameter[1]})
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': db_settings.get('DB_NAME', os.environ.get('DB_NAME')),
-        'USER': db_settings.get('DB_USERNAME', os.environ.get('DB_USERNAME')),
-        'PASSWORD': db_settings.get('DB_PASSWORD', os.environ.get('DB_PASSWORD')),
-        'HOST': db_settings.get('DB_HOSTNAME', os.environ.get('DB_HOSTNAME')),
-        'PORT': db_settings.get('DB_PORT', os.environ.get('DB_PORT')),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USERNAME'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOSTNAME'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
