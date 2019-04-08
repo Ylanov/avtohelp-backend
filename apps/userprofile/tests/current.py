@@ -383,6 +383,40 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('approved'), True)
 
+    def test_delete_outgoing_request(self):
+        """
+        Test delete outgoing friend request
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+
+        api_path = '%s:userprofile:my-friendrequest-delete' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': request.id}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_incoming_request(self):
+        """
+        Test delete incoming friend request
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
+
+        api_path = '%s:userprofile:friendrequest-delete' % self.VERSION
+        response = self.client.delete(reverse(api_path, kwargs={'pk': request.id}))
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
     def test_remove_friend_from_friendlist(self):
         """Test remove friend from friendlist"""
         # Authorize user_1

@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 from account.models import User
 from userprofile.models import BlackList, FriendList, FriendRequest
-from chat.models import ChatRoom, ChatMessage
+from chat.models import ChatRoom, ChatMessage, ChatReadMessage
 from utils import api_exceptions
 
 
@@ -50,7 +50,7 @@ class TestChat(APITestCase):
         self.token, created = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-    def test_chat_list(self):
+    def test_room_list(self):
         """Test view for getting list of chats"""
         # Create Chat Room
         ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
@@ -216,19 +216,70 @@ class TestChat(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_chat_create(self):
+    def test_chat_room_messages_count(self):
+        """Test count of messages in room by pk"""
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+
+        api_path = '%s:chat:message-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
+
+    def test_chat_room_messages_unread_count(self):
+        """Test count of unread messages in room by pk"""
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+        message = ChatMessage.objects.create(sender=self.user_2, room=room, message='Ay')
+        ChatReadMessage.objects.create(user=self.user_3, message=message)
+
+        api_path = '%s:chat:message-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ChatMessage.objects.annotate_read_status(self.user_3).filter(room=room, read=False).count())
+
+    def test_total_chat_room_messages_unread_count(self):
+        """Test total count of unread messages in rooms"""
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
+        message = ChatMessage.objects.create(sender=self.user_2, room=room, message='Ay')
+        ChatReadMessage.objects.create(user=self.user_3, message=message)
+
+        api_path = '%s:chat:message-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), ChatMessage.objects.annotate_read_status(self.user_3).filter(read=False).count())
+
+    def test_room_create(self):
         """Test create chat room"""
         api_path = '%s:chat:private-room-create' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.post(reverse(api_path), data={'participant': self.user_1.pk})
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    # def test_chat_create_error_1(self):
-    #     """Test create chat room w/ person who is not your friend"""
-    #     api_path = '%s:chat:private-room-create' % settings.AVAILABLE_VERSIONS.get('current')
-    #     response = self.client.post(reverse(api_path), data={'participant': self.user_4.id})
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    #     self.assertEqual(response.data.get('status_code'), api_exceptions.ArentFriendsError.extended_status_code)
-    #
     def test_chat_create_error_2(self):
         """Test create chat room w/ person who is in your black list"""
         api_path = '%s:chat:private-room-create' % settings.AVAILABLE_VERSIONS.get('current')
