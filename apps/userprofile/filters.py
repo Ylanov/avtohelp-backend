@@ -41,7 +41,7 @@ class ProfileGalleryListFilterSet(django_filters.FilterSet):
 class OutgoingRequestFilterSet(django_filters.FilterSet):
     """Outgoing friend request filter set."""
 
-    person = django_filters.NumberFilter(field_name='invited')
+    person = django_filters.NumberFilter(field_name='invited__profile')
 
     class Meta:
         """Meta class."""
@@ -55,7 +55,7 @@ class OutgoingRequestFilterSet(django_filters.FilterSet):
 class IncomingRequestFilterSet(django_filters.FilterSet):
     """Incoming friend request filter set."""
 
-    person = django_filters.NumberFilter(field_name='owner')
+    person = django_filters.NumberFilter(field_name='owner__profile')
 
     class Meta:
         """Meta class."""
