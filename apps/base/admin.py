@@ -6,7 +6,7 @@ from .models import Newsletter, PushNotification
 class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
     readonly_fields = ('id', 'created', 'modified')
-    list_display = ('id', 'title', 'publish', 'publish_date')
+    list_display = ('id', 'title', 'short_description', 'publish', 'publish_date')
 
 
 class PushNotificationModelAdmin(admin.ModelAdmin):

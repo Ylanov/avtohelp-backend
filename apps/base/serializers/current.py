@@ -9,7 +9,7 @@ class NewsListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Newsletter
-        fields = ('id', 'created', 'title', 'publish_date', 'text')
+        fields = ('id', 'created', 'title', 'short_description', 'publish_date')
 
 
 class NewsDetailSerializer(serializers.ModelSerializer):
@@ -20,7 +20,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
-                  'text', 'publish', 'publish_date')
+                  'short_description', 'text', 'publish',
+                  'publish_date')
 
 
 class NotificationListSerializer(serializers.ModelSerializer):
