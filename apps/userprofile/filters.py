@@ -34,5 +34,5 @@ class ProfileGalleryListFilterSet(django_filters.FilterSet):
 
         model = models.ProfileGallery
         fields = [
-            'is_main', 'profile',
+            'profile',
         ]

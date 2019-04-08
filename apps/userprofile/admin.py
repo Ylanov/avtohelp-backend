@@ -22,7 +22,8 @@ class ProfileModelAdmin(admin.ModelAdmin):
     list_display = readonly_fields + ('user',)
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'first_name',
-                                        'last_name', 'middle_name')}),
+                                        'last_name', 'middle_name',
+                                        'image')}),
         (_('Location'), {'fields': ('city',)}),
         (_('Info'), {'fields': ('created', 'modified')}),
     )

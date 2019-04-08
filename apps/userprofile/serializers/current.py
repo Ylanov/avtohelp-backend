@@ -164,8 +164,8 @@ class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.ProfileGallery
-        fields = ('id', 'created', 'profile', 'is_main', 'tiny', 'small',
-                  'average', 'medium', 'big', 'large', 'is_main')
+        fields = ('id', 'created', 'profile', 'tiny', 'small',
+                  'average', 'medium', 'big', 'large')
 
     def get_tiny(self, obj):
         """Get image with size tiny"""
@@ -199,7 +199,7 @@ class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProfileGallery
-        fields = ('id', 'created', 'profile_id', 'image', 'is_main')
+        fields = ('id', 'created', 'profile_id', 'image')
 
     def create(self, validated_data):
         """Override create method"""
@@ -207,31 +207,18 @@ class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
         return super(ProfileGalleryCreateSerializer, self).create(validated_data)
 
 
-class ProfileGallerySetMainSerializer(serializers.ModelSerializer):
-    """Serializer for ProfileGalleryCreateView"""
-    class Meta:
-        model = models.ProfileGallery
-        fields = ('is_main',)
-
-    def update(self, instance, validated_data):
-        """Override update method"""
-        validated_data['is_main'] = True
-        models.ProfileGallery.objects.reset_status(profile=self.context.get('request').user.profile)
-        return super(ProfileGallerySetMainSerializer, self).update(instance, validated_data)
-
-
 class ProfileGalleryListSerializer(serializers.ModelSerializer):
     """Serializer for ProfileGalleryListView"""
     class Meta:
         model = models.ProfileGallery
-        fields = ('id', 'created', 'profile', 'image', 'is_main')
+        fields = ('id', 'created', 'profile', 'image')
 
 
 class FullProfileSerializer(serializers.ModelSerializer):
     """Serializer for ProfileListView"""
     online = serializers.BooleanField()
     license_plate = serializers.CharField(source='user.get_car_license_plate')
-    avatar = serializers.SerializerMethodField()
+    avatar = serializers.ImageField(source='image')
 
     class Meta:
         """Meta class"""
@@ -240,17 +227,12 @@ class FullProfileSerializer(serializers.ModelSerializer):
                   'middle_name', 'online', 'license_plate',
                   'avatar')
 
-    def get_avatar(self, obj):
-        """Get profile avatar"""
-        return (obj.gallery.filter(is_main=True).first().image.url
-                if obj.gallery.filter(is_main=True).exists()
-                else None)
-
 
 class ProfileListSerializer(FullProfileSerializer):
     """Serializer for ProfileListView"""
 
     friend = serializers.BooleanField()
+    avatar = serializers.ImageField(source='image')
 
     class Meta:
         """Meta class"""
@@ -263,18 +245,20 @@ class ProfileListSerializer(FullProfileSerializer):
 class ProfileBaseSerializer(serializers.ModelSerializer):
     """Serializer for model FriendRequest"""
 
-    car_id = serializers.SerializerMethodField()
+    license_plate = serializers.SerializerMethodField()
+    avatar = serializers.ImageField(source='image')
 
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name', 'car_id')
+        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
+                  'license_plate', 'avatar')
 
-    def get_car_id(self, obj):
+    def get_license_plate(self, obj):
         """Get car id"""
         cars = obj.user.profilecar_set
         if cars.first():
-            return cars.first().id
+            return cars.first().license_plate
         else:
             return None
 

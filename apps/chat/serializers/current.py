@@ -12,18 +12,12 @@ class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='get_first_name')
     last_name = serializers.CharField(source='get_last_name')
     middle_name = serializers.CharField(source='get_middle_name')
-    avatar = serializers.SerializerMethodField()
+    avatar = serializers.ImageField(source='profile.image')
 
     class Meta:
         """Meta class"""
         model = User
         fields = ('id', 'first_name', 'last_name', 'middle_name', 'avatar')
-
-    def get_avatar(self, obj):
-        """Get profile avatar"""
-        return (obj.profile.gallery.filter(is_main=True).first().image.url
-                if obj.profile.gallery.filter(is_main=True).exists()
-                else None)
 
 
 class ChatMessageListSerializer(serializers.ModelSerializer):

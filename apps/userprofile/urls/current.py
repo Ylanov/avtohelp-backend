@@ -39,9 +39,6 @@ urlpatterns = [
     path('profile/gallery/<int:pk>', views.ProfileGalleryDetailView.as_view(),
          name='profile-gallery-detail'),
 
-    path('profile/gallery/<int:pk>/set_main', views.ProfileGallerySetMainView.as_view(),
-         name='profile-gallery-set_main'),
-
     path('profile/gallery/add', views.ProfileGalleryCreateView.as_view(),
          name='profile-gallery-create'),
 

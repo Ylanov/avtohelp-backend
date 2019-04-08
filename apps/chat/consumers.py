@@ -136,9 +136,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "first_name": user.get_first_name(),
                 "last_name": user.get_last_name(),
                 "middle_name": user.get_middle_name(),
-                "avatar": (user.profile.gallery.filter(is_main=True).first().image.url
-                           if user.profile.gallery.filter(is_main=True).exists()
-                           else None),
+                "avatar": user.get_avatar(),
                 'datetime': f'{letter.created.isoformat()}',
                 "message": message,
                 "message_id": letter.id

@@ -66,15 +66,8 @@ class ProfileQuerySet(models.QuerySet):
             ),
         )
 
-    def annotate_avatar(self):
-        """Annotate profile avatar"""
-        gallery = ProfileGallery.objects.filter(profile=models.OuterRef('id'), is_main=True)
-        return self.annotate(
-            avatar=models.Subquery(gallery.values('image')[:1])
-        )
 
-
-class Profile(BaseMixin):
+class Profile(BaseMixin, ImageMixin):
     """Profile model"""
 
     user = models.OneToOneField('account.User', on_delete=models.PROTECT)
@@ -152,21 +145,13 @@ class ProfileGalleryQuerySet(models.QuerySet):
         """Show user profile gallery"""
         return self.filter(profile=profile)
 
-    def get_avatar(self, profile):
-        """Show user profile avatar"""
-        return self.filter(profile=profile, is_main=True)
-
-    def by_status(self, switcher=False):
-        """Filter ProfileGallery objects by flag is_main"""
-        return self.filter(is_main=switcher)
-
 
 class ProfileGalleryManager(models.Manager):
     """ProfileGallery manager"""
 
     def reset_status(self, profile):
         """Reset status is_main"""
-        return ProfileGallery.objects.by_profile(profile=profile).by_status(switcher=True).update(is_main=False)
+        return ProfileGallery.objects.by_profile(profile=profile).by_status(switcher=True)
 
 
 class ProfileGallery(BaseMixin, ImageMixin):
@@ -179,7 +164,6 @@ class ProfileGallery(BaseMixin, ImageMixin):
         default=None,
         on_delete=models.CASCADE,
         related_name='gallery')
-    is_main = models.BooleanField(default=False)
 
     objects = ProfileGalleryManager.from_queryset(ProfileGalleryQuerySet)()
 

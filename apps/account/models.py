@@ -20,13 +20,6 @@ class UserQuerySet(models.QuerySet):
         """Queryset by user phone"""
         return self.filter(phone=phone)
 
-    def annotate_profile_avatar(self):
-        """Annotate profile avatar"""
-        gallery = ProfileGallery.objects.filter(profile=models.OuterRef('user__profile'), is_main=True)
-        return self.annotate(
-            avatar=models.Subquery(gallery.values('image')[:1])
-        )
-
 
 class UserManager(AbstractUserManager):
     """Base User manager"""
@@ -100,3 +93,7 @@ class User(AbstractUser, BaseMixin):
     def get_car_license_plate(self):
         """Return user profile car license plate"""
         return f'{self.profilecar_set.first().license_plate}' if self.profilecar_set.first() else None
+
+    def get_avatar(self):
+        """Return user profile avatar"""
+        return f'{self.profile.image.url}' if self.profile.image else None
