@@ -341,14 +341,23 @@ class FriendRequestDetailView(generics.RetrieveAPIView):
     queryset = models.FriendRequest.objects.all()
 
 
-class FriendRequestDeleteView(generics.DestroyAPIView):
+class OutFriendRequestDeleteView(generics.DestroyAPIView):
     """
-    View for delete user friend request
+    View for delete outgoing friend request
     """
 
     def get_queryset(self):
         """Override get queryset method"""
         return models.FriendRequest.objects.from_me(owner=self.request.user)
+
+
+class InFriendRequestDeleteView(generics.DestroyAPIView):
+    """
+    View for delete incoming friend request
+    """
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.FriendRequest.objects.to_me(invited=self.request.user).not_approved()
 
 
 # Blacklist

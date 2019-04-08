@@ -64,13 +64,16 @@ urlpatterns = [
     path('profile/friends/requests/incoming/<int:pk>/approve', views.FriendRequestApproveView.as_view(),
          name='friendrequest-approve'),
 
+    path('profile/friends/requests/incoming/<int:pk>/delete', views.InFriendRequestDeleteView.as_view(),
+         name='friendrequest-delete'),
+
     path('profile/friends/requests/outgoing', views.OutFriendRequestListView.as_view(),
          name='my-friendrequest-list'),
 
     path('profile/friends/requests/outgoing/<int:pk>', views.FriendRequestDetailView.as_view(),
          name='my-friendrequest-detail'),
 
-    path('profile/friends/requests/outgoing/<int:pk>/delete', views.FriendRequestDeleteView.as_view(),
+    path('profile/friends/requests/outgoing/<int:pk>/delete', views.OutFriendRequestDeleteView.as_view(),
          name='my-friendrequest-delete'),
 
     # Blacklist
