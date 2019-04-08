@@ -10,8 +10,8 @@ PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 CONFIG_FILE = f'{PROJECT_ROOT}/roadhelper.ini'
 if os.path.exists(CONFIG_FILE):
     for i in open(CONFIG_FILE):
-        parameter = i.rstrip().split('=')
-        os.environ[parameter[0]] = os.environ[parameter[1]]
+        key, value = i.rstrip().split('=')
+        os.environ[key] = value
 
 configuration = os.environ.get('SETTINGS_CONFIGURATION', None)
 
