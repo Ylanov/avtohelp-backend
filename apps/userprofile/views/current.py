@@ -311,6 +311,7 @@ class InFriendRequestListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.FriendRequestSerializer
+    filter_class = filters.IncomingRequestFilterSet
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -324,6 +325,7 @@ class OutFriendRequestListView(generics.ListAPIView):
     """
 
     serializer_class = serializers.FriendRequestSerializer
+    filter_class = filters.OutgoingRequestFilterSet
 
     def get_queryset(self):
         """Override get_queryset method"""
