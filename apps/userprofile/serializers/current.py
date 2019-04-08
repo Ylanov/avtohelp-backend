@@ -94,7 +94,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     # car = serializers.CharField(source='get_car_info')
 
     # REQUEST
-
+    avatar = serializers.ImageField(source='image')
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
                                               write_only=True)
 
@@ -102,7 +102,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
+        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name', 'avatar',
                   'phone', 'city', 'city_detail', 'car')
 
 
