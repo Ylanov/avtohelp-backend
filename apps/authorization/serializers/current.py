@@ -73,8 +73,7 @@ class ProfileMinSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = profile_models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name',
-                  'middle_name')
+        fields = ('id', 'created', 'first_name', 'last_name')
 
 
 class AuthorizationView(serializers.ModelSerializer):

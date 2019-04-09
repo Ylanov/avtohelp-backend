@@ -82,13 +82,9 @@ class User(AbstractUser, BaseMixin):
         """Return user last"""
         return self.profile.last_name if self.profile else None
 
-    def get_middle_name(self):
-        """Return user middle_name"""
-        return self.profile.middle_name if self.profile else None
-
     def get_full_name(self):
-        """Return user middle_name"""
-        return f'{self.profile.first_name} {self.profile.last_name} {self.profile.middle_name}' if self.profile else None
+        """Return user full name"""
+        return f'{self.profile.first_name} {self.profile.last_name}' if self.profile else None
 
     def get_car_license_plate(self):
         """Return user profile car license plate"""

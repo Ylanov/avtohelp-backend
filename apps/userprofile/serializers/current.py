@@ -80,7 +80,7 @@ class ProfileViewSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'first_name', 'last_name', 'middle_name', 'profile_car')
+        fields = ('id', 'first_name', 'last_name', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -102,7 +102,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name', 'avatar',
+        fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
                   'phone', 'city', 'city_detail', 'car')
 
 
@@ -228,8 +228,7 @@ class FullProfileSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'middle_name', 'online', 'license_plate',
-                  'avatar')
+                  'online', 'license_plate', 'avatar')
 
 
 class ProfileListSerializer(FullProfileSerializer):
@@ -242,8 +241,7 @@ class ProfileListSerializer(FullProfileSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'middle_name', 'online', 'friend', 'license_plate',
-                  'avatar')
+                  'online', 'friend', 'license_plate', 'avatar')
 
 
 class ProfileBaseSerializer(serializers.ModelSerializer):
@@ -255,7 +253,7 @@ class ProfileBaseSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.Profile
-        fields = ('id', 'created', 'first_name', 'last_name', 'middle_name',
+        fields = ('id', 'created', 'first_name', 'last_name',
                   'license_plate', 'avatar')
 
     def get_license_plate(self, obj):

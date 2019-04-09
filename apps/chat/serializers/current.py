@@ -11,13 +11,12 @@ class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(source='profile.id')
     first_name = serializers.CharField(source='get_first_name')
     last_name = serializers.CharField(source='get_last_name')
-    middle_name = serializers.CharField(source='get_middle_name')
     avatar = serializers.ImageField(source='profile.image')
 
     class Meta:
         """Meta class"""
         model = User
-        fields = ('id', 'first_name', 'last_name', 'middle_name', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'avatar')
 
 
 class ChatMessageListSerializer(serializers.ModelSerializer):

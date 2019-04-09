@@ -61,7 +61,6 @@ class ProfileQuerySet(models.QuerySet):
             search=SearchVector(
                 'first_name',
                 'last_name',
-                'middle_name',
                 'user__profilecar__license_plate'
             ),
         )
@@ -75,8 +74,6 @@ class Profile(BaseMixin, ImageMixin):
                                   default=None, verbose_name=_('Name'))
     last_name = models.CharField(max_length=255, null=True, blank=True,
                                  default=None, verbose_name=_('Last name'))
-    middle_name = models.CharField(max_length=255, null=True, blank=True,
-                                   default=None, verbose_name=_('Middle name'))
     city = models.ForeignKey('catalog.City',
                              on_delete=models.CASCADE,
                              blank=True, null=True, default=None)

@@ -163,26 +163,6 @@ class TestChat(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_chat_messages_list_filter_by_middle_name(self):
-        """Test view for messages of chat room w/ filter by middle name"""
-        # Fill user profile
-        self.user.middle_name = 'Vyacheslavovich'
-        self.user.save()
-
-        # Create Chat Room
-        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-
-        # Create messages
-        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='sup')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='what ur u doin')
-
-        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-        filters = {'middle_name': self.user.middle_name}
-        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
     def test_chat_messages_list_filter_by_sender_id(self):
         """Test view for messages of chat room w/ filter by sender id"""
         # Create Chat Room

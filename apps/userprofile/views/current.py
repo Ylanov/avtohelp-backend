@@ -82,7 +82,6 @@ class MyProfileDetailView(generics.RetrieveUpdateAPIView):
     {
         "first_name": CharField,
         "last_name": CharField,
-        "middle_name": CharField,
         "city_id": IntegerField,
     }
     Response (PATCH): {**user_data}
@@ -91,7 +90,6 @@ class MyProfileDetailView(generics.RetrieveUpdateAPIView):
     {
         "first_name": CharField,
         "last_name": CharField,
-        "middle_name": CharField,
         "city_id": IntegerField,
     }
     Response (PUT): {**user_data}

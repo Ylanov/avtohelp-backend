@@ -13,7 +13,7 @@ class AssistanceRequestMixin(object):
 
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
-    """
+    """middle
     Get user assistance request list
     """
     serializer_class = serializers.AssistanceRequestListSerializer
@@ -57,7 +57,6 @@ class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView
         "id": 1,
         "first_name": null,
         "last_name": null,
-        "middle_name": null,
         "phone": "+79095499896",
         "car": {
           "id": 1,
