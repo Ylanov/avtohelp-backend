@@ -21,7 +21,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date')
+                  'publish_date', 'image')
 
 
 class NotificationListSerializer(serializers.ModelSerializer):

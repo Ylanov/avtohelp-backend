@@ -1,11 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from utils.mixins import BaseMixin
+from utils.mixins import BaseMixin, ImageMixin
 
 
 # Create your models here.
-class Newsletter(BaseMixin):
+class Newsletter(BaseMixin, ImageMixin):
     """Model to new representation."""
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
