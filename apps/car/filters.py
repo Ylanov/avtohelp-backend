@@ -95,5 +95,7 @@ class ServiceStationsFilterSet(django_filters.FilterSet):
         """Meta class"""
         model = models.CarService
         fields = [
-            'category', 'from_center', 'distance'
+            'category',
+            'from_center',
+            'distance'
         ]

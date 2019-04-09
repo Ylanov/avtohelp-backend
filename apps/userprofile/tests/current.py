@@ -430,7 +430,7 @@ class TestProfile(APITestCase):
         friend_request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
         friend = FriendList.objects.create(owner=self.user_1, friend=user_2, request=friend_request)
 
-        api_path = '%s:userprofile:friendlist-remove' % self.VERSION
+        api_path = '%s:userprofile:friendlist-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'profile_id': user_2.profile.id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
@@ -447,7 +447,7 @@ class TestProfile(APITestCase):
         friend_request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
         friend = FriendList.objects.create(owner=self.user_1, friend=user_2, request=friend_request)
 
-        api_path = '%s:userprofile:friendlist-remove' % self.VERSION
+        api_path = '%s:userprofile:friendlist-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'profile_id': 420}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

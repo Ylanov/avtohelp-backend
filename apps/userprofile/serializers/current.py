@@ -132,7 +132,11 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Override validated data"""
         validated_data['owner'] = self.context.get('request').user
-        validated_data['car'] = car_models.Car.objects.get(**validated_data.pop('car'))
+        qs = car_models.Car.objects.filter(**validated_data.get('car'))
+        if not qs.exists():
+            raise api_exceptions.CarNotFound()
+        else:
+            validated_data['car'] = car_models.Car.objects.get(**validated_data.pop('car'))
         return super(ProfileCarCreateSerializer, self).create(validated_data)
 
 
@@ -246,7 +250,7 @@ class ProfileBaseSerializer(serializers.ModelSerializer):
     """Serializer for model FriendRequest"""
 
     license_plate = serializers.SerializerMethodField()
-    avatar = serializers.ImageField(source='image')
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
@@ -259,6 +263,13 @@ class ProfileBaseSerializer(serializers.ModelSerializer):
         cars = obj.user.profilecar_set
         if cars.first():
             return cars.first().license_plate
+        else:
+            return None
+
+    def get_avatar(self, obj):
+        """Get avatar full url"""
+        if obj.image and hasattr(obj.image, 'url'):
+            return self.context.get('request').build_absolute_uri(obj.image.url)
         else:
             return None
 
@@ -279,9 +290,9 @@ class FriendRequestSerializer(serializers.ModelSerializer):
 
     def get_person(self, obj):
         if obj.owner == self.context.get('request').user:
-            return ProfileBaseSerializer(obj.invited.profile).data
+            return ProfileBaseSerializer(obj.invited.profile, context={'request': self.context.get('request')}).data
         else:
-            return ProfileBaseSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile, context={'request': self.context.get('request')}).data
 
 
 class FriendRequestCreateSerializer(serializers.ModelSerializer):

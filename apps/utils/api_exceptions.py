@@ -178,7 +178,7 @@ class ChatRoomAlreadyExistsError(ValidationErrorMixin):
 
 
 class AreFoesError(ValidationErrorMixin):
-    """Users aren foes"""
+    """Users aren't foes"""
     default_detail = _('User ID %s and User ID %s are foes')
     extended_status_code = '%s.11' % ValidationErrorMixin.status_code
 
@@ -186,3 +186,16 @@ class AreFoesError(ValidationErrorMixin):
         self.default_detail = dict(detail=self.default_detail % (owner, user),
                                    status_code=self.extended_status_code)
         super().__init__()
+
+
+class CarNotFound(ValidationErrorMixin):
+    """Car is not found"""
+    default_detail = _('Car is not found in DB')
+    extended_status_code = '%s.12' % ValidationErrorMixin.status_code
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()
+
+
