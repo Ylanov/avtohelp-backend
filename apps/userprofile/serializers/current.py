@@ -89,9 +89,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     # RESPONSE
     phone = PhoneNumberField(read_only=True, source='user.phone')
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
-    car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
-    #   or  #
-    # car = serializers.CharField(source='get_car_info')
+    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+    friend = serializers.BooleanField()
+    online = serializers.BooleanField()
 
     # REQUEST
     avatar = serializers.ImageField(source='image')
@@ -103,7 +103,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
-                  'phone', 'city', 'city_detail', 'car')
+                  'phone', 'city', 'city_detail', 'profile_car', 'friend',
+                  'online')
 
 
 class ProfileCarCreateSerializer(serializers.ModelSerializer):

@@ -118,7 +118,8 @@ class ProfileDetailView(generics.RetrieveAPIView):
         """Override get_queryset method"""
         return models.Profile.objects.select_related(
             'user'
-        ).friendly(self.request.user)
+        ).friendly(self.request.user).annotate_online_status().annotate_friend_status(
+            self.request.user)
 
 
 # Car
