@@ -299,7 +299,7 @@ class TestProfile(APITestCase):
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
         FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
 
-        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        api_path = '%s:userprofile:friendlist-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
@@ -416,6 +416,49 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:friendrequest-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'pk': request.id}))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_friend_list(self):
+        """Test for retrieving user friends"""
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Create friend request for user_3
+        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+        friend_request = FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+
+        # Put user_3 to friend list
+        FriendList.objects.create(owner=user_3, friend=self.user_1, request=friend_request)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendList.objects.common(self.user_1).count())
+
+    def test_friend_list_1(self):
+        """Test for retrieving user friends"""
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Create friend request for user_3
+        friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+
+        # Put user_3 to friend list
+        FriendList.objects.create(owner=user_3, friend=self.user_1, request=friend_request)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendList.objects.common(self.user_1).count())
 
     def test_remove_friend_from_friendlist(self):
         """Test remove friend from friendlist"""
