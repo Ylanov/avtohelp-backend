@@ -357,9 +357,9 @@ class ProfileFriendListSerializer(serializers.ModelSerializer):
     def get_person(self, obj):
         """Serializer method for get friend profile"""
         if obj.owner == self.context.get('request').user:
-            return ProfileBaseSerializer(obj.friend.profile).data
+            return ProfileBaseSerializer(obj.friend.profile, context={'request': self.context.get('request')}).data
         else:
-            return ProfileBaseSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile, context={'request': self.context.get('request')}).data
 
 
 # Black list
@@ -409,6 +409,6 @@ class BlackListDetailSerializer(serializers.ModelSerializer):
 
     def get_person(self, obj):
         if obj.owner == self.context.get('request').user:
-            return ProfileBaseSerializer(obj.foe.profile).data
+            return ProfileBaseSerializer(obj.foe.profile, context={'request': self.context.get('request')}).data
         else:
-            return ProfileBaseSerializer(obj.owner.profile).data
+            return ProfileBaseSerializer(obj.owner.profile, context={'request': self.context.get('request')}).data
