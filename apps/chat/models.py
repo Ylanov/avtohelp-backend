@@ -5,6 +5,10 @@ from django.utils.translation import ugettext_lazy as _
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin, ImageMixin
 
+from utils import tasks
+
+from django.conf import settings
+
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
 
 MSG_TYPE_MESSAGE = 0  # For standard messages
@@ -59,6 +63,7 @@ class ChatMessageManager(models.Manager):
         """Create chat message"""
         obj = self.model(sender=sender, room_id=room_id, message=message)
         obj.save()
+        obj.send_push_notifications()
         return obj
 
 
@@ -75,6 +80,17 @@ class ChatMessage(BaseMixin):
     class Meta:
         """Meta class"""
         ordering = ('created',)
+
+    def send_push_notifications(self):
+        """Sent push notification to all users in chat room exclude sender"""
+        if settings.USE_CELERY:
+            tasks.notify_chat_participants.delay(
+                sender_id=self.sender.id,
+                participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
+        else:
+            tasks.notify_chat_participants(
+                sender_id=self.sender.id,
+                participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
 
 
 class ChatRoomManager(models.Manager):

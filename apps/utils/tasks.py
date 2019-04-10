@@ -11,6 +11,7 @@ from authorization import models as auth_models
 from celery import shared_task
 from chat import models as chat_models
 from order import models as order_models
+from account import models as account_models
 
 logger = logging.getLogger('CELERY')
 
@@ -98,6 +99,21 @@ def notify_friend_request(invited_id):
         logger.info(f'Users notified: {count}')
     else:
         logger.info(f'Error was occurred when sending PUSH-notifications')
+
+
+@shared_task
+def notify_chat_participants(sender_id, participants):
+    """Notify user about new friend request"""
+    sender = account_models.User.objects.get(id=sender_id)
+    title = _(f'New message from chat')
+    body = _(f'User {sender.get_full_name()} wrote a message')
+    for user in participants:
+        devices = FCMDevice.objects.get(user_id=user.get('id'))
+        count = devices.send_message(title=title, body=body)
+        if count > 0:
+            logger.info(f'Users notified: {count}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications')
 
 
 @shared_task
