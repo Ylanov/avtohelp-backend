@@ -107,6 +107,29 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'online')
 
 
+class MyProfileSerializer(serializers.ModelSerializer):
+    """Serializer for retrieving user profile"""
+
+    # RESPONSE
+    phone = PhoneNumberField(source='user.phone', read_only=True, )
+    city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
+    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+
+    # REQUEST
+    city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
+                                              write_only=True)
+
+    # COMMON
+    avatar = serializers.ImageField(source='image')
+
+    class Meta:
+        """Meta class"""
+
+        model = models.Profile
+        fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
+                  'phone', 'city', 'city_detail', 'profile_car')
+
+
 class ProfileCarCreateSerializer(serializers.ModelSerializer):
     """Serializer class for ProfileCarCreateView"""
 

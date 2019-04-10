@@ -97,7 +97,7 @@ class MyProfileDetailView(generics.RetrieveUpdateAPIView):
     :return: return object
     """
 
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = serializers.MyProfileSerializer
     queryset = models.Profile.objects.all()
 
     def get_object(self):
