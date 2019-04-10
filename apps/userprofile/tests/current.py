@@ -309,7 +309,7 @@ class TestProfile(APITestCase):
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
         FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
 
-        api_path = '%s:userprofile:friendlist-list' % self.VERSION
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
@@ -647,8 +647,7 @@ class TestProfile(APITestCase):
 
         data = {
             "color": self.color_1.id,
-            "mark": self.toyota.id,
-            "car_model": self.toyota_model.id,
+            "car": self.car_1.id,
             "license_plate": "yyy123yy 100"
         }
 
