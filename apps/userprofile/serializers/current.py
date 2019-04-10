@@ -421,6 +421,16 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
                                                 user=attrs['foe'].id)
         return attrs
 
+    def create(self, validated_data):
+        """Override create method"""
+        # If participants are friends then break the friendship
+        qs = models.FriendList.objects.by_users(validated_data['owner'], validated_data['foe'])
+        if qs.exists():
+            friendship = qs.first()
+            friendship.request.delete()
+            friendship.delete()
+        return super(BlackListCreateSerializer, self).create(validated_data)
+
 
 class BlackListDetailSerializer(serializers.ModelSerializer):
     """Serializer for model BlackList"""

@@ -18,7 +18,9 @@ class ProfileQuerySet(models.QuerySet):
         :type user: object
         :return: ProfileQuerySet
         """
-        return self.exclude(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))).exclude(user=user)
+        return self.exclude(Q(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))) |
+                            Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner_id')))
+                            ).exclude(user=user)
 
     def friends(self, user):
         """
@@ -63,7 +65,8 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.annotate(
             foe=models.Case(
-                models.When(user_id__in=Subquery(BlackList.objects.common(user).values('foe__id')),
+                models.When(Q(user_id__in=Subquery(BlackList.objects.common(user).values('foe__id'))) |
+                            Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner__id'))),
                             then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
@@ -267,14 +270,14 @@ class FriendListQuerySet(models.QuerySet):
         return self.filter(Q(owner=user) | Q(friend=user))
 
     def by_profiles(self, owner, friend):
-        """Get user friend"""
+        """Get user friend by profiles"""
         return self.filter(Q(owner__profile=owner) & Q(friend__profile=friend) |
                            Q(owner__profile=friend) & Q(friend__profile=owner))
 
-    def friendly(self, user):
-        """Get user friend"""
-        return self.exclude(Q(owner_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))) |
-                            Q(friend_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))))
+    def by_users(self, owner, friend):
+        """Get user friend" by users"""
+        return self.filter(Q(owner=owner) & Q(friend=friend) |
+                           Q(owner=friend) & Q(friend=owner))
 
     def in_list(self, user):
         """User in someones friendlist"""
@@ -325,6 +328,11 @@ class BlackListQuerySet(models.QuerySet):
     def in_my_list(self, owner, foe):
         """User in my blacklist"""
         return self.filter(owner__profile=owner, foe__profile=foe)
+
+    def by_users(self, owner, foe):
+        """User in my blacklist"""
+        return self.filter(Q(owner__profile=owner, foe__profile=foe) |
+                           Q(owner__profile=foe, foe__profile=owner))
 
     def common(self, user):
         return self.filter(models.Q(owner=user) | models.Q(foe=user))

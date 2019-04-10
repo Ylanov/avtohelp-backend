@@ -254,7 +254,7 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.common(user=self.request.user).friendly(self.request.user)
+        return models.FriendList.objects.common(user=self.request.user)
 
 
 class FriendRequestCreateView(generics.CreateAPIView):
@@ -404,5 +404,5 @@ class BlackListDestroyView(generics.DestroyAPIView):
 
     def get_object(self):
         """Override get_object method"""
-        return get_object_or_404(models.BlackList.objects.in_my_list(
+        return get_object_or_404(models.BlackList.objects.by_users(
             owner=self.request.user.profile, foe=self.kwargs.get('profile_id')))

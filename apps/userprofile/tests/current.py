@@ -470,30 +470,6 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendList.objects.common(self.user_1).count())
 
-    def test_friend_list_2(self):
-        """Test for retrieving user friends"""
-        # Authorize user_1
-        self.token, created = Token.objects.get_or_create(user=self.user_1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        # Create additional users
-        user_2 = User.objects.make(phone='+79000000002')
-        user_3 = User.objects.make(phone='+79000000003')
-
-        # Create friend request for user_3
-        friend_request = FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
-
-        # Put user_3 to friend list
-        FriendList.objects.create(owner=user_3, friend=self.user_1, request=friend_request)
-
-        # Put user_3 to black list
-        BlackList.objects.create(owner=self.user_1, foe=user_3)
-
-        api_path = '%s:userprofile:friendlist-list' % self.VERSION
-        response = self.client.get(reverse(api_path))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), 0)
-
     def test_friend_list_3(self):
         """Test for retrieving user friends"""
         # Authorize user_1
@@ -502,13 +478,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
-        user_3 = User.objects.make(phone='+79000000003')
 
-        # Create friend request for user_3
-        friend_request = FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+        # Create friend request for user_2
+        friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
 
-        # Put user_3 to friend list
-        FriendList.objects.create(owner=user_3, friend=self.user_1, request=friend_request)
+        # Put user_2 to friend list
+        FriendList.objects.create(owner=user_2, friend=self.user_1, request=friend_request)
 
         api_path = '%s:userprofile:friendlist-list' % self.VERSION
         response = self.client.get(reverse(api_path))
