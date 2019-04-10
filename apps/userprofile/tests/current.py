@@ -225,6 +225,16 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('id'), user_2.profile.id)
 
+    def test_my_profile_detail(self):
+        """Test my profile detail"""
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:my-profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def test_profile_detail_1(self):
         """Test get wrong profile detail"""
 

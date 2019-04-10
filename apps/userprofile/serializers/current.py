@@ -135,32 +135,24 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
 
     color = serializers.PrimaryKeyRelatedField(queryset=car_models.CarColor.objects.all(),
                                                write_only=True)
-    mark = serializers.PrimaryKeyRelatedField(source='car.mark', queryset=car_models.CarMark.objects.all(),
-                                              write_only=True)
-    car_model = serializers.PrimaryKeyRelatedField(source='car.car_model', queryset=car_models.CarModel.objects.all(),
-                                                   write_only=True)
+    car = serializers.PrimaryKeyRelatedField(queryset=car_models.Car.objects.all(),
+                                             write_only=True)
     license_plate = serializers.CharField()
 
     # RESPONSE
     color_name = serializers.CharField(source='color.name', read_only=True)
-    car = car_serializers.CarDetailSerializer(read_only=True)
+    profile_car = car_serializers.CarDetailSerializer(source='car', read_only=True)
 
     class Meta:
         """meta model"""
 
         model = models.ProfileCar
-        fields = ('id', 'created', 'modified', 'color',
-                  'mark', 'car_model', 'color_name', 'license_plate',
-                  'car')
+        fields = ('id', 'created', 'modified', 'color', 'car',
+                  'color_name', 'license_plate', 'profile_car')
 
     def create(self, validated_data):
         """Override validated data"""
         validated_data['owner'] = self.context.get('request').user
-        qs = car_models.Car.objects.filter(**validated_data.get('car'))
-        if not qs.exists():
-            raise api_exceptions.CarNotFound()
-        else:
-            validated_data['car'] = car_models.Car.objects.get(**validated_data.pop('car'))
         return super(ProfileCarCreateSerializer, self).create(validated_data)
 
 
