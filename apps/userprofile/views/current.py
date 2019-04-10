@@ -116,9 +116,8 @@ class ProfileDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.Profile.objects.select_related(
-            'user'
-        ).friendly(self.request.user).annotate_online_status().annotate_friend_status(
+        return models.Profile.objects.select_related('user').annotate_online_status().annotate_friend_status(
+            self.request.user).annotate_foe_status(
             self.request.user)
 
 
@@ -255,7 +254,7 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.common(user=self.request.user)
+        return models.FriendList.objects.common(user=self.request.user).friendly(self.request.user)
 
 
 class FriendRequestCreateView(generics.CreateAPIView):

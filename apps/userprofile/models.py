@@ -56,6 +56,20 @@ class ProfileQuerySet(models.QuerySet):
             )
         )
 
+    def annotate_foe_status(self, user):
+        """
+        Annotate foe status
+        :return: annotated field
+        """
+        return self.annotate(
+            foe=models.Case(
+                models.When(user_id__in=Subquery(BlackList.objects.common(user).values('foe__id')),
+                            then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
     def annotate_full_search(self, *args, **kwargs):
         return self.annotate(
             search=SearchVector(
@@ -256,6 +270,11 @@ class FriendListQuerySet(models.QuerySet):
         """Get user friend"""
         return self.filter(Q(owner__profile=owner) & Q(friend__profile=friend) |
                            Q(owner__profile=friend) & Q(friend__profile=owner))
+
+    def friendly(self, user):
+        """Get user friend"""
+        return self.exclude(Q(owner_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))) |
+                            Q(friend_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))))
 
     def in_list(self, user):
         """User in someones friendlist"""
