@@ -6,6 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from online_users.models import OnlineUserActivity as activity
 
 from utils.mixins import BaseMixin, ImageMixin
+from utils import tasks
+from django.conf import settings
 
 
 class ProfileQuerySet(models.QuerySet):
@@ -107,16 +109,6 @@ class Profile(BaseMixin, ImageMixin):
         """Get str representation of user car"""
         profile_car = self.user.profilecar_set.first()
         return f'{profile_car.car.mark} {profile_car.car.car_model} {profile_car.color}' if profile_car else None
-
-
-class ProfileCarManager(models.Manager):
-    """Custom Manager for ProfileCar"""
-    pass
-
-
-class ProfileCarQuerySet(models.QuerySet):
-    """Custom Query for ProfileCar"""
-    pass
 
 
 class ProfileCar(BaseMixin):
@@ -226,6 +218,7 @@ class FriendRequestManager(models.Manager):
         """Create friend request"""
         obj = self.model(owner=owner, invited=user)
         obj.save()
+        obj.send_push_notification()
         return obj
 
 
@@ -256,6 +249,13 @@ class FriendRequest(BaseMixin):
         # create new record in FriendList
         FriendList.objects.create(owner=owner, friend=invited, request=self)
         return self
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to invited user"""
+        if settings.USE_CELERY:
+            tasks.notify_friend_request.delay(self.invited)
+        else:
+            tasks.notify_friend_request(self.invited)
 
 
 class FriendListQuerySet(models.QuerySet):

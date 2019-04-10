@@ -88,6 +88,19 @@ def check_request_relevance():
 
 
 @shared_task
+def notify_friend_request(invited_id):
+    """Notify user about new friend request"""
+    title = _('New friend request')
+    body = _('A new friend request has been received')
+    devices = FCMDevice.objects.get(user_id=invited_id)
+    count = devices.send_message(title=title, body=body)
+    if count > 0:
+        logger.info(f'Users notified: {count}')
+    else:
+        logger.info(f'Error was occurred when sending PUSH-notifications')
+
+
+@shared_task
 def notify_users(title=None, body=None):
     """Notify users about assistance request"""
     if not (title or body) or not (title and body):
