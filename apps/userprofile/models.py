@@ -182,6 +182,10 @@ class FriendRequestQuerySet(models.QuerySet):
         """Request to add ME in friend list"""
         return self.filter(invited=invited)
 
+    def common(self, owner, invited):
+        """Common request"""
+        return self.filter(Q(owner=owner, invited=invited) | Q(owner=invited, invited=owner) & Q(approved=False))
+
     def approved(self):
         """Approved requests"""
         return self.filter(approved=True)
@@ -192,7 +196,7 @@ class FriendRequestQuerySet(models.QuerySet):
 
     def waiting(self, user, invited):
         """Check whether there is a user request"""
-        if self.filter(owner=user, invited=invited).exists():
+        if self.filter(owner=user, invited=invited, approved=False).exists():
             return True
         else:
             return False
@@ -265,11 +269,6 @@ class FriendListQuerySet(models.QuerySet):
             return False
 
 
-class FriendListManager(models.Manager):
-    """Custom Manager for FriendList model"""
-    pass
-
-
 class FriendList(BaseMixin):
     """Friend-list model"""
 
@@ -285,7 +284,7 @@ class FriendList(BaseMixin):
                                 related_name='friendlist_request',
                                 on_delete=models.CASCADE)
 
-    objects = FriendListManager.from_queryset(FriendListQuerySet)()
+    objects = FriendListQuerySet.as_manager()
 
     class Meta:
         """Meta-class"""

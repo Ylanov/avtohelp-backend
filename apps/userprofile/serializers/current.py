@@ -333,18 +333,25 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
 
         if attrs['owner'].id == attrs['invited'].id:
             raise api_exceptions.EqualIDError()
-        # Check existed request
-        in_pending = models.FriendRequest.objects.waiting(user=attrs['owner'],
-                                                          invited=attrs['invited'])
-        if in_pending:
-            raise api_exceptions.FriendRequestAlreadyExists(owner=attrs['owner'].id,
-                                                            invited=attrs['invited'].id)
         return attrs
 
     def create(self, validated_data):
         """Override create-method"""
-        return models.FriendRequest.objects.make(owner=validated_data['owner'],
-                                                 user=validated_data['invited'])
+        owner = validated_data['owner']
+        invited = validated_data['invited']
+        # If request is already exists by one of the selected users,
+        # set request approved and create a record in DB.
+        requests = models.FriendRequest.objects.common(owner, invited)
+        if requests.exists():
+            request = requests.first()
+            # Update flag
+            request.approved = True
+            request.save()
+            # Create new record in FriendList
+            models.FriendList.objects.create(owner=owner, friend=invited, request=request)
+            return request
+        return models.FriendRequest.objects.make(owner=owner,
+                                                 user=invited)
 
 
 class FriendRequestApproveSerializer(serializers.ModelSerializer):
