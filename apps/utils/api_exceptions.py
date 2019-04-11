@@ -135,7 +135,7 @@ class AlreadyBlacked(ValidationErrorMixin):
 
 class FriendRequestAlreadyExists(ValidationErrorMixin):
     """Friend request already exists"""
-    default_detail = _('Friend request from User ID %s to User ID %s, already exists')
+    default_detail = _('Friend request from User %s to User %s, already exists')
     extended_status_code = '%s.7' % ValidationErrorMixin.status_code
 
     def __init__(self, owner, invited):
@@ -157,7 +157,7 @@ class EqualIDError(ValidationErrorMixin):
 
 class ArentFriendsError(ValidationErrorMixin):
     """Users aren't friends"""
-    default_detail = _('User ID %s and User ID %s aren\'t friends')
+    default_detail = _('User %s and User %s aren\'t friends')
     extended_status_code = '%s.9' % ValidationErrorMixin.status_code
 
     def __init__(self, owner, user):
@@ -168,7 +168,7 @@ class ArentFriendsError(ValidationErrorMixin):
 
 class ChatRoomAlreadyExistsError(ValidationErrorMixin):
     """Chat room already exists"""
-    default_detail = _('Chat room for User ID %s to User ID %s, already exists')
+    default_detail = _('Chat room for User %s to User %s, already exists')
     extended_status_code = '%s.10' % ValidationErrorMixin.status_code
 
     def __init__(self, initiator, participant):
@@ -179,7 +179,7 @@ class ChatRoomAlreadyExistsError(ValidationErrorMixin):
 
 class AreFoesError(ValidationErrorMixin):
     """Users aren't foes"""
-    default_detail = _('User ID %s and User ID %s are foes')
+    default_detail = _('User %s and User %s are foes')
     extended_status_code = '%s.11' % ValidationErrorMixin.status_code
 
     def __init__(self, owner, user):

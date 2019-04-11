@@ -93,12 +93,13 @@ def notify_friend_request(invited_id):
     """Notify user about new friend request"""
     title = _('New friend request')
     body = _('A new friend request has been received')
-    devices = FCMDevice.objects.get(user_id=invited_id)
-    count = devices.send_message(title=title, body=body)
-    if count > 0:
-        logger.info(f'Users notified: {count}')
-    else:
-        logger.info(f'Error was occurred when sending PUSH-notifications')
+    devices = FCMDevice.objects.filter(user_id=invited_id)
+    if devices.exists():
+        count = devices.send_message(title=title, body=body)
+        if count > 0:
+            logger.info(f'Users notified: {count}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications')
 
 
 @shared_task
@@ -108,12 +109,13 @@ def notify_chat_participants(sender_id, participants):
     title = _(f'New message from chat')
     body = _(f'User {sender.get_full_name()} wrote a message')
     for user in participants:
-        devices = FCMDevice.objects.get(user_id=user.get('id'))
-        count = devices.send_message(title=title, body=body)
-        if count > 0:
-            logger.info(f'Users notified: {count}')
-        else:
-            logger.info(f'Error was occurred when sending PUSH-notifications')
+        devices = FCMDevice.objects.filter(user_id=user.get('id'))
+        if devices.exists():
+            count = devices.send_message(title=title, body=body)
+            if count > 0:
+                logger.info(f'Users notified: {count}')
+            else:
+                logger.info(f'Error was occurred when sending PUSH-notifications')
 
 
 @shared_task
@@ -151,9 +153,10 @@ def notify_unread_messages(title=None, body=None):
         if notify:
             for user in notify:
                 devices = FCMDevice.objects.filter(user=user)
-                count = devices.send_message(title=title, body=body)
-                if count and count > 0:
-                    logger.info(f'Users notified: {count}')
-                else:
-                    logger.info(f'Error was occurred when sending PUSH-notifications')
+                if devices.exists():
+                    count = devices.send_message(title=title, body=body)
+                    if count and count > 0:
+                        logger.info(f'Users notified: {count}')
+                    else:
+                        logger.info(f'Error was occurred when sending PUSH-notifications')
         notify.clear()

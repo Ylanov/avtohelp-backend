@@ -195,6 +195,10 @@ class FriendRequestQuerySet(models.QuerySet):
         """Common request"""
         return self.filter(Q(owner=owner, invited=invited) | Q(owner=invited, invited=owner) & Q(approved=False))
 
+    def from_me_to_user(self, owner, invited):
+        """Return queryset with existed friend request"""
+        return self.filter(owner=owner, invited=invited, approved=False)
+
     def approved(self):
         """Approved requests"""
         return self.filter(approved=True)
@@ -253,9 +257,9 @@ class FriendRequest(BaseMixin):
     def send_push_notification(self):
         """Sent PUSH-notification to invited user"""
         if settings.USE_CELERY:
-            tasks.notify_friend_request.delay(self.invited)
+            tasks.notify_friend_request.delay(self.invited.id)
         else:
-            tasks.notify_friend_request(self.invited)
+            tasks.notify_friend_request(self.invited.id)
 
 
 class FriendListQuerySet(models.QuerySet):
