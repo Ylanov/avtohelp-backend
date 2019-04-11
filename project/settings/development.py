@@ -3,14 +3,6 @@ from .base import *
 
 DEBUG = True
 
-# Celery settings
-CELERY_BROKER_URL = 'redis://base:6379/10'
-CELERY_RESULT_BACKEND = 'redis://base:6379/10'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = TIME_ZONE
-
 ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
 # Logging
