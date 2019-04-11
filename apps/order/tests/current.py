@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.gis.geos import Point
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -44,6 +45,24 @@ class TestOrder(APITestCase):
 
         # Create user
         self.user_1 = account_models.User.objects.make(phone='+79000000000')
+        self.user_2 = account_models.User.objects.make(phone='+79000000002')
+        self.user_3 = account_models.User.objects.make(phone='+79000000003')
+
+        # Create assistance requests
+        models.AssistanceRequest.objects.create(user=self.user_1,
+                                                issue='Issue 1',
+                                                description='Description',
+                                                location=Point(45.062003, 38.940738, srid=4326))
+        models.AssistanceRequest.objects.create(user=self.user_2,
+                                                issue='Issue 2',
+                                                description='Description',
+                                                location=Point(55.062003, 28.940738, srid=4326))
+        models.AssistanceRequest.objects.create(user=self.user_3,
+                                                issue='Issue 3',
+                                                description='Description',
+                                                location=Point(65.062003, 18.940738, srid=4326))
+
+
 
         # Create user cars
         self.car_1 = car_models.Car.objects.create(mark=self.toyota,
@@ -83,33 +102,23 @@ class TestOrder(APITestCase):
                              AssistanceRequest(user_3)
         Result: [AssistanceRequest(user_1), AssistanceRequest(user_3),]
         """
-
-        # Authorize user_1
-        self.token, created = Token.objects.get_or_create(user=self.user_1)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        # Create additional users
-        user_2 = account_models.User.objects.make(phone='+79000000002')
-        user_3 = account_models.User.objects.make(phone='+79000000003')
-
-        # Create assistance requests
-        models.AssistanceRequest.objects.create(user=self.user_1,
-                                                issue='Issue 1',
-                                                description='Description')
-        models.AssistanceRequest.objects.create(user=user_2,
-                                                issue='Issue 2',
-                                                description='Description')
-        models.AssistanceRequest.objects.create(user=user_3,
-                                                issue='Issue 3',
-                                                description='Description')
-
         # Put user_2 in BlackList
-        profile_models.BlackList.objects.create(owner=self.user_1, foe=user_2)
+        profile_models.BlackList.objects.create(owner=self.user_1, foe=self.user_2)
 
         api_path = '%s:order:request-list' % self.VERSION
 
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_service_list_query(self):
+        """Test service list query - from center & position"""
+        query = {
+            'position': ['45.061016, 38.944007']  # latitude, longitude
+        }
+        api_path = '%s:order:request-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data=query)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get('distance'), 373.38496906)  # output in meters
 
     def test_count_created_assistance_requests(self):
         """
@@ -127,23 +136,8 @@ class TestOrder(APITestCase):
         self.token, created = Token.objects.get_or_create(user=self.user_1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        # Create additional users
-        user_2 = account_models.User.objects.make(phone='+79000000002')
-        user_3 = account_models.User.objects.make(phone='+79000000003')
-
-        # Create assistance requests
-        models.AssistanceRequest.objects.create(user=self.user_1,
-                                                issue='Issue 1',
-                                                description='Description')
-        models.AssistanceRequest.objects.create(user=user_2,
-                                                issue='Issue 2',
-                                                description='Description')
-        models.AssistanceRequest.objects.create(user=user_3,
-                                                issue='Issue 3',
-                                                description='Description')
-
         # Put user_2 in BlackList
-        profile_models.BlackList.objects.create(owner=self.user_1, foe=user_2)
+        profile_models.BlackList.objects.create(owner=self.user_1, foe=self.user_2)
 
         api_path = '%s:order:requests-count' % self.VERSION
 
