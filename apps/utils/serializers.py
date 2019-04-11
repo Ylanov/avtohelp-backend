@@ -33,9 +33,9 @@ class GeoPositonMixin(serializers.Serializer):
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.y
+            return obj.user.profilelocation.location.x
 
     def get_geo_lon(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.x
+            return obj.user.profilelocation.location.y

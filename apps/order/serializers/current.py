@@ -42,12 +42,12 @@ class AssistanceRequestListSerializer(AssistanceRequestMixin):
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.location, Point):
-            return obj.location.y
+            return obj.location.x
 
     def get_geo_lon(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.location, Point):
-            return obj.location.x
+            return obj.location.y
 
     def get_distance(self, obj):
         """Get distance in meters"""
@@ -81,15 +81,15 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         geo_lon = attrs.pop('geo_lon') if 'geo_lon' in attrs else None
         if geo_lat and geo_lon:
             # Point(longitude, latitude)
-            attrs['location'] = Point(geo_lon, geo_lat)
+            attrs['location'] = Point(geo_lat, geo_lon)
         return attrs
 
     def to_representation(self, instance):
         """Override to_representation method"""
         if instance.location and isinstance(instance.location, Point):
             # Point(longitude, latitude)
-            setattr(instance, 'geo_lat', instance.location.y)
-            setattr(instance, 'geo_lon', instance.location.x)
+            setattr(instance, 'geo_lat', instance.location.x)
+            setattr(instance, 'geo_lon', instance.location.y)
         else:
             setattr(instance, 'geo_lat', float(0))
             setattr(instance, 'geo_lon', float(0))

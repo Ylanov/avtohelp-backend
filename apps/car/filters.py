@@ -80,7 +80,7 @@ class CenterFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
             center_y = float(value[1])
             radius = int(value[2])
 
-            center = Point(center_x, center_y, srid=4326)
+            center = Point(x=center_x, y=center_y, srid=4326)
             return qs.filter(location__distance_lte=(center, Distance(m=radius)))
         return qs
 

@@ -70,7 +70,8 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
         if query:
             position_x = float(query.split(',')[0])
             position_y = float(query.split(',')[1])
-            position = Point(position_x, position_y, srid=4326)
+            # Point(longitude, latitude)
+            position = Point(position_y, position_x, srid=4326)
             return self.queryset.annotate_distance(position)
         return self.queryset
 
