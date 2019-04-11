@@ -903,3 +903,90 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:profile-gallery-delete' % self.VERSION
         response = self.client.delete(reverse(api_path, kwargs={'pk': profile_image.id}))
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_annotated_field_friend(self):
+        """Test case for correct value of annotated field friend"""
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Added user_2 to friend list
+        friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
+        FriendList.objects.create(owner=user_2, friend=self.user_1, request=friend_request)
+
+        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': user_2.profile.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('friend'), True)
+
+    def test_annotated_field_friend_1(self):
+        """Test case for correct value of annotated field friend"""
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Added user_1 to friend list
+        friend_request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
+        FriendList.objects.create(owner=self.user_1, friend=user_2, request=friend_request)
+
+        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.user_1.profile.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('friend'), True)
+
+    def test_annotated_field_foe(self):
+        """Test case for correct value of annotated field foe"""
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Added user_2 to black list
+        BlackList.objects.create(owner=self.user_1, foe=user_2)
+
+        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': user_2.profile.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('foe'), True)
+
+    def test_annotated_field_foe_1(self):
+        """Test case for correct value of annotated field foe"""
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Added user_2 to black list
+        BlackList.objects.create(owner=user_2, foe=self.user_1)
+
+        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.user_1.profile.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('foe'), True)
+
+    def test_annotated_field_friend_request(self):
+        """Test case for correct value of annotated field friend_request"""
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+
+        # Create friend request for user_2
+        FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+
+        api_path = '%s:userprofile:profile-detail' % self.VERSION
+        response = self.client.get(reverse(api_path, kwargs={'pk': user_2.profile.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('friend_request'), True)

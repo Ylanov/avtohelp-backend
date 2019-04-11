@@ -53,7 +53,8 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.annotate(
             friend=models.Case(
-                models.When(user_id__in=Subquery(FriendList.objects.my_list(user).values('friend__id')),
+                models.When(Q(user_id__in=Subquery(FriendList.objects.common(user).values('friend__id'))) |
+                            Q(user_id__in=Subquery(FriendList.objects.common(user).values('owner__id'))),
                             then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
@@ -69,6 +70,20 @@ class ProfileQuerySet(models.QuerySet):
             foe=models.Case(
                 models.When(Q(user_id__in=Subquery(BlackList.objects.common(user).values('foe__id'))) |
                             Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner__id'))),
+                            then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
+    def annotate_friend_request_status(self, user):
+        """
+        Annotate annotate friend request status
+        :return: annotated field
+        """
+        return self.annotate(
+            friend_request=models.Case(
+                models.When(Q(user_id__in=Subquery(FriendRequest.objects.from_me(user).values('invited__id'))),
                             then=True),
                 output_field=models.BooleanField(default=False),
                 default=False

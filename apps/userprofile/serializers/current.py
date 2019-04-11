@@ -93,6 +93,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     # ANNOTATED FIELDS
     friend = serializers.BooleanField()
     foe = serializers.BooleanField()
+    friend_request = serializers.BooleanField()
     online = serializers.BooleanField()
 
     # REQUEST
@@ -106,7 +107,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
                   'phone', 'city', 'city_detail', 'profile_car', 'friend',
-                  'foe', 'online')
+                  'foe', 'online', 'friend_request')
 
 
 class MyProfileSerializer(serializers.ModelSerializer):
