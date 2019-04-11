@@ -62,7 +62,8 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Override to_representation method"""
         import os
-        if os.environ.get('SETTINGS_CONFIGURATION') == ('local' or 'development'):
+        configuration = os.environ.get('SETTINGS_CONFIGURATION')
+        if (configuration is 'local') or (configuration is 'development'):
             return {'code': instance.code}
         return super(PhoneVerificationSerializer, self).to_representation(instance)
 
@@ -104,9 +105,9 @@ class AuthorizationView(serializers.ModelSerializer):
             # put SMSCode object instead of code number
             attrs['code'] = qs.first()
             if settings.USE_CELERY:
-                tasks.success_authorization.delay(user_id=user.id)
+                tasks.success_authorization.delay(user_id=user.id, sms_code_id=attrs['code'].id)
             else:
-                tasks.success_authorization(user_id=user.id)
+                tasks.success_authorization(user_id=user.id, sms_code_id=attrs['code'].id)
             return attrs
         else:
             # get or create UserLock object by user

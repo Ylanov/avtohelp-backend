@@ -41,17 +41,17 @@ def not_completed_authorization(user_id):
     """Authorization was not completed"""
     try:
         reset_attempts(user_id=user_id)
-        auth_models.SMSCode.objects.decline_all_by_user(user=user_id)
+        auth_models.SMSCode.objects.decline_all_by_user(user_id=user_id)
     except:
         logger.info(f'ERROR: authorization was not completed for user {user_id}')
 
 
 @shared_task
-def success_authorization(user_id):
+def success_authorization(user_id, sms_code_id):
     """Finish of success authorization"""
     try:
         reset_attempts(user_id=user_id)
-        change_smscode_status(user_id=user_id, status=auth_models.SMSCode.ACTIVATED)
+        change_smscode_status(sms_code_id=sms_code_id, status=auth_models.SMSCode.ACTIVATED)
         auth_models.SMSCode.objects.decline_all_by_user(user=user_id)
     except:
         logger.info(f'ERROR: success authorization was not completed for user {user_id}')
@@ -67,9 +67,9 @@ def reset_attempts(user_id):
 
 
 @shared_task
-def change_smscode_status(user_id, status):
+def change_smscode_status(sms_code_id, status):
     """Change SMSCode object status"""
-    smscode = auth_models.SMSCode.objects.get(user=user_id)
+    smscode = auth_models.SMSCode.objects.get(id=sms_code_id)
     smscode.status = status
     smscode.save()
 

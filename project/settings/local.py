@@ -2,7 +2,7 @@
 from .base import *
 
 DEBUG = True
-USE_CELERY = True
+USE_CELERY = False
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://redis:6379/1'
@@ -21,6 +21,8 @@ CHANNEL_LAYERS = {
     },
 }
 
+# SMS
+SMS_SEND_DELAY = 10
 SMS_BLOCKING_PERIOD = 30
 
 ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49',)
