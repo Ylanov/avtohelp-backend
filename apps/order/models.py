@@ -2,8 +2,9 @@ from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
-from utils.mixins import BaseMixin
+from utils.mixins import BaseMixin, ImageMixin
 from django.contrib.gis.db.models.functions import Distance
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class AssistanceRequestQuerySet(models.QuerySet):
@@ -41,7 +42,7 @@ class AssistanceRequestQuerySet(models.QuerySet):
         return self.annotate(distance=Distance('location', position))
 
 
-class AssistanceRequest(BaseMixin):
+class AssistanceRequest(BaseMixin, ImageMixin):
     """Assistance request model"""
 
     EXPIRED = 0
@@ -65,6 +66,11 @@ class AssistanceRequest(BaseMixin):
                                      blank=True, null=True, default=None)
     status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
                                               default=AVAILABLE, choices=STATUS_CHOICES)
+    contact_phone = PhoneNumberField(verbose_name=_('User contact phone'),
+                                     blank=True, null=True, default=None)
+    text_address = models.CharField(max_length=255,
+                                    verbose_name=_('Text address'),
+                                    blank=True, null=True, default=None)
 
     objects = AssistanceRequestQuerySet.as_manager()
 

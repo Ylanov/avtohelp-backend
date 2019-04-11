@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from car import models
 from utils.serializers import CoordinatesSerializer
+from os.path import exists
 
 
 class CarListSerializer(serializers.ModelSerializer):
@@ -89,20 +90,53 @@ class CarDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'mark', 'model')
 
 
+class CarServiceCategorySerializer(serializers.ModelSerializer):
+    """Serializer for model CarServiceCategory"""
+
+    icon = serializers.SerializerMethodField()
+
+    class Meta:
+        """Meta model"""
+        model = models.CarServiceCategory
+        fields = ('id', 'name', 'icon')
+
+    def get_icon(self, obj):
+        """Get icon"""
+        if obj.image and hasattr(obj.image, 'url'):
+            return self.context.get('request').build_absolute_uri(obj.image.url)
+        else:
+            return None
+
+
 class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
     """Service list serializer"""
 
     distance = serializers.SerializerMethodField()
+    category_detail = serializers.SerializerMethodField()
 
     class Meta:
         """Meta model"""
 
         model = models.CarService
-        fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon', 'category_id', 'distance')
+        fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon', 'category_detail', 'distance')
 
     def get_distance(self, obj):
         """Get distance in meters"""
         return obj.distance.m if hasattr(obj, 'distance') else None
+
+    def get_category_detail(self, obj):
+        """Method to get category"""
+        return CarServiceCategorySerializer(obj.category, context={'request': self.context.get('request')}).data
+
+
+class ServiceStationsCategoriesSerializer(serializers.ModelSerializer):
+    """Service list serializer"""
+
+    class Meta:
+        """Meta model"""
+
+        model = models.CarServiceCategory
+        fields = ('id', 'name', 'image')
 
 
 class ServiceDetailSerializer(serializers.ModelSerializer, CoordinatesSerializer):

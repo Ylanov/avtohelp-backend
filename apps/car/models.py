@@ -1,5 +1,5 @@
 from django.db import models
-from utils.mixins import BaseMixin, NameMixin
+from utils.mixins import BaseMixin, NameMixin, ImageMixin
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.db import models as gis_models
 from phonenumber_field.modelfields import PhoneNumberField
@@ -98,7 +98,7 @@ class CarService(NameMixin, BaseMixin):
         verbose_name_plural = _('Services')
 
 
-class CarServiceCategory(NameMixin, BaseMixin):
+class CarServiceCategory(NameMixin, BaseMixin, ImageMixin):
     """Service category model"""
 
     class Meta:

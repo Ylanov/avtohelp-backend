@@ -76,6 +76,16 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset
 
 
+class ServiceStationsCategoriesViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet for model ServiceStationsViewSet
+    """
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.ServiceStationsCategoriesSerializer
+    queryset = models.CarServiceCategory.objects.all()
+    pagination_class = None
+
+
 """
 VIEWS
 """
