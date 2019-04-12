@@ -50,11 +50,12 @@ class ChatRoomAdminModel(admin.ModelAdmin):
 
 class ChatMessageAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
-    readonly_fields = ('id', 'created', 'modified', 'get_room_link', 'get_room_id')
-    list_display = readonly_fields[:-1]
+    readonly_fields = ('id', 'created', 'modified', 'get_room_link', 'get_room_id', 'message')
+    list_display = readonly_fields[:-2]
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
         (_('Room\'s data'), {'fields': ('get_room_id', 'get_room_link')}),
+        (_('Message'), {'fields': ('message',)}),
     )
 
     def get_room_link(self, instance):

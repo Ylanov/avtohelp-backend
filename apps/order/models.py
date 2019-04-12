@@ -41,7 +41,7 @@ class AssistanceRequestQuerySet(models.QuerySet):
     def annotate_distance(self, raw_position):
         """Annotate service distance from position"""
         if raw_position:
-            x, y = float(raw_position.split(',')[0]), float(raw_position.split(',')[1])
+            x, y = float(raw_position[0]), float(raw_position[1])
             return self.annotate(distance=Distance('location', Point(x, y, srid=4326)))
         return self
 

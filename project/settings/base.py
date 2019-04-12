@@ -261,6 +261,7 @@ USE_SMS = False  # Actual sms sending switcher
 
 # ASSISTANCE REQUESTS
 REQUEST_RELEVANCE = 30  # minutes
+DEFAULT_REQUEST_RADIUS = 1000  # in meters
 
 
 # PUSH-NOTIFICATIONS

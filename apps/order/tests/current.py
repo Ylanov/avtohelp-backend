@@ -123,9 +123,7 @@ class TestOrder(APITestCase):
     def test_service_list_query_1(self):
         """Test service list query - filter by distance"""
         query = {
-            'position': ['45.061016, 38.944007'],  # latitude, longitude
-            'distance_min': 0.0,
-            'distance_max': 0.0
+            'coordinates': ['45.061016, 38.944007'],  # latitude, longitude
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
@@ -141,6 +139,16 @@ class TestOrder(APITestCase):
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0].get('profile_id'), self.assistance_request.user.profile.id)
+
+    def test_service_list_query_3(self):
+        """Test service list query - filter by distance"""
+        query = {
+            'coordinates': ['45.061016, 38.944007, 0'],  # latitude, longitude
+        }
+        api_path = '%s:order:request-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data=query)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get('distance'), 0.0)  # output in meters
 
     def test_count_created_assistance_requests(self):
         """

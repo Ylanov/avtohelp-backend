@@ -32,5 +32,5 @@ class ChatRoomListFilterSet(django_filters.FilterSet):
         """Meta class"""
         model = models.ChatRoom
         fields = [
-            'is_public', 'participants'
+            'is_public', 'participant'
         ]
