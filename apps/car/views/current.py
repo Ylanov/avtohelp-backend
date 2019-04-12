@@ -61,7 +61,7 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AllowAny,)
     serializer_class = serializers.ServiceListSerializer
     filter_class = filters.ServiceStationsFilterSet
-    queryset = models.CarService.objects.all()
+    queryset = models.CarService.objects.annotate_icon_exists()
     pagination_class = None
 
     def get_queryset(self):

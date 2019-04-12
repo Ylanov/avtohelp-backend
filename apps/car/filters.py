@@ -90,6 +90,7 @@ class ServiceStationsFilterSet(django_filters.FilterSet):
 
     from_center = CenterFilter()
     distance = django_filters.NumberFilter()
+    icon_exists = django_filters.BooleanFilter()
 
     class Meta:
         """Meta class"""
@@ -97,5 +98,6 @@ class ServiceStationsFilterSet(django_filters.FilterSet):
         fields = [
             'category',
             'from_center',
-            'distance'
+            'distance',
+            'icon_exists'
         ]
