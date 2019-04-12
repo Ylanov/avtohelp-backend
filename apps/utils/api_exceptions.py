@@ -197,14 +197,3 @@ class CarNotFound(ValidationErrorMixin):
         self.default_detail = dict(detail=self.default_detail,
                                    status_code=self.extended_status_code)
         super().__init__()
-
-
-class PhoneIsNotEntered(ValidationErrorMixin):
-    """Phone number is not entered"""
-    default_detail = _('Phone number is not entered')
-    extended_status_code = '%s.13' % ValidationErrorMixin.status_code
-
-    def __init__(self):
-        self.default_detail = dict(detail=self.default_detail,
-                                   status_code=self.extended_status_code)
-        super().__init__()

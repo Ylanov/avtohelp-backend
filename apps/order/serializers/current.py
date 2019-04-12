@@ -1,5 +1,5 @@
 from django.contrib.gis.geos.point import Point
-from phonenumber_field.modelfields import PhoneNumberField
+from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 from order import models
@@ -65,7 +65,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
     # REQUEST
     geo_lat = serializers.FloatField(allow_null=True)
     geo_lon = serializers.FloatField(allow_null=True)
-    contact_phone = PhoneNumberField()
+    contact_phone = PhoneNumberField(allow_blank=False)
     text_address = serializers.CharField(allow_blank=False)
 
     class Meta:
@@ -84,8 +84,6 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         # if geo_lat and geo_lon was sent
         geo_lat = attrs.pop('geo_lat') if 'geo_lat' in attrs else None
         geo_lon = attrs.pop('geo_lon') if 'geo_lon' in attrs else None
-        if 'contact_phone' not in attrs:
-            raise api_exceptions.PhoneIsNotEntered()
         if geo_lat and geo_lon:
             # Point(longitude, latitude)
             attrs['location'] = Point(geo_lat, geo_lon)
