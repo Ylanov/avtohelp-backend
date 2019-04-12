@@ -5,6 +5,7 @@ from django.db.models import Q
 from utils.mixins import BaseMixin, ImageMixin
 from django.contrib.gis.db.models.functions import Distance
 from phonenumber_field.modelfields import PhoneNumberField
+from django.contrib.gis.geos import Point
 
 
 class AssistanceRequestQuerySet(models.QuerySet):
@@ -37,9 +38,12 @@ class AssistanceRequestQuerySet(models.QuerySet):
             Q(user__blacklist_owner__foe=user) |
             Q(user__blacked_user__owner=user))
 
-    def annotate_distance(self, position):
+    def annotate_distance(self, raw_position):
         """Annotate service distance from position"""
-        return self.annotate(distance=Distance('location', position))
+        if raw_position:
+            x, y = float(raw_position.split(',')[0]), float(raw_position.split(',')[1])
+            return self.annotate(distance=Distance('location', Point(x, y, srid=4326)))
+        return self
 
 
 class AssistanceRequest(BaseMixin, ImageMixin):

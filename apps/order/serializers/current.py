@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from order import models
 from userprofile.serializers import current as profile_serializers
-from utils import api_exceptions
 
 
 class AssistanceRequestMixin(serializers.ModelSerializer):
@@ -21,13 +20,13 @@ class AssistanceRequestMixin(serializers.ModelSerializer):
 
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.y
+        if isinstance(obj.location, Point):
+            return obj.location.x
 
     def get_geo_lon(self, obj):
         """Point(longitude, latitude)"""
-        if isinstance(obj.user.profilelocation.location, Point):
-            return obj.user.profilelocation.location.x
+        if isinstance(obj.location, Point):
+            return obj.location.y
 
 
 class AssistanceRequestListSerializer(AssistanceRequestMixin):
@@ -41,16 +40,6 @@ class AssistanceRequestListSerializer(AssistanceRequestMixin):
         model = models.AssistanceRequest
         fields = ('id', 'created', 'profile_id', 'issue', 'description', 'geo_lat', 'geo_lon', 'distance')
 
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.x
-
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.y
-
     def get_distance(self, obj):
         """Get distance in meters"""
         return obj.distance.m if hasattr(obj, 'distance') else None
@@ -61,6 +50,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
 
     # RESPONSE
     profile = profile_serializers.ProfileViewSerializer(read_only=True, source='user.profile')
+    distance = serializers.SerializerMethodField()
 
     # REQUEST
     geo_lat = serializers.FloatField(allow_null=True)
@@ -74,7 +64,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         model = models.AssistanceRequest
         fields = ('id', 'created', 'issue', 'description',
                   'image', 'geo_lat', 'geo_lon', 'profile',
-                  'contact_phone', 'text_address')
+                  'contact_phone', 'text_address', 'distance')
 
     def validate(self, attrs):
         """Override validate method"""
@@ -99,6 +89,10 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
             setattr(instance, 'geo_lat', float(0))
             setattr(instance, 'geo_lon', float(0))
         return super().to_representation(instance)
+
+    def get_distance(self, obj):
+        """Get distance in meters"""
+        return obj.distance.m if hasattr(obj, 'distance') else None
 
 
 class AssistanceRequestUpdateSerializer(serializers.ModelSerializer):

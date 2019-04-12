@@ -226,7 +226,7 @@ class TestCatalog(APITestCase):
         """Test services list view w/ filters"""
 
         api_path = '%s:car:carservice-list' % self.VERSION
-        response = self.client.get(reverse(api_path), data={'category': self.service_cat_1.id})
+        response = self.client.get(reverse(api_path), data={'category_id': self.service_cat_1.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarService.objects.filter(category_id=self.service_cat_1.id).count())
 

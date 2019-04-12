@@ -1,4 +1,3 @@
-from django.contrib.gis.geos import Point
 from rest_framework import generics, views
 from rest_framework.response import Response
 
@@ -11,25 +10,21 @@ class AssistanceRequestMixin(object):
     model = models.AssistanceRequest
     queryset = models.AssistanceRequest.objects.all()
 
+    def get_queryset(self):
+        """Override get_queryset method"""
+        qs = self.queryset.available(self.request.user)
+        return qs.annotate_distance(raw_position=self.request.query_params.get('position'))
+
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
-    """middle
-    Get user assistance request list
+    """
+    Get user assistance request list w/ filters by fields
+    profile_id
+    distance
     """
     serializer_class = serializers.AssistanceRequestListSerializer
     pagination_class = None
     filter_class = filters.AssistanceRequestFitlerSet
-
-    def get_queryset(self):
-        """Override get_queryset method"""
-        qs = self.queryset.available(self.request.user)
-        query = self.request.query_params.get('position')
-        if query:
-            position_x = float(query.split(',')[0])
-            position_y = float(query.split(',')[1])
-            position = Point(position_x, position_y, srid=4326)
-            return qs.annotate_distance(position)
-        return qs
 
 
 class AssistanceRequestCountView(views.APIView):
@@ -75,11 +70,16 @@ class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
 
-class AssistanceRequestDetailView(AssistanceRequestMixin, generics.RetrieveAPIView):
+class AssistanceRequestDetailView(generics.RetrieveAPIView):
     """
     Get detail information of assistance request
     """
     serializer_class = serializers.AssistanceRequestCreateSerializer
+    queryset = models.AssistanceRequest.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.all().annotate_distance(raw_position=self.request.query_params.get('position'))
 
 
 class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):

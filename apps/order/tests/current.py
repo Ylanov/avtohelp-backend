@@ -49,10 +49,10 @@ class TestOrder(APITestCase):
         self.user_3 = account_models.User.objects.make(phone='+79000000003')
 
         # Create assistance requests
-        models.AssistanceRequest.objects.create(user=self.user_1,
-                                                issue='Issue 1',
-                                                description='Description',
-                                                location=Point(45.062003, 38.940738, srid=4326))
+        self.assistance_request = models.AssistanceRequest.objects.create(user=self.user_1,
+                                                                          issue='Issue 1',
+                                                                          description='Description',
+                                                                          location=Point(45.061016, 38.944007, srid=4326))
         models.AssistanceRequest.objects.create(user=self.user_2,
                                                 issue='Issue 2',
                                                 description='Description',
@@ -119,7 +119,28 @@ class TestOrder(APITestCase):
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0].get('distance'), 373.38496906)  # output in meters
+
+    def test_service_list_query_1(self):
+        """Test service list query - filter by distance"""
+        query = {
+            'position': ['45.061016, 38.944007'],  # latitude, longitude
+            'distance_min': 0.0,
+            'distance_max': 0.0
+        }
+        api_path = '%s:order:request-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data=query)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get('distance'), 0.0)  # output in meters
+
+    def test_service_list_query_2(self):
+        """Test service list query - filter by profile id"""
+        query = {
+            'profile_id': self.assistance_request.user.profile.id
+        }
+        api_path = '%s:order:request-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data=query)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get('profile_id'), self.assistance_request.user.profile.id)
 
     def test_count_created_assistance_requests(self):
         """
@@ -156,7 +177,7 @@ class TestOrder(APITestCase):
             issue='Issue 1',
             description='Issue description'
         )
-        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_update_assistance_request(self):
