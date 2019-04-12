@@ -85,10 +85,11 @@ class TestOrder(APITestCase):
             "description": "Description",
             "geo_lat": "45.060487",
             "geo_lon": "38.944205",
-            # "phone": "+79000000000"
+            "contact_phone": "+79000000000",
+            "text_address": "улица Новицкого 2/4, возле ТЦ Boss House"
         }
         response = self.client.post(reverse(api_path), data)
-        assistance_request = models.AssistanceRequest.objects.first().id
+        assistance_request = models.AssistanceRequest.objects.last().id
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data.get('id'), assistance_request)
 

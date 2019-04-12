@@ -74,7 +74,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         model = models.AssistanceRequest
         fields = ('id', 'created', 'issue', 'description',
                   'image', 'geo_lat', 'geo_lon', 'profile',
-                  'contact_phone', 'text_address', 'status')
+                  'contact_phone', 'text_address')
 
     def validate(self, attrs):
         """Override validate method"""
