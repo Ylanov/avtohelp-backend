@@ -23,7 +23,7 @@ class AssistanceRequestRadiusFilter(django_filters.BaseInFilter, django_filters.
             x, y = float(value[0]), float(value[1])
             point = Point(x, y, srid=4326)
             return qs.filter(location__distance_lte=(point, Distance(
-                m=value[2] if len(value) == 3 else settings.DEFAULT_REQUEST_RADIUS)))
+                m=float(value[2]) if len(value) == 3 else settings.DEFAULT_REQUEST_RADIUS)))
         return qs
 
 

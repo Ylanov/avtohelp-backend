@@ -38,11 +38,16 @@ class AssistanceRequestQuerySet(models.QuerySet):
             Q(user__blacklist_owner__foe=user) |
             Q(user__blacked_user__owner=user))
 
-    def annotate_distance(self, raw_position):
-        """Annotate service distance from position"""
-        if raw_position:
-            x, y = float(raw_position[0]), float(raw_position[1])
-            return self.annotate(distance=Distance('location', Point(x, y, srid=4326)))
+    def annotate_distance(self, raw_coordinates):
+        """
+        Annotate service distance from position
+        raw_coordinates can contain -
+        - latitude (index 0),
+        - longitude (index 1),
+        """
+        if raw_coordinates:
+            x, y = raw_coordinates.split(',')[0], raw_coordinates.split(',')[1]
+            return self.annotate(distance=Distance('location', Point(float(x), float(y), srid=4326)))
         return self
 
 

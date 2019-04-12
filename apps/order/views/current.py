@@ -12,11 +12,8 @@ class AssistanceRequestMixin(object):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        try:
-            query = self.request.query_params.get('coordinates').split(',')
-            return self.queryset.available(self.request.user).annotate_distance(raw_position=query)
-        except:
-            return self.queryset
+        return self.queryset.available(self.request.user).annotate_distance(
+            raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
@@ -28,8 +25,6 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     serializer_class = serializers.AssistanceRequestListSerializer
     pagination_class = None
     filter_class = filters.AssistanceRequestFitlerSet
-    # filter_backends = (filters.OrderingFilter, filters.AssistanceRequestFitlerSet)
-    # ordering_fields = ('distance',)
 
 
 class AssistanceRequestCountView(views.APIView):
@@ -74,6 +69,10 @@ class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView
     """
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
+    def get_queryset(self):
+        return self.queryset.available(self.request.user).annotate_distance(
+            raw_coordinates=self.request.query_params.get('coordinates'))
+
 
 class AssistanceRequestDetailView(generics.RetrieveAPIView):
     """
@@ -84,7 +83,8 @@ class AssistanceRequestDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.all().annotate_distance(raw_position=self.request.query_params.get('position'))
+        return self.queryset.all().annotate_distance(
+            raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):
