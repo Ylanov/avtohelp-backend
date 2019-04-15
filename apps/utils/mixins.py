@@ -9,6 +9,7 @@ from easy_thumbnails.fields import ThumbnailerImageField
 from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from account import models as account_models
+from os.path import exists
 
 
 def generate_image_name():
@@ -53,9 +54,14 @@ class ImageMixin(models.Model):
         else:
             return None
 
-    def get_image_media_path(self):
-        """Get image path with media prefix"""
-        return self.image.url
+    def get_full_image_url(self, request, thumbnail_key=None):
+        """Get full image url"""
+        if self.image and exists(self.image.path):
+            if thumbnail_key:
+                return request.build_absolute_uri(self.image[thumbnail_key].url)
+            return request.build_absolute_uri(self.image.url)
+        else:
+            return None
 
     image_tag.short_description = _('Image')
     image_tag.allow_tags = True

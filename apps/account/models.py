@@ -76,15 +76,15 @@ class User(AbstractUser, BaseMixin):
 
     def get_first_name(self):
         """Return user first_name"""
-        return self.profile.first_name if self.profile else None
+        return self.profile.first_name if hasattr(self, 'profile') else None
 
     def get_last_name(self):
         """Return user last"""
-        return self.profile.last_name if self.profile else None
+        return self.profile.last_name if hasattr(self, 'profile') else None
 
     def get_full_name(self):
         """Return user full name"""
-        return f'{self.profile.first_name} {self.profile.last_name}' if self.profile else self.id
+        return f'{self.profile.first_name} {self.profile.last_name}' if hasattr(self, 'profile') else self.id
 
     def get_car_license_plate(self):
         """Return user profile car license plate"""
@@ -92,4 +92,4 @@ class User(AbstractUser, BaseMixin):
 
     def get_avatar(self):
         """Return user profile avatar"""
-        return f'{self.profile.image.url}' if self.profile.image else None
+        return self.profile.get_image_url()

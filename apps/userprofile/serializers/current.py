@@ -114,7 +114,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
     """Serializer for retrieving user profile"""
 
     # RESPONSE
-    phone = PhoneNumberField(source='user.phone', read_only=True, )
+    phone = PhoneNumberField(source='user.phone', read_only=True)
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
     profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
 
@@ -192,27 +192,27 @@ class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
 
     def get_tiny(self, obj):
         """Get image with size tiny"""
-        return obj.image['tiny'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='tiny')
 
     def get_small(self, obj):
         """Get image with size small"""
-        return obj.image['small'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='small')
 
     def get_average(self, obj):
         """Get image with size average"""
-        return obj.image['average'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='average')
 
     def get_medium(self, obj):
         """Get image with size medium"""
-        return obj.image['medium'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='medium')
 
     def get_big(self, obj):
         """Get image with size big"""
-        return obj.image['big'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='big')
 
     def get_large(self, obj):
         """Get image with size large"""
-        return obj.image['large'].url if obj.image and exists(obj.image.path) else None
+        return obj.get_full_image_url(self.context.get('request'), thumbnail_key='large')
 
 
 class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
@@ -232,9 +232,10 @@ class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
 
 class ProfileGalleryListSerializer(serializers.ModelSerializer):
     """Serializer for ProfileGalleryListView"""
+
     class Meta:
         model = models.ProfileGallery
-        fields = ('id', 'created', 'profile', 'image')
+        fields = ('id', 'created', 'profile_id', 'image')
 
 
 class FullProfileSerializer(serializers.ModelSerializer):
@@ -285,10 +286,7 @@ class ProfileBaseSerializer(serializers.ModelSerializer):
 
     def get_avatar(self, obj):
         """Get avatar full url"""
-        if obj.image and hasattr(obj.image, 'url'):
-            return self.context.get('request').build_absolute_uri(obj.image.url)
-        else:
-            return None
+        return obj.get_full_image_url(request=self.context.get('request'))
 
 
 # Friend list

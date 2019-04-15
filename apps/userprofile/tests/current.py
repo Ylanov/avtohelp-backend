@@ -356,6 +356,50 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
 
+    def test_friend_request_to_user_4(self):
+        """
+        Get all friend requests TO user
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Put user_3 in FriendList
+        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data={'person_id': user_2.profile.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().to_me(
+            self.user_1).filter(owner=user_2).count())
+
+    def test_friend_request_to_user_5(self):
+        """
+        Get all friend requests FROM user
+        """
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_3 = User.objects.make(phone='+79000000003')
+
+        # Put user_3 in FriendList
+        FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=False)
+        FriendRequest.objects.create(owner=self.user_1, invited=user_3, approved=True)
+
+        api_path = '%s:userprofile:my-friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data={'person_id': user_2.profile.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().from_me(
+            self.user_1).filter(invited=user_2).count())
+
     def test_friend_request_to_user_detail(self):
         """
         Get all friend requests TO user

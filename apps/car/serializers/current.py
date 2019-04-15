@@ -102,10 +102,7 @@ class CarServiceCategorySerializer(serializers.ModelSerializer):
 
     def get_icon(self, obj):
         """Get icon"""
-        if obj.image and hasattr(obj.image, 'url'):
-            return self.context.get('request').build_absolute_uri(obj.image.url)
-        else:
-            return None
+        return obj.get_full_image_url(request=self.context.get('request'))
 
 
 class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
