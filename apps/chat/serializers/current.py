@@ -41,19 +41,18 @@ class ChatRoomDetailSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.ChatRoom
         fields = ('id', 'created', 'modified',
-                  'participants', 'name', 'is_public')
+                  'participants', 'name', 'image')
 
 
 class ChatRoomListSerializer(serializers.ModelSerializer):
     """Serializer for model ChatRoom"""
 
     participants = ChatRoomParticipantsSerializer(many=True)
-    avatar = serializers.ImageField(source='image')
 
     class Meta:
         """Meta class"""
         model = models.ChatRoom
-        fields = ('id', 'created', 'participants', 'avatar', 'is_public')
+        fields = ('id', 'created', 'participants', 'image', 'name')
 
 
 class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
@@ -67,12 +66,11 @@ class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
     participants = ChatRoomParticipantsSerializer(read_only=True,
                                                   required=False,
                                                   many=True)
-    is_public = serializers.BooleanField(read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.ChatRoom
-        fields = ('id', 'created', 'participant', 'participants', 'is_public')
+        fields = ('id', 'created', 'participant', 'participants')
 
     def validate(self, attrs):
         """Override validate method"""

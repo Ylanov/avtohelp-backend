@@ -18,7 +18,7 @@ class ChatRoomAdminModel(admin.ModelAdmin):
     filter_horizontal = ('participants',)
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
-        (_('Room\'s data'), {'fields': ('name', 'participants', 'is_public')}),
+        (_('Room\'s data'), {'fields': ('name', 'participants', 'is_public', 'image')}),
     )
 
     # def save_model(self, request, obj, form, change):

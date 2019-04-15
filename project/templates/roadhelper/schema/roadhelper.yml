@@ -1,0 +1,377 @@
+swagger: '2.0'
+schemes:
+  - http
+info:
+  description: |
+     {{ title }} Integration API
+  version: 1.0.1
+  title: "{{ title }} Integration"
+  termsOfService: 'http://swagger.io/terms/'
+  x-logo:
+    altText: RoadHelper Documentation
+tags:
+  - name: Chat
+    description: Чат
+x-servers:
+  - url: http://roadhelper.spider.ru/
+    description: Development server
+paths:
+  # Chat app
+  /api/chat/rooms/:
+    get:
+      tags:
+        - Chat
+      summary: Список чатов
+      description: |
+        Пагинированный (пагинациция курсором) список чатов (комнат),
+        для залогиневшегося пользователя.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: false
+          schema:
+            type: object
+            properties:
+              is_public:
+                type: boolean
+                description: Флаг обозначающий приватность чат-комнаты
+                example: False
+              participant_id:
+                type: int32
+                description: Идентификатор профиля участника чата
+                example: 1
+      responses:
+        200:
+          description: Список чатов
+          schema:
+            allOf:
+              - $ref: '#/definitions/Utils/CustomCursorPagination'
+              - type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/definitions/Models/ChatRoomModel'
+                        - type: object
+                          properties:
+                            image:
+                              $ref: '#/definitions/Fields/ImageField'
+                            name:
+                              type: string
+                              description: Название комнаты
+                              example: Room 1
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+  /api/chat/rooms/{pk}:
+    get:
+      tags:
+        - Chat
+      summary: Детальная карточка чата
+      description: |
+        Детальная карточка чата.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: pk
+          in: path
+          description: Идентификатор комнаты чата
+          required: true
+          type: "integer"
+          format: "int64"
+          example: 3
+      responses:
+        200:
+          description: Детальная карточка чата
+          schema:
+            type: object
+            properties:
+            allOf:
+              - $ref: '#/definitions/Models/ChatRoomModel'
+              - type: object
+                properties:
+                  modified:
+                    $ref: '#/definitions/Fields/DateTime'
+                  image:
+                    $ref: '#/definitions/Fields/ImageField'
+                  name:
+                    type: string
+                    description: Название комнаты
+                    example: Room 1
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+        403:
+          description: Недостаточно прав
+          schema:
+            $ref: '#/definitions/Errors/InsufficientlyRights'
+  /api/chat/rooms/private/create:
+    get:
+      tags:
+        - Chat
+      summary: Создание приватного чата
+      description: |
+        Создание приватной комнаты чата.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              participant:
+                type: integer
+                description: Идентификатор профиля участника
+                example: 1
+      responses:
+        200:
+          description: Детальная карточка чата
+          schema:
+            type: object
+            properties:
+            allOf:
+              - $ref: '#/definitions/Models/ChatRoomModel'
+        400:
+          description: Ошибки валидации
+          schema:
+            $ref: '#/definitions/Errors/ValidationDetail'
+        400.8:
+          description: Идентичные идентификаторы профилей
+          schema:
+            type: object
+            properties:
+            allOf:
+              - $ref: '#/definitions/Errors/EqualIDError'
+        400.10:
+          description: Комната чата уже существует
+          schema:
+            type: object
+            properties:
+            allOf:
+              - $ref: '#/definitions/Errors/ChatRoomAlreadyExistsError'
+        400.11:
+          description: Пользователи являются врагами
+          schema:
+            type: object
+            properties:
+            allOf:
+              - $ref: '#/definitions/Errors/AreFoesError'
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+
+definitions:
+  Utils:
+    LimitOffsetPagination:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 6
+          description: Количество объектов
+        next:
+          type: string
+          example: 'some'
+          x-nullable: true
+        previous:
+          type: string
+          example: 'some'
+          x-nullable: true
+    CustomCursorPagination:
+      type: object
+      properties:
+        next:
+          type: string
+          example: 'some'
+          x-nullable: true
+        previous:
+          type: string
+          example: 'some'
+          x-nullable: true
+
+  Fields:
+    ID:
+      type: integer
+      format: int32
+      description: Уникальный Идентификатор
+      example: 33231
+    UserID:
+      description: Идентификатор пользователя
+      example: 293384
+      allOf:
+        - $ref: '#/definitions/Fields/ID'
+    ProfileID:
+      description: Идентификатор профиля участника
+      example: 293384
+      allOf:
+        - $ref: '#/definitions/Fields/ID'
+    DateTime:
+      description: Дата и время
+      type: string
+      format: ISO-8601
+      example: "2018-11-13T00:00:00+0300"
+    Date:
+      description: Дата в формате ISO-8601
+      type: string
+      format: "YYYY-MM-DDTHH:MM:SS.Z"
+      example: "2019-04-12T08:29:34.757354Z"
+    Phone:
+      type: string
+      format: e164
+      example: "+79996667722"
+      description: Номер телефона в международном формате
+    Email:
+      type: string
+      example: "john.doe@example.com"
+      format: email
+      description: E-mail
+    ImageField:
+      type: string
+      description: URL файла изображения
+      example: "http://roadhelper.spider.ru/media/image/profile/08-04-2019/473807.jpeg"
+
+  Errors:
+    ValidationDetail:
+      type: object
+      properties:
+        field:
+          type: array
+          example: ['Текст ошибки валидации']
+    NotApprovedUser:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'У вас нет прав для выполнения этой операции.'
+    UnauthorizedUser:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'Учетные данные не были предоставлены.'
+    InsufficientlyRights:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'У вас нет прав для выполнения этой операции.'
+    EqualIDError:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'Идентичные идентификаторы профилей пользователей'
+        status_code:
+          type: string
+          example: '400.8'
+    AreFoesError:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'Пользователи враги'
+        status_code:
+          type: string
+          example: '400.11'
+    ChatRoomAlreadyExistsError:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: 'Комната чата уже существует'
+        status_code:
+          type: string
+          example: '400.10'
+    ObjectNotFound:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: "Не найдено."
+
+  Models:
+    ChatRoomParticipant:
+      type: object
+      properties:
+      allOf:
+        - $ref: '#/definitions/Mixins/NameMixin'
+        - type: object
+          properties:
+            id:
+              description: Идентификатор
+              allOf:
+                - $ref: '#/definitions/Fields/ID'
+            avatar:
+              $ref: '#/definitions/Fields/ImageField'
+    ChatRoomModel:
+      type: object
+      properties:
+      allOf:
+        - $ref: '#/definitions/Mixins/IDCreatedMixin'
+        - type: object
+          properties:
+            participants:
+              type: array
+              items:
+                $ref: '#/definitions/Models/ChatRoomParticipant'
+
+  Mixins:
+    PhoneEmailMixin:
+      type: object
+      properties:
+        phone:
+          description: Контактный номер телефона
+          allOf:
+            - $ref: '#/definitions/Fields/Phone'
+        email:
+          type: string
+          x-nullable: True
+          description: Контактный адрес электронной почты
+          example: mail@mail_service.com
+    IDCreatedMixin:
+      type: object
+      properties:
+        id:
+          description: Идентификатор
+          allOf:
+            - $ref: '#/definitions/Fields/ID'
+        created:
+          $ref: '#/definitions/Fields/DateTime'
+    NameMixin:
+      type: object
+      properties:
+        first_name:
+          example: Иван
+          type: string
+          description: Имя
+          x-nullable: True
+        last_name:
+          example: Ягодкин
+          type: string
+          description: Фамилия
+          x-nullable: True
+    NotificationMixin:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название уведомления
+          example: Оповещение об изменении заявки
+        text:
+          type: string
+          description: Текст уведомления
+          example: Статус заявки изменен

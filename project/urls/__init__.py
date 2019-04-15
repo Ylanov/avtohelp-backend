@@ -31,7 +31,8 @@ urlpatterns = [
     path(f'api/v{future_version}/', include(future, namespace=f'{future_version}')),
     path('version/', include('versioning.urls')),
     path('device', views.FCMDeviceViewSet.as_view(), name='fcm_device_create'),
-    path('docs/', api_schema_view),
-    # path('documentation/', include('documentation.urls', namespace='documentation'))
+    path('swagger/', api_schema_view),
+
+    path('documentation/', include('documentation.urls', namespace='documentation'))
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

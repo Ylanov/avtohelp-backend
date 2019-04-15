@@ -178,7 +178,7 @@ class ChatRoomAlreadyExistsError(ValidationErrorMixin):
 
 
 class AreFoesError(ValidationErrorMixin):
-    """Users aren't foes"""
+    """Users are foes"""
     default_detail = _('User %s and User %s are foes')
     extended_status_code = '%s.11' % ValidationErrorMixin.status_code
 
