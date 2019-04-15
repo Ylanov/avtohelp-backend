@@ -63,7 +63,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         """Override to_representation method"""
         import os
         configuration = os.environ.get('SETTINGS_CONFIGURATION')
-        if (configuration is 'local') or (configuration is 'development'):
+        if (configuration == 'local') or (configuration == 'development'):
             return {'code': instance.code}
         return super(PhoneVerificationSerializer, self).to_representation(instance)
 
