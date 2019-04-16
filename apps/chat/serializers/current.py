@@ -29,7 +29,7 @@ class ChatMessageListSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.ChatMessage
         fields = ('id', 'created', 'modified',
-                  'sender', 'room', 'message', 'read')
+                  'sender', 'room_id', 'message', 'read')
 
 
 class ChatRoomDetailSerializer(serializers.ModelSerializer):

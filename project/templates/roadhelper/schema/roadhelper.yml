@@ -13,7 +13,7 @@ tags:
   - name: Chat
     description: Чат
 x-servers:
-  - url: http://roadhelper.spider.ru/
+  - url: http://roadhelper.spider.ru/api/v1.0.0/
     description: Development server
 paths:
   # Chat app
@@ -93,7 +93,6 @@ paths:
           description: Детальная карточка чата
           schema:
             type: object
-            properties:
             allOf:
               - $ref: '#/definitions/Models/ChatRoomModel'
               - type: object
@@ -141,7 +140,6 @@ paths:
           description: Детальная карточка чата
           schema:
             type: object
-            properties:
             allOf:
               - $ref: '#/definitions/Models/ChatRoomModel'
         400:
@@ -169,6 +167,167 @@ paths:
             properties:
             allOf:
               - $ref: '#/definitions/Errors/AreFoesError'
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+  /api/chat/messages/rooms/{pk}:
+    get:
+      tags:
+        - Chat
+      summary: История сообщений чата
+      description: |
+        История сообщений чата (комнаты) по идентификаторы комнаты.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: pk
+          in: path
+          description: Идентификатор комнаты чата
+          required: true
+          type: "integer"
+          format: "int64"
+          example: 3
+        - name: body
+          in: body
+          required: False
+          schema:
+            type: object
+            properties:
+              created_after:
+                description: Фильтрация по дате создания ПОСЛЕ указанной даты
+                allOf:
+                  - $ref: '#/definitions/Fields/Date'
+              created_before:
+                description: Фильтрация по дате создания ДО указанной даты
+                allOf:
+                  - $ref: '#/definitions/Fields/Date'
+              read:
+                type: boolean
+                description: Фильтр по флагу прочитанности сообщения
+                example: True
+
+      responses:
+        200:
+          description: История сообщений чата
+          schema:
+            allOf:
+              - $ref: '#/definitions/Utils/CustomCursorPagination'
+              - type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/definitions/Models/ChatMessageModel'
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+        403:
+          description: Недостаточно прав
+          schema:
+            $ref: '#/definitions/Errors/InsufficientlyRights'
+  /chat/messages/room/{pk}/count:
+    get:
+      tags:
+        - Chat
+      summary: Количество сообщений в чате
+      description: |
+        Количество сообщений в чате (комнате).
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: pk
+          in: path
+          description: Идентификатор комнаты чата
+          required: true
+          type: "integer"
+          format: "int64"
+          example: 3
+
+      responses:
+        200:
+          description: Количество сообщений в комнате
+          schema:
+            type: object
+            properties:
+              count:
+                type: int32
+                description: Количество сообщений в комнате
+                example: 420
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+  /chat/messages/room/{pk}/unread/count:
+    get:
+      tags:
+        - Chat
+      summary: Количество непрочитанных сообщений в чате
+      description: |
+        Количество непрочитанных сообщений в чате (комнате).
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: pk
+          in: path
+          description: Идентификатор комнаты чата
+          required: true
+          type: "integer"
+          format: "int64"
+          example: 3
+
+      responses:
+        200:
+          description: Количество непрочитанных сообщений в чате
+          schema:
+            type: object
+            properties:
+              count:
+                type: int32
+                description: Количество непрочитанных сообщений в чате
+                example: 420
+        401:
+          description: Ошибка авторизации
+          schema:
+            $ref: '#/definitions/Errors/UnauthorizedUser'
+  /chat/messages/unread/count:
+    get:
+      tags:
+        - Chat
+      summary: Общее количество непрочитанных сообщений в чатах
+      description: |
+        Общее количество непрочитанных сообщений в чатах
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: pk
+          in: path
+          description: Идентификатор комнаты чата
+          required: true
+          type: "integer"
+          format: "int64"
+          example: 3
+
+      responses:
+        200:
+          description: Общее количество непрочитанных сообщений в чатах
+          schema:
+            type: object
+            properties:
+              count:
+                type: int32
+                description: Общее количество непрочитанных сообщений в чатах
+                example: 666
         401:
           description: Ошибка авторизации
           schema:
@@ -222,13 +381,13 @@ definitions:
     DateTime:
       description: Дата и время
       type: string
-      format: ISO-8601
-      example: "2018-11-13T00:00:00+0300"
+      format: "YYYY-MM-DDTHH:MM:SS.Z"
+      example: "2019-04-12T08:29:34.757354Z"
     Date:
       description: Дата в формате ISO-8601
       type: string
-      format: "YYYY-MM-DDTHH:MM:SS.Z"
-      example: "2019-04-12T08:29:34.757354Z"
+      format: "YYYY-MM-DD"
+      example: "2019-04-12"
     Phone:
       type: string
       format: e164
@@ -306,7 +465,6 @@ definitions:
   Models:
     ChatRoomParticipant:
       type: object
-      properties:
       allOf:
         - $ref: '#/definitions/Mixins/NameMixin'
         - type: object
@@ -319,15 +477,60 @@ definitions:
               $ref: '#/definitions/Fields/ImageField'
     ChatRoomModel:
       type: object
-      properties:
       allOf:
         - $ref: '#/definitions/Mixins/IDCreatedMixin'
         - type: object
           properties:
             participants:
               type: array
-              items:
-                $ref: '#/definitions/Models/ChatRoomParticipant'
+              example: [{
+                          "id": 3,
+                          "first_name": Петр,
+                          "last_name": Васильев,
+                          "avatar": http://0.0.0.0:8000/media/image/profile/08-04-2019/473807.jpeg
+                        },
+                        {
+                          "id": 8,
+                          "first_name": Федор,
+                          "last_name": Иванов,
+                          "avatar": http://0.0.0.0:8000/media/image/profile/08-04-2019/473807.jpeg
+                        }]
+
+    SenderModel:
+      type: object
+      description: Sender model in chat history messages
+      allOf:
+        - $ref: '#/definitions/Mixins/NameMixin'
+        - type: object
+          properties:
+            id:
+              $ref: '#/definitions/Fields/ID'
+            avatar:
+              $ref: '#/definitions/Fields/ImageField'
+    ChatMessageModel:
+      type: object
+      description: Модель сообщений чата
+      allOf:
+        - $ref: '#/definitions/Mixins/IDCreatedMixin'
+        - type: object
+          properties:
+            modified:
+              $ref: '#/definitions/Fields/DateTime'
+            sender:
+              $ref: '#/definitions/Models/SenderModel'
+            room_id:
+              type: int32
+              description: Идентификатор комнаты
+              example: 1
+            message:
+              type: string
+              description: Текст сообщения
+              example: Привет
+            read:
+              type: boolean
+              description: Флаг прочитанности сообщения
+              example: True
+              default: False
 
   Mixins:
     PhoneEmailMixin:
