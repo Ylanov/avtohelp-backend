@@ -112,13 +112,13 @@ def notify_chat_participants(sender_id, participants):
     sender = account_models.User.objects.get(id=sender_id)
     for user in participants:
         notification = base_models.PushNotification.objects.create(
-            user_id=sender_id,
+            user_id=user.get('id'),
             title=_('New message from chat'),
             description=_(f'User {sender.get_full_name()} wrote a message')
         )
         devices = FCMDevice.objects.filter(user_id=user.get('id'))
         if devices.exists():
-            count = devices.send_message(**notification.get_push_dict())[0]
+            count = devices.send_message(**notification.get_push_dict())
             if count.get('success') > 0:
                 notification.status = True
                 notification.save()
@@ -137,7 +137,7 @@ def notify_users():
             title=_('New assistance request'),
             description=_('New assistance request was published')
         )
-        count = devices.send_message(**notification.get_push_dict())[0]
+        count = devices.send_message(**notification.get_push_dict())
         if count.get('success') > 0:
             notification.status = True
             notification.save()
@@ -170,7 +170,7 @@ def notify_unread_messages(title, body):
                 )
                 devices = FCMDevice.objects.filter(user=user)
                 if devices.exists():
-                    count = devices.send_message(**notification.get_push_dict())[0]
+                    count = devices.send_message(**notification.get_push_dict())
                     if count.get('success') > 0:
                         notification.status = True
                         notification.save()
