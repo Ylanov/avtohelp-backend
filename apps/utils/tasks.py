@@ -12,6 +12,7 @@ from celery import shared_task
 from chat import models as chat_models
 from order import models as order_models
 from account import models as account_models
+from base import models as base_models
 
 logger = logging.getLogger('CELERY')
 
@@ -91,13 +92,16 @@ def check_request_relevance():
 @shared_task
 def notify_friend_request(invited_id):
     """Notify user about new friend request"""
-    title = _('New friend request')
-    body = _('A new friend request has been received')
+    notification = base_models.PushNotification.objects.create(
+        user_id=invited_id,
+        title=_('New friend request'),
+        description=_('A new friend request has been received')
+    )
     devices = FCMDevice.objects.filter(user_id=invited_id)
     if devices.exists():
-        count = devices.send_message(title=title, body=body)
+        count = devices.send_message(**notification.get_push_dict())[0]
         if count > 0:
-            logger.info(f'Users notified: {count}')
+            logger.info(f'Users notified: {count.get("success")}')
         else:
             logger.info(f'Error was occurred when sending PUSH-notifications')
 
@@ -106,38 +110,45 @@ def notify_friend_request(invited_id):
 def notify_chat_participants(sender_id, participants):
     """Notify user about new friend request"""
     sender = account_models.User.objects.get(id=sender_id)
-    title = _(f'New message from chat')
-    body = _(f'User {sender.get_full_name()} wrote a message')
     for user in participants:
+        notification = base_models.PushNotification.objects.create(
+            user_id=sender_id,
+            title=_('New message from chat'),
+            description=_(f'User {sender.get_full_name()} wrote a message')
+        )
         devices = FCMDevice.objects.filter(user_id=user.get('id'))
         if devices.exists():
-            count = devices.send_message(title=title, body=body)
-            if count > 0:
-                logger.info(f'Users notified: {count}')
+            count = devices.send_message(**notification.get_push_dict())[0]
+            if count.get('success') > 0:
+                notification.status = True
+                notification.save()
+                logger.info(f'Users notified: {count.get("success")}')
             else:
-                logger.info(f'Error was occurred when sending PUSH-notifications')
+                logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
 
 
 @shared_task
-def notify_users(title=None, body=None):
+def notify_users():
     """Notify users about assistance request"""
-    if not (title or body) or not (title and body):
-        title = _('New assistance request')
-        body = _('New assistance request was published')
     devices = FCMDevice.objects.all()
-    count = devices.send_message(title=title, body=body)
-    if count > 0:
-        logger.info(f'Users notified: {count}')
-    else:
-        logger.info(f'Error was occurred when sending PUSH-notifications')
+    for device in devices:
+        notification = base_models.PushNotification.objects.create(
+            user=device.user,
+            title=_('New assistance request'),
+            description=_('New assistance request was published')
+        )
+        count = devices.send_message(**notification.get_push_dict())[0]
+        if count.get('success') > 0:
+            notification.status = True
+            notification.save()
+            logger.info(f'Users notified: {count.get("success")}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
 
 
 @periodic_task(run_every=crontab(minute=settings.MESSAGES_UPDATE_PERIOD))
-def notify_unread_messages(title=None, body=None):
+def notify_unread_messages(title, body):
     """Notify users about unread messages"""
-    if not (title or body) or not (title and body):
-        title = _('Unread messages')
-        body = _('You have unread messages')
     rooms = chat_models.ChatRoom.objects.all()
     for room in rooms:
         notify = list()
@@ -152,11 +163,19 @@ def notify_unread_messages(title=None, body=None):
             #         notify.append(participant)
         if notify:
             for user in notify:
+                notification = base_models.PushNotification.objects.create(
+                    user=user,
+                    title=_('Unread messages'),
+                    description=_('You have unread messages')
+                )
                 devices = FCMDevice.objects.filter(user=user)
                 if devices.exists():
-                    count = devices.send_message(title=title, body=body)
-                    if count and count > 0:
-                        logger.info(f'Users notified: {count}')
+                    count = devices.send_message(**notification.get_push_dict())[0]
+                    if count.get('success') > 0:
+                        notification.status = True
+                        notification.save()
+                        logger.info(f'Users notified: {count.get("success")}')
                     else:
-                        logger.info(f'Error was occurred when sending PUSH-notifications')
+                        logger.info(
+                            f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
         notify.clear()

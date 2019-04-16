@@ -89,7 +89,7 @@ class ChatMessage(BaseMixin):
                 participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
         else:
             tasks.notify_chat_participants(
-                sender_id=self.sender.id,
+                sender_id=self.sender_id,
                 participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
 
 

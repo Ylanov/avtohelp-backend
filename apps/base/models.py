@@ -58,3 +58,12 @@ class PushNotification(BaseMixin):
 
         verbose_name = _('Push notification')
         verbose_name_plural = _('Push notifications')
+
+    def get_push_dict(self):
+        """Make dict object, for push notification."""
+        result = dict()
+        result.update({
+            'title': str(self.title),
+            'body': str(self.description),
+        })
+        return result

@@ -12,7 +12,6 @@ from utils.paginations import CustomCursorPagination
 class ChatMessageListView(generics.ListAPIView):
     """MessageList view"""
     serializer_class = serializers.ChatMessageListSerializer
-    queryset = models.ChatMessage.objects.all()
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
     pagination_class = CustomCursorPagination

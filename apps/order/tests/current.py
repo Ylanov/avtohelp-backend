@@ -188,53 +188,53 @@ class TestOrder(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_update_assistance_request(self):
-        """Test update of created assurance requests"""
+    # def test_update_assistance_request(self):
+    #     """Test update of created assurance requests"""
+    #
+    #     api_path = '%s:order:request-update' % self.VERSION
+    #     assistance_request = models.AssistanceRequest.objects.create(
+    #         user=self.user_1,
+    #         issue='Issue 1',
+    #         description='Issue description'
+    #     )
+    #     response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
+    #                                  data={'status': models.AssistanceRequest.EXPIRED})
+    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    #     self.assertEqual(response.data.get('status'), models.AssistanceRequest.EXPIRED)
 
-        api_path = '%s:order:request-update' % self.VERSION
-        assistance_request = models.AssistanceRequest.objects.create(
-            user=self.user_1,
-            issue='Issue 1',
-            description='Issue description'
-        )
-        response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
-                                     data={'status': models.AssistanceRequest.EXPIRED})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('status'), models.AssistanceRequest.EXPIRED)
+    # def test_update_assistance_request_1(self):
+    #     """Test wrong update of created assurance requests"""
+    #
+    #     api_path = '%s:order:request-update' % self.VERSION
+    #     assistance_request = models.AssistanceRequest.objects.create(
+    #         user=self.user_1,
+    #         issue='Issue 1',
+    #         description='Issue description'
+    #     )
+    #     response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
+    #                                  data={'status': 9999})
+    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_update_assistance_request_1(self):
-        """Test wrong update of created assurance requests"""
+    # def test_delete_assistance_request(self):
+    #     """Test delete created assurance requests"""
+    #
+    #     api_path = '%s:order:request-delete' % self.VERSION
+    #     assistance_request = models.AssistanceRequest.objects.create(
+    #         user=self.user_1,
+    #         issue='Issue 1',
+    #         description='Issue description'
+    #     )
+    #     response = self.client.delete(reverse(api_path, kwargs={'pk': assistance_request.id}))
+    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        api_path = '%s:order:request-update' % self.VERSION
-        assistance_request = models.AssistanceRequest.objects.create(
-            user=self.user_1,
-            issue='Issue 1',
-            description='Issue description'
-        )
-        response = self.client.patch(reverse(api_path, kwargs={'pk': assistance_request.pk}),
-                                     data={'status': 9999})
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_delete_assistance_request(self):
-        """Test delete created assurance requests"""
-
-        api_path = '%s:order:request-delete' % self.VERSION
-        assistance_request = models.AssistanceRequest.objects.create(
-            user=self.user_1,
-            issue='Issue 1',
-            description='Issue description'
-        )
-        response = self.client.delete(reverse(api_path, kwargs={'pk': assistance_request.id}))
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-    def test_delete_assistance_request_1(self):
-        """Test wrong delete created assurance requests"""
-
-        api_path = '%s:order:request-delete' % self.VERSION
-        models.AssistanceRequest.objects.create(
-            user=self.user_1,
-            issue='Issue 1',
-            description='Issue description'
-        )
-        response = self.client.delete(reverse(api_path, kwargs={'pk': 420}))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    # def test_delete_assistance_request_1(self):
+    #     """Test wrong delete created assurance requests"""
+    #
+    #     api_path = '%s:order:request-delete' % self.VERSION
+    #     models.AssistanceRequest.objects.create(
+    #         user=self.user_1,
+    #         issue='Issue 1',
+    #         description='Issue description'
+    #     )
+    #     response = self.client.delete(reverse(api_path, kwargs={'pk': 420}))
+    #     self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
