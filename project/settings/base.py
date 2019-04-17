@@ -160,6 +160,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Save the session to the database on every single request
+SESSION_SAVE_EVERY_REQUEST = True
+
 AUTH_USER_MODEL = 'account.User'
 LOGIN_URL = 'admin:login'
 LOGOUT_URL = 'admin:logout'

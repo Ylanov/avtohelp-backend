@@ -10,13 +10,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """Connect to WebSocket"""
         # Check if connected user isn't anonymous
         # Are they logged in?
-        #if self.scope["user"].is_anonymous:
-        #    # Reject the connection
-        #    await self.close()
-        #else:
-        #    # Accept the connection
-        #    await self.accept()
-        await self.accept()
+        if self.scope["user"].is_anonymous:
+            # Reject the connection
+            await self.close()
+        else:
+            # Accept the connection
+            await self.accept()
         # Store which rooms the user has joined on this connection
         self.rooms = set()
 
