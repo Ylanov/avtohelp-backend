@@ -17,7 +17,7 @@ x-servers:
     description: Development server
 paths:
   # Chat app
-  /api/chat/rooms/:
+  /api/chat/rooms:
     get:
       tags:
         - Chat
@@ -65,6 +65,8 @@ paths:
                               type: string
                               description: Название комнаты
                               example: Room 1
+                            last_message:
+                              $ref: '#/definitions/Models/LastMessageModel'
         401:
           description: Ошибка авторизации
           schema:
@@ -495,7 +497,6 @@ definitions:
                           "last_name": Иванов,
                           "avatar": http://0.0.0.0:8000/media/image/profile/08-04-2019/473807.jpeg
                         }]
-
     SenderModel:
       type: object
       description: Sender model in chat history messages
@@ -531,6 +532,17 @@ definitions:
               description: Флаг прочитанности сообщения
               example: True
               default: False
+    LastMessageModel:
+      type: object
+      description: Модель объекта сообщения
+      allOf:
+        - $ref: '#/definitions/Mixins/IDCreatedMixin'
+        - type: object
+          properties:
+            message:
+              type: string
+              description: Текст сообщения
+              example: Привет
 
   Mixins:
     PhoneEmailMixin:
