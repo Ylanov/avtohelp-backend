@@ -19,6 +19,9 @@ urlpatterns = [
     path('profile/detail', views.MyProfileDetailView.as_view(),
          name='my-profile-detail'),
 
+    path('profile/change_avatar', views.ProfileChangeAvatarView.as_view(),
+         name='change-profile-avatar'),
+
     # Profile car
     path('profile/cars', views.ProfileCarListView.as_view(),
          name='profile-car-list'),

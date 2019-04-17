@@ -1,17 +1,12 @@
 import logging
 
-from celery.schedules import crontab
-from celery.task import periodic_task
+from celery import shared_task
 from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from fcm_django.models import FCMDevice
 
-from authorization import models as auth_models
-from celery import shared_task
-from chat import models as chat_models
-from order import models as order_models
 from account import models as account_models
+from authorization import models as auth_models
 from base import models as base_models
 
 logger = logging.getLogger('CELERY')
@@ -75,18 +70,18 @@ def change_smscode_status(sms_code_id, status):
     smscode.save()
 
 
-@periodic_task(run_every=crontab(minute=settings.REQUEST_RELEVANCE))
-def check_request_relevance():
-    """Check relevance of assistance requests"""
-    timedelta = timezone.now() + timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
-    available_requests = order_models.AssistanceRequest.objects.by_status(
-        status=order_models.AssistanceRequest.AVAILABLE)
-    if available_requests.exists():
-        for request in available_requests:
-            expired_date = request.created + timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
-            if expired_date >= timedelta:
-                request.status = order_models.AssistanceRequest.EXPIRED
-                request.save()
+# Conflict with daphne
+# @periodic_task(run_every=crontab(minute=settings.REQUEST_RELEVANCE))
+# def check_request_relevance():
+#     """Check relevance of assistance requests"""
+#     available_requests = order_models.AssistanceRequest.objects.exclude(
+#         status=order_models.AssistanceRequest.EXPIRED)
+#     if available_requests.exists():
+#         for request in available_requests:
+#             expired_date = request.created + timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
+#             if timezone.now() >= expired_date:
+#                 request.status = order_models.AssistanceRequest.EXPIRED
+#                 request.save()
 
 
 @shared_task
@@ -146,36 +141,37 @@ def notify_users():
             logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
 
 
-@periodic_task(run_every=crontab(minute=settings.MESSAGES_UPDATE_PERIOD))
-def notify_unread_messages(title, body):
-    """Notify users about unread messages"""
-    rooms = chat_models.ChatRoom.objects.all()
-    for room in rooms:
-        notify = list()
-        for participant in room.participants.all():
-            message_count = room.chatmessage_set.exclude(sender=participant).count()
-            read_messages = chat_models.ChatReadMessage.objects.filter(user=participant).count()
-            if (message_count - read_messages) > settings.LIMIT_UNREAD_MESSAGES:
-                notify.append(participant)
-            # for message in room.chatmessage_set.all():
-            #     qs = chat_models.ChatReadMessage.objects.filter(message=message, user=participant)
-            #     if not qs.exists():
-            #         notify.append(participant)
-        if notify:
-            for user in notify:
-                notification = base_models.PushNotification.objects.create(
-                    user=user,
-                    title=_('Unread messages'),
-                    description=_('You have unread messages')
-                )
-                devices = FCMDevice.objects.filter(user=user)
-                if devices.exists():
-                    count = devices.send_message(**notification.get_push_dict())
-                    if count.get('success') > 0:
-                        notification.status = True
-                        notification.save()
-                        logger.info(f'Users notified: {count.get("success")}')
-                    else:
-                        logger.info(
-                            f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
-        notify.clear()
+# Conflict with daphne
+# @periodic_task(run_every=crontab(minute=settings.MESSAGES_UPDATE_PERIOD))
+# def notify_unread_messages(title, body):
+#     """Notify users about unread messages"""
+#     rooms = chat_models.ChatRoom.objects.all()
+#     for room in rooms:
+#         notify = list()
+#         for participant in room.participants.all():
+#             message_count = room.chatmessage_set.exclude(sender=participant).count()
+#             read_messages = chat_models.ChatReadMessage.objects.filter(user=participant).count()
+#             if (message_count - read_messages) > settings.LIMIT_UNREAD_MESSAGES:
+#                 notify.append(participant)
+#             # for message in room.chatmessage_set.all():
+#             #     qs = chat_models.ChatReadMessage.objects.filter(message=message, user=participant)
+#             #     if not qs.exists():
+#             #         notify.append(participant)
+#         if notify:
+#             for user in notify:
+#                 notification = base_models.PushNotification.objects.create(
+#                     user=user,
+#                     title=_('Unread messages'),
+#                     description=_('You have unread messages')
+#                 )
+#                 devices = FCMDevice.objects.filter(user=user)
+#                 if devices.exists():
+#                     count = devices.send_message(**notification.get_push_dict())
+#                     if count.get('success') > 0:
+#                         notification.status = True
+#                         notification.save()
+#                         logger.info(f'Users notified: {count.get("success")}')
+#                     else:
+#                         logger.info(
+#                             f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
+#         notify.clear()

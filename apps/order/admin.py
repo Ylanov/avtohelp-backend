@@ -7,11 +7,11 @@ from .models import AssistanceRequest
 class AssistanceRequestModelAdmin(admin.ModelAdmin):
     """Custom admin page for AssistanceRequest"""
 
-    readonly_fields = ('id', 'created', 'modified')
+    readonly_fields = ('id', 'created', 'modified', 'status')
     list_display = ('id', 'user', 'created', 'modified')
     fieldsets = (
         (_('User\'s data'), {'fields': ('user',)}),
-        (_('Assistance request'), {'fields': ('issue', 'description')}),
+        (_('Assistance request'), {'fields': ('issue', 'description', 'status')}),
         (_('Location'), {'fields': ('location',)}),
         (_('Info'), {'fields': ('created', 'modified')}),
     )

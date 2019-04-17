@@ -105,6 +105,34 @@ class MyProfileDetailView(generics.RetrieveUpdateAPIView):
         return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
 
 
+class ProfileChangeAvatarView(generics.UpdateAPIView):
+    """
+    View for retrieving or update user profile.
+    Allowed HTTP-requests: (GET, PATCH, PUT)
+
+    Request (PATCH - partial):
+    {
+        "avatar": ImageField,
+    }
+    Response (PATCH): {"avatar": "url"}
+
+    Request (PUT - partial):
+    {
+        "avatar": ImageField,
+    }
+    Response (PUT): {"avatar": "url"}
+
+    :return: return object
+    """
+
+    serializer_class = serializers.ProfileChangeAvatar
+    queryset = models.Profile.objects.all()
+
+    def get_object(self):
+        """Override get object method"""
+        return get_object_or_404(self.get_queryset(), pk=self.request.user.profile.pk)
+
+
 class ProfileDetailView(generics.RetrieveAPIView):
     """
     View for retrieving user profile.
