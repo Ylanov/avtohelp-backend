@@ -50,7 +50,7 @@ class LastChatMessageSerializer(serializers.ModelSerializer):
     class Meta:
         """Meta class"""
         model = models.ChatMessage
-        fields = ('id', 'message')
+        fields = ('id', 'created', 'message')
 
 
 class ChatRoomListSerializer(serializers.ModelSerializer):
