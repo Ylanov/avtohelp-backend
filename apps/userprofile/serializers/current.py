@@ -117,11 +117,11 @@ class MyProfileSerializer(serializers.ModelSerializer):
     phone = PhoneNumberField(source='user.phone', read_only=True)
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
     profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
-    avatar = serializers.ImageField(source='image', read_only=True)
 
     # REQUEST
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
                                               write_only=True)
+    avatar = serializers.ImageField(source='image')
 
     class Meta:
         """Meta class"""
