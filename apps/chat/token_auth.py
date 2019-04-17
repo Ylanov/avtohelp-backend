@@ -15,15 +15,15 @@ class TokenAuthMiddleware:
         self.inner = inner
 
     def __call__(self, scope):
-        headers = dict(scope['headers'])
+        #  Decode binary strings and pack to dictionary
+        headers = {i[0].decode(): i[1].decode() for i in scope['headers']}
         try:
-            if b'authorization' in headers:
-                token_name, token_key = headers[b'authorization'].decode().split()
+            if 'authorization' in headers:
+                token_name, token_key = headers['authorization'].split()
                 token = Token.objects.get(key=token_key)
                 scope['user'] = token.user
             else:
-                cookie = {i.split('=')[0].strip(): i.split('=')[1].strip()
-                          for i in headers.get(b'cookie').decode().split(';')}
+                cookie = {i.split('=')[0].lstrip(): i.split('=')[1] for i in headers.get('cookie').split(';')}
                 session = Session.objects.get(session_key=cookie.get('sessionid'))
                 session_data = session.get_decoded()
                 scope['user'] = User.objects.get(id=session_data.get('_auth_user_id'))
