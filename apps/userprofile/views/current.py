@@ -30,15 +30,15 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
 
     def get_object_or_none(self):
-        """Object as resylt and the view is displaying or None."""
+        """Object as result and the view is displaying or None."""
         queryset = self.get_queryset()  # get the base queryset
         queryset = self.filter_queryset(queryset)  # apply any filter backends
         # generate filter
-        filter = {f: self.request.data.get(f) for f in self.lookup_fields
-                  if self.request.data.get(f)}
+        filter_params = {f: self.request.data.get(f) for f in self.lookup_fields
+                         if self.request.data.get(f)}
 
         # get object and check permissions or return None
-        obj = queryset.filter(**filter).first()
+        obj = queryset.filter(**filter_params).first()
         obj and self.check_object_permissions(self.request, obj)
         return obj
 
