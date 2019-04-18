@@ -424,14 +424,14 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
         attrs['owner'] = self.context.get('request').user
         attrs['foe'] = attrs.pop('profile').user
 
-        if attrs['owner'].id == attrs['foe'].id:
+        if attrs['owner'] == attrs['foe']:
             raise api_exceptions.EqualIDError()
         # Check existed request
         in_pending = models.BlackList.objects.are_foes(owner=attrs['owner'],
                                                        user=attrs['foe'])
         if in_pending:
-            raise api_exceptions.AlreadyBlacked(owner=attrs['owner'].id,
-                                                user=attrs['foe'].id)
+            raise api_exceptions.AlreadyBlacked(owner=attrs['owner'],
+                                                user=attrs['foe'])
         return attrs
 
     def create(self, validated_data):

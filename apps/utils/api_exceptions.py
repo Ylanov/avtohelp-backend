@@ -124,7 +124,7 @@ class AlreadyFriends(ValidationErrorMixin):
 
 class AlreadyBlacked(ValidationErrorMixin):
     """User is already in Blacklist"""
-    default_detail = _('User with ID %s is already in Blacklist User ID %s')
+    default_detail = _('User %s is already in User %s blacklist')
     extended_status_code = '%s.6' % ValidationErrorMixin.status_code
 
     def __init__(self, owner, user):
