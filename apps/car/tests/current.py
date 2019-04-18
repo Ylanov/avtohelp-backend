@@ -167,7 +167,7 @@ class TestCatalog(APITestCase):
         api_path = '%s:car:car-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), self.cars_count)
+        self.assertEqual(len(response.data), self.cars_count)
 
     def test_list_cars_w_filters(self):
         """Test view for getting list of users cars with filters"""
@@ -177,19 +177,19 @@ class TestCatalog(APITestCase):
         api_path = '%s:car:car-list' % self.VERSION
         response = self.client.get(reverse(api_path), data={'mark_name': self.toyota.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), Car.objects.filter(mark__name=self.toyota.name).count())
+        self.assertEqual(len(response.data), Car.objects.filter(mark__name=self.toyota.name).count())
 
         response = self.client.get(reverse(api_path), data={'model_name': self.toyota_model.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), Car.objects.filter(car_model__name=self.toyota_model.name).count())
+        self.assertEqual(len(response.data), Car.objects.filter(car_model__name=self.toyota_model.name).count())
 
         response = self.client.get(reverse(api_path), data={'mark_id': self.toyota.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), Car.objects.filter(mark__id=self.toyota.id).count())
+        self.assertEqual(len(response.data), Car.objects.filter(mark__id=self.toyota.id).count())
 
         response = self.client.get(reverse(api_path), data={'model_id': self.toyota_model.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), Car.objects.filter(car_model__id=self.toyota_model.id).count())
+        self.assertEqual(len(response.data), Car.objects.filter(car_model__id=self.toyota_model.id).count())
 
     def test_car_detail(self):
         """Test view for getting detail of user car"""
