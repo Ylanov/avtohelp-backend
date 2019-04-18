@@ -28,6 +28,7 @@ class TokenAuthMiddleware:
                 token = Token.objects.get(key=token_key)
                 scope['user'] = token.user
             else:
+                # todo: remove from production!
                 cookie = {i.split('=')[0].lstrip(): i.split('=')[1] for i in headers.get('cookie').split(';')}
                 session = Session.objects.get(session_key=cookie.get('sessionid'))
                 session_data = session.get_decoded()

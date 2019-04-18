@@ -4,10 +4,12 @@ from celery import shared_task
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from fcm_django.models import FCMDevice
+from django.utils.timezone import timedelta
 
 from account import models as account_models
 from authorization import models as auth_models
 from base import models as base_models
+from online_users.models import OnlineUserActivity
 
 logger = logging.getLogger('CELERY')
 
@@ -105,21 +107,24 @@ def notify_friend_request(invited_id):
 def notify_chat_participants(sender_id, participants):
     """Notify user about new friend request"""
     sender = account_models.User.objects.get(id=sender_id)
+    activity = OnlineUserActivity.get_user_activities(time_delta=timedelta(minutes=1)).values('user_id')
     for user in participants:
-        notification = base_models.PushNotification.objects.create(
-            user_id=user.get('id'),
-            title=_('New message from chat'),
-            description=_(f'User {sender.get_full_name()} wrote a message')
-        )
-        devices = FCMDevice.objects.filter(user_id=user.get('id'))
-        if devices.exists():
-            count = devices.send_message(**notification.get_push_dict())
-            if count.get('success') > 0:
-                notification.status = True
-                notification.save()
-                logger.info(f'Users notified: {count.get("success")}')
-            else:
-                logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
+        # Check if user is online
+        if not user.get('id') in [i.get('user_id') for i in list(activity)]:
+            notification = base_models.PushNotification.objects.create(
+                user_id=user.get('id'),
+                title=_('New message from chat'),
+                description=_(f'User {sender.get_full_name()} wrote a message')
+            )
+            devices = FCMDevice.objects.filter(user_id=user.get('id'))
+            if devices.exists():
+                count = devices.send_message(**notification.get_push_dict())[0]
+                if count.get('success') > 0:
+                    notification.status = True
+                    notification.save()
+                    logger.info(f'Users notified: {count.get("success")}')
+                else:
+                    logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
 
 
 @shared_task
