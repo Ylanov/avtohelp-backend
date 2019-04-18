@@ -16,7 +16,10 @@ class TokenAuthMiddleware:
 
     def __call__(self, scope):
         #  Decode binary strings and pack to dictionary
-        headers = {i[0].decode(): i[1].decode() for i in scope['headers']}
+        headers = dict()
+        for i in scope['headers']:
+            headers[i[0] if not hasattr(i[0], 'decode') else i[0].decode()] = i[1] if not hasattr(i[1], 'decode') else i[1].decode()
+
         try:
             if 'authorization' in headers:
                 token_name, token_key = headers['authorization'].split()
