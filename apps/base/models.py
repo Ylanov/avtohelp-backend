@@ -63,6 +63,7 @@ class PushNotification(BaseMixin):
         """Make dict object, for push notification."""
         result = dict()
         result.update({
+            'datetime': str(self.created.strftime('%Y-%m-%dT%H:%M:%S.%fZ')),
             'title': str(self.title),
             'body': str(self.description),
         })
