@@ -49,14 +49,14 @@ class TestOrder(APITestCase):
         self.user_3 = account_models.User.objects.make(phone='+79000000003')
 
         # Create assistance requests
-        self.assistance_request = models.AssistanceRequest.objects.create(user=self.user_1,
-                                                                          issue='Issue 1',
-                                                                          description='Description',
-                                                                          location=Point(45.061016, 38.944007, srid=4326))
-        models.AssistanceRequest.objects.create(user=self.user_2,
-                                                issue='Issue 2',
+        models.AssistanceRequest.objects.create(user=self.user_1,
+                                                issue='Issue 1',
                                                 description='Description',
-                                                location=Point(55.062003, 28.940738, srid=4326))
+                                                location=Point(45.061016, 38.944007, srid=4326))
+        self.assistance_request = models.AssistanceRequest.objects.create(user=self.user_2,
+                                                                          issue='Issue 2',
+                                                                          description='Description',
+                                                                          location=Point(55.062003, 28.940738, srid=4326))
         models.AssistanceRequest.objects.create(user=self.user_3,
                                                 issue='Issue 3',
                                                 description='Description',
@@ -123,7 +123,7 @@ class TestOrder(APITestCase):
     def test_service_list_query_1(self):
         """Test service list query - filter by distance"""
         query = {
-            'coordinates': ['45.061016, 38.944007'],  # latitude, longitude
+            'coordinates': ['55.062003, 28.940738'],  # latitude, longitude
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
@@ -143,12 +143,13 @@ class TestOrder(APITestCase):
     def test_service_list_query_3(self):
         """Test service list query - filter by distance"""
         query = {
-            'coordinates': ['45.061016, 38.944007, 0'],  # latitude, longitude
+            'coordinates': ['55.062003, 28.940738, 100000000'],  # latitude, longitude
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0].get('distance'), 0.0)  # output in meters
+        self.assertEqual(response.data[1].get('distance'), 1504877.55296152)  # output in meters
 
     def test_count_created_assistance_requests(self):
         """
