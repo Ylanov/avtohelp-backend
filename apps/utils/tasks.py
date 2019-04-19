@@ -4,12 +4,10 @@ from celery import shared_task
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from fcm_django.models import FCMDevice
-from django.utils.timezone import timedelta
 
 from account import models as account_models
 from authorization import models as auth_models
 from base import models as base_models
-from online_users.models import OnlineUserActivity
 
 logger = logging.getLogger('CELERY')
 
@@ -116,7 +114,7 @@ def notify_chat_participants(sender_id, participants):
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
         if devices.exists():
-            count = devices.send_message(**notification.get_push_dict())[0]
+            count = devices.send_message(**notification.get_push_dict())
             if count.get('success') > 0:
                 notification.status = True
                 notification.save()
