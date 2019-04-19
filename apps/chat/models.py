@@ -63,7 +63,7 @@ class ChatMessageManager(models.Manager):
         """Create chat message"""
         obj = self.model(sender=sender, room_id=room_id, message=message)
         obj.save()
-        obj.send_push_notifications()
+        # obj.send_push_notifications()
         return obj
 
 
