@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from chat import models
 from utils import methods as utils_methods
 from utils.api_exceptions import ClientError
+from django.conf import settings
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -62,8 +63,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # The logged-in user is in our scope thanks to the authentication
         # ASGI middleware
         room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+        # Store that we're in the room
+        self.rooms.add(room_id)
+        # Store logged users in cache
+        caches['default'].set(room.group_name, self.scope["user"].profile.id, timeout=None)
+        # Add them to the group so they get room messages
+        await self.channel_layer.group_add(
+            room.group_name,
+            self.channel_name,
+        )
         # Send a join message if it's turned on
-        if models.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
+        if settings.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
             await self.channel_layer.group_send(
                 room.group_name,
                 {
@@ -72,17 +82,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "profile_id": self.scope["user"].profile.id,
                 }
             )
-        # Store that we're in the room
-        self.rooms.add(room_id)
-        # Add them to the group so they get room messages
-        await self.channel_layer.group_add(
-            room.group_name,
-            self.channel_name,
-        )
-        # Instruct their client to finish opening the room
-        await self.send_json({
-            "join": room.id,
-        })
 
     async def leave_room(self, room_id):
         """
@@ -166,6 +165,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "msg_type": models.MSG_TYPE_ENTER,
                 "room": event["room_id"],
                 "profile_id": event["profile_id"],
+                # todo: remove from production, need for /chat/stream view
+                # Instruct their client to finish opening the room
+                "join": event["room_id"],
             },
         )
 
