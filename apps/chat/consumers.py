@@ -1,9 +1,9 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.conf import settings
 
 from chat import models
 from utils import methods as utils_methods
 from utils.api_exceptions import ClientError
-from django.conf import settings
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
@@ -63,15 +63,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # The logged-in user is in our scope thanks to the authentication
         # ASGI middleware
         room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+
         # Store that we're in the room
         self.rooms.add(room_id)
-        # # Store logged users in cache
-        # caches['default'].set(room.group_name, self.scope["user"].profile.id, timeout=None)
+
+        # Store logged users in cache
+        await utils_methods.update_logged_users(user_id=self.scope["user"].id, room_id=room_id)
+
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
             room.group_name,
             self.channel_name,
         )
+
         # Send a join message if it's turned on
         if settings.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
             await self.channel_layer.group_send(
@@ -100,13 +104,19 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "profile_id": self.scope["user"].profile.id,
                 }
             )
+
         # Remove that we're in the room
         self.rooms.discard(room_id)
+
+        # Remove from logged users
+        await utils_methods.logout_user(user_id=self.scope["user"].id, room_id=room_id)
+
         # Remove them from the group so they no longer get room messages
         await self.channel_layer.group_discard(
             room.group_name,
             self.channel_name,
         )
+
         # Instruct their client to finish closing the room
         await self.send_json({
             "leave": room.id,
@@ -120,8 +130,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if room_id not in self.rooms:
             raise ClientError("ROOM_ACCESS_DENIED")
         user = self.scope["user"]
+
         # Get the room and send to the group about it
         room = await utils_methods.by_user_and_room_id(user, room_id)
+
         # Make a record in the DB
         letter = await utils_methods.create_chat_message(room_id=room_id,
                                                          message=message,
@@ -148,6 +160,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Check they are in this room
         if room_id not in self.rooms:
             raise ClientError("ROOM_ACCESS_DENIED")
+
         # Make a record in the DB
         await utils_methods.read_message(message_list=messages, reader=self.scope["user"])
 

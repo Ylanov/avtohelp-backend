@@ -279,6 +279,14 @@ LIMIT_UNREAD_MESSAGES = 3
 MESSAGES_UPDATE_PERIOD = 15
 
 
+# Cache
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+
 # Django Rest Swagger
 SWAGGER_SETTINGS = {
     'JSON_EDITOR': False,

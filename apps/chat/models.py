@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin, ImageMixin
+from django.core.cache import caches
 
 from utils import tasks
 
@@ -61,7 +62,7 @@ class ChatMessageManager(models.Manager):
         """Create chat message"""
         obj = self.model(sender=sender, room_id=room_id, message=message)
         obj.save()
-        # obj.send_push_notifications()
+        obj.send_push_notification_offline_users()
         return obj
 
 
@@ -79,16 +80,19 @@ class ChatMessage(BaseMixin):
         """Meta class"""
         ordering = ('created',)
 
-    def send_push_notifications(self):
-        """Sent push notification to all users in chat room exclude sender"""
+    def send_push_notification_offline_users(self):
+        """Sent push notification to offline users in chat room exclude sender"""
+        participants = {i.get('id') for i in self.room.participants.all().values('id')}
+        offline_users = participants.difference(caches['default'].get(f'room_{self.room.id}').union({self.sender.id}))
+
         if settings.USE_CELERY:
             tasks.notify_chat_participants.delay(
                 sender_id=self.sender.id,
-                participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
+                participants=offline_users)
         else:
             tasks.notify_chat_participants(
-                sender_id=self.sender_id,
-                participants=self.room.participants.all().exclude(id=self.sender.id).values('id'))
+                sender_id=self.sender.id,
+                participants=offline_users)
 
 
 class ChatRoomManager(models.Manager):
