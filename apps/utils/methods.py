@@ -65,14 +65,14 @@ def read_message(message_list, reader):
 
 
 @database_sync_to_async
-def update_logged_users(user_id, room_id):
+def chat_update_logged_users(user_id, room_id):
     """Store logged users in cache"""
     logged_users = caches['default'].get_or_set(f'room_{room_id}', set(), timeout=None)
     logged_users.add(user_id)
     caches['default'].set(f'room_{room_id}', logged_users)
 
 @database_sync_to_async
-def logout_user(user_id, room_id):
+def chat_logout_user(user_id, room_id):
     """Logout logged user, """
     logged_users = caches['default'].get_or_set(f'room_{room_id}', set(), timeout=None)
     logged_users.remove(user_id)

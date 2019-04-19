@@ -51,7 +51,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         for room_id in list(self.rooms):
             try:
                 await self.leave_room(room_id)
-            except ClientError:
+                await utils_methods.chat_logout_user(user_id=self.scope["user"].id, room_id=room_id)
+            except:
                 pass
 
     ##### Command helper methods called by receive_json
@@ -68,7 +69,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.rooms.add(room_id)
 
         # Store logged users in cache
-        await utils_methods.update_logged_users(user_id=self.scope["user"].id, room_id=room_id)
+        await utils_methods.chat_update_logged_users(user_id=self.scope["user"].id, room_id=room_id)
 
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
@@ -108,8 +109,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Remove that we're in the room
         self.rooms.discard(room_id)
 
-        # Remove from logged users
-        await utils_methods.logout_user(user_id=self.scope["user"].id, room_id=room_id)
+        try:
+            # Remove from logged users
+            await utils_methods.chat_logout_user(user_id=self.scope["user"].id, room_id=room_id)
+        except:
+            pass
 
         # Remove them from the group so they no longer get room messages
         await self.channel_layer.group_discard(
