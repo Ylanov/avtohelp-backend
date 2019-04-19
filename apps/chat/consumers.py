@@ -65,8 +65,8 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
         # Store that we're in the room
         self.rooms.add(room_id)
-        # Store logged users in cache
-        caches['default'].set(room.group_name, self.scope["user"].profile.id, timeout=None)
+        # # Store logged users in cache
+        # caches['default'].set(room.group_name, self.scope["user"].profile.id, timeout=None)
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
             room.group_name,
@@ -91,7 +91,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # ASGI middleware
         room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
         # Send a leave message if it's turned on
-        if models.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
+        if settings.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
             await self.channel_layer.group_send(
                 room.group_name,
                 {

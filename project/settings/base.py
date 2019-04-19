@@ -259,6 +259,10 @@ SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 USE_SMS = False  # Actual sms sending switcher
 
 
+# CHAT
+NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
+
+
 # ASSISTANCE REQUESTS
 REQUEST_RELEVANCE = 30  # minutes
 DEFAULT_REQUEST_RADIUS = 1000  # in meters
