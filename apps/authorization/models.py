@@ -27,6 +27,11 @@ class SMSCodeManager(models.Manager):
         if status:
             obj.status = status
         obj.save()
+
+        if settings.USE_CELERY:
+            send_verification_sms.delay(sms_code_id=obj.id)
+        else:
+            send_verification_sms(sms_code_id=obj.id)
         return obj
 
     def decline_all_others(self, obj):

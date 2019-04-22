@@ -1,6 +1,8 @@
 from django.contrib.gis.geos.point import Point
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
+from django.conf import settings
+from utils import tasks
 
 from order import models
 from userprofile.serializers import current as profile_serializers
@@ -93,6 +95,10 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
     def get_distance(self, obj):
         """Get distance in meters"""
         return obj.distance.m if hasattr(obj, 'distance') else None
+
+    def create(self, validated_data):
+        """Override create method"""
+        return models.AssistanceRequest.objects.make(**validated_data)
 
 
 class AssistanceRequestUpdateSerializer(serializers.ModelSerializer):

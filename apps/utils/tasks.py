@@ -126,7 +126,7 @@ def notify_chat_participants(sender_id, participants):
 
 
 @shared_task
-def notify_users():
+def notify_assistance_request():
     """Notify users about assistance request"""
     devices = FCMDevice.objects.all()
     for device in devices:

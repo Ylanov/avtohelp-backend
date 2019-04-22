@@ -6,6 +6,8 @@ from utils.mixins import BaseMixin, ImageMixin
 from django.contrib.gis.db.models.functions import Distance
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.gis.geos import Point
+from django.conf import settings
+from utils import tasks
 
 
 class AssistanceRequestQuerySet(models.QuerySet):
@@ -51,6 +53,17 @@ class AssistanceRequestQuerySet(models.QuerySet):
         return self
 
 
+class AssistanceRequestManager(models.Manager):
+    """Manager for AssistanceRequest model"""
+
+    def make(self, **kwargs):
+        """Make new assistance request"""
+        obj = self.model(**kwargs)
+        obj.save()
+        obj.send_push_notification()
+        return obj
+
+
 class AssistanceRequest(BaseMixin, ImageMixin):
     """Assistance request model"""
 
@@ -81,10 +94,17 @@ class AssistanceRequest(BaseMixin, ImageMixin):
                                     verbose_name=_('Text address'),
                                     blank=True, null=True, default=None)
 
-    objects = AssistanceRequestQuerySet.as_manager()
+    objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
 
     class Meta:
         """Meta class"""
 
         verbose_name = _('Assistance request')
         verbose_name_plural = _('Assistance requests')
+
+    def send_push_notification(self):
+        """Notify all users about new assistance request"""
+        if settings.USE_CELERY:
+            tasks.notify_assistance_request.delay()
+        else:
+            tasks.notify_assistance_request()

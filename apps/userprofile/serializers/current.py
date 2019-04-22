@@ -150,7 +150,7 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
     color = serializers.PrimaryKeyRelatedField(queryset=car_models.CarColor.objects.all(),
                                                write_only=True)
     car = serializers.PrimaryKeyRelatedField(queryset=car_models.Car.objects.all())
-    license_plate = serializers.CharField()
+    license_plate = serializers.CharField(allow_blank=True)
 
     # RESPONSE
     color_name = serializers.CharField(source='color.name', read_only=True)
