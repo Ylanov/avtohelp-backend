@@ -275,16 +275,23 @@ FCM_DJANGO_SETTINGS = {
         "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"
     ),
 }
+
+
+# Message PUSH-notifications
 LIMIT_UNREAD_MESSAGES = 3
 MESSAGES_UPDATE_PERIOD = 15
 
 
 # Cache
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#     }
+# }
+
+
+# Save the session to the database on every single request
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # Django Rest Swagger

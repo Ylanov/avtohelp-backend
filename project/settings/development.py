@@ -5,6 +5,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://base:6379/13",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
+
 # Logging
 LOGGING = {
     'version': 1,
