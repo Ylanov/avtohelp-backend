@@ -78,7 +78,7 @@ class ChatMessage(BaseMixin):
 
     class Meta:
         """Meta class"""
-        ordering = ('created',)
+        ordering = ('-created',)
 
     def send_push_notification_offline_users(self):
         """Sent push notification to offline users in chat room exclude sender"""

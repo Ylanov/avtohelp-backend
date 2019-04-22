@@ -9,27 +9,16 @@ from chat.serializers import current as serializers
 from utils.paginations import CustomCursorPagination
 
 
-# class ChatMessageListView(generics.ListAPIView):
-#     """MessageList view"""
-#     serializer_class = serializers.ChatMessageListSerializer
-#     permission_classes = (permissions.ChatMessagePermission,)
-#     filter_class = filters.ChatMessageFilterSet
-#     pagination_class = CustomCursorPagination
-#
-#     def get_queryset(self):
-#         """Override get_queryset method"""
-#         return models.ChatMessage.objects.filter(room=self.kwargs.get('pk')).annotate_read_status(user=self.request.user)
-
-
-class ChatMessageListView(generics.GenericAPIView):
+class ChatMessageListView(generics.ListAPIView):
     """MessageList view"""
     serializer_class = serializers.ChatMessageListSerializer
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
     pagination_class = CustomCursorPagination
 
-    def get(self):
-        pass
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk')).annotate_read_status(user=self.request.user)
 
 
 class ChatMessageCountView(views.APIView):
