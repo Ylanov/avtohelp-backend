@@ -71,9 +71,11 @@ def chat_update_logged_users(user_id, room_id):
     logged_users.add(user_id)
     caches['default'].set(f'room_{room_id}', logged_users)
 
+
 @database_sync_to_async
 def chat_logout_user(user_id, room_id):
     """Logout logged user, """
-    logged_users = caches['default'].get_or_set(f'room_{room_id}', set(), timeout=None)
-    logged_users.remove(user_id)
-    caches['default'].set(f'room_{room_id}', logged_users)
+    logged_users = caches['default'].get(f'room_{room_id}')
+    if user_id in logged_users:
+        logged_users.remove(user_id)
+        caches['default'].set(f'room_{room_id}', logged_users)
