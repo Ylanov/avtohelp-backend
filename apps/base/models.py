@@ -63,10 +63,12 @@ class PushNotification(BaseMixin):
         """Make dict object, for push notification."""
         result = dict()
         result.update({
-            'title': 'Автопомощь на дорогах',
+            'title': 'Автопомощь на дороге',
+            'body': str(self.description),
             'data': {
                 'title': str(self.title),
                 'body': str(self.description),
-            }
+            },
+            'icon': 'statusbar_icn',
         })
         return result

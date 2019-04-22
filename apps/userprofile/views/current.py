@@ -375,7 +375,7 @@ class OutFriendRequestDeleteView(generics.DestroyAPIView):
 
     def get_queryset(self):
         """Override get queryset method"""
-        return models.FriendRequest.objects.from_me(owner=self.request.user)
+        return models.FriendRequest.objects.common_by_user(user=self.request.user)
 
 
 class InFriendRequestDeleteView(generics.DestroyAPIView):
@@ -384,7 +384,7 @@ class InFriendRequestDeleteView(generics.DestroyAPIView):
     """
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.to_me(invited=self.request.user).not_approved()
+        return models.FriendRequest.objects.common_by_user(user=self.request.user).not_approved()
 
 
 # Blacklist

@@ -95,7 +95,7 @@ def notify_friend_request(invited_id):
     devices = FCMDevice.objects.filter(user_id=invited_id)
     if devices.exists():
         count = devices.send_message(**notification.get_push_dict())
-        if count > 0:
+        if count.get('success') > 0:
             logger.info(f'Users notified: {count.get("success")}')
         else:
             logger.info(f'Error was occurred when sending PUSH-notifications')

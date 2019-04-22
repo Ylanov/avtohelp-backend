@@ -214,6 +214,10 @@ class FriendRequestQuerySet(models.QuerySet):
         """Return queryset with existed friend request"""
         return self.filter(owner=owner, invited=invited, approved=False)
 
+    def common_by_user(self, user):
+        """My requests to add SOMEONE in my friend list"""
+        return self.filter(Q(owner=user) | Q(invited=user) & Q(approved=False))
+
     def approved(self):
         """Approved requests"""
         return self.filter(approved=True)
