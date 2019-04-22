@@ -25,3 +25,4 @@ kombu>=4.4.0
 django-phonenumber-field==2.2.0
 django-multiselectfield==0.1.8
 django-online-users==0.3
+django-colorful==1.3

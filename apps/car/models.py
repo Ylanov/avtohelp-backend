@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.gis.db import models as gis_models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.gis.db.models.functions import Distance
+from colorful.fields import RGBColorField
 
 
 class CarMark(BaseMixin, NameMixin):
@@ -31,6 +32,10 @@ class CarModel(BaseMixin, NameMixin):
 
 class CarColor(NameMixin, BaseMixin):
     """Car color model"""
+
+    hex_color = RGBColorField(blank=True,
+                              default=None,
+                              null=True)
 
     class Meta:
         """Meta class"""

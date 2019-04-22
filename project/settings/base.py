@@ -76,6 +76,7 @@ EXTERNAL_APPS = [
     'django_object_actions',
     'multiselectfield',
     'online_users',
+    'colorful'
 
 ]
 

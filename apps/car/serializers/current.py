@@ -74,7 +74,7 @@ class CarColorDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarColor
-        fields = ('id', 'created', 'name')
+        fields = ('id', 'created', 'name', 'hex_color')
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
