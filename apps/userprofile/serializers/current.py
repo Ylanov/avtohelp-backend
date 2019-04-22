@@ -149,20 +149,20 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
 
     color = serializers.PrimaryKeyRelatedField(queryset=car_models.CarColor.objects.all(),
                                                write_only=True)
-    car = serializers.PrimaryKeyRelatedField(queryset=car_models.Car.objects.all(),
-                                             write_only=True)
+    car = serializers.PrimaryKeyRelatedField(queryset=car_models.Car.objects.all())
     license_plate = serializers.CharField()
 
     # RESPONSE
     color_name = serializers.CharField(source='color.name', read_only=True)
-    profile_car = car_serializers.CarDetailSerializer(source='car', read_only=True)
+    car_detail = car_serializers.CarDetailSerializer(source='car', read_only=True)
 
     class Meta:
         """meta model"""
 
         model = models.ProfileCar
-        fields = ('id', 'created', 'modified', 'color', 'car',
-                  'color_name', 'license_plate', 'profile_car')
+        fields = ('id', 'created', 'modified', 'color',
+                  'car', 'color_name', 'license_plate',
+                  'car_detail')
 
     def create(self, validated_data):
         """Override validated data"""
@@ -175,14 +175,14 @@ class ProfileCarListSerializer(serializers.ModelSerializer):
 
     # RESPONSE
     color_name = serializers.CharField(source='color.name', read_only=True)
-    car = car_serializers.CarDetailSerializer(read_only=True)
+    car_detail = car_serializers.CarDetailSerializer(source='car', read_only=True)
 
     class Meta:
         """meta model"""
 
         model = models.ProfileCar
         fields = ('id', 'created', 'modified', 'color_name',
-                  'license_plate', 'car')
+                  'license_plate', 'car_detail')
 
 
 class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
