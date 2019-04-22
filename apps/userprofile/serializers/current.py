@@ -62,25 +62,25 @@ class ProfileCarDetailSerializer(serializers.ModelSerializer):
     """Serializer for ProfileCar"""
 
     color_name = serializers.CharField(source='color.name')
-    car = car_serializers.CarDetailSerializer()
+    car_detail = car_serializers.CarDetailSerializer(source='car')
 
     class Meta:
         """meta model"""
 
         model = models.ProfileCar
-        fields = ('id', 'created', 'modified', 'color_name', 'license_plate', 'car')
+        fields = ('id', 'created', 'modified', 'color_name', 'license_plate', 'car_detail')
 
 
 class ProfileViewSerializer(serializers.ModelSerializer):
     """Profile serializer for Requests"""
 
-    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
+    car_detail = ProfileCarDetailSerializer(source='user.profilecar_set.first')
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'first_name', 'last_name', 'profile_car')
+        fields = ('id', 'first_name', 'last_name', 'car_detail')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -89,7 +89,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     # RESPONSE
     phone = PhoneNumberField(read_only=True, source='user.phone')
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
-    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+    car_detail = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
     # ANNOTATED FIELDS
     friend = serializers.BooleanField()
     foe = serializers.BooleanField()
@@ -106,7 +106,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
-                  'phone', 'city', 'city_detail', 'profile_car', 'friend',
+                  'phone', 'city', 'city_detail', 'car_detail', 'friend',
                   'foe', 'online', 'friend_request')
 
 
@@ -116,7 +116,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
     # RESPONSE
     phone = PhoneNumberField(source='user.phone', read_only=True)
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
-    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+    car_detail = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
 
     # REQUEST
     city = serializers.PrimaryKeyRelatedField(queryset=catalog_models.City.objects.all(),
@@ -128,7 +128,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
-                  'phone', 'city', 'city_detail', 'profile_car')
+                  'phone', 'city', 'city_detail', 'car_detail')
 
 
 class ProfileChangeAvatar(serializers.ModelSerializer):
