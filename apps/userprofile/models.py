@@ -354,10 +354,9 @@ class BlackListQuerySet(models.QuerySet):
         """User in my blacklist"""
         return self.filter(owner__profile=owner, foe__profile=foe)
 
-    def by_users(self, owner, foe):
+    def by_profiles(self, owner, foe):
         """User in my blacklist"""
-        return self.filter(Q(owner__profile=owner, foe__profile=foe) |
-                           Q(owner__profile=foe, foe__profile=owner))
+        return self.filter(owner__profile=owner, foe__profile=foe)
 
     def common(self, user):
         return self.filter(models.Q(owner=user) | models.Q(foe=user))

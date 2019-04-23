@@ -399,7 +399,7 @@ class ProfileBlackListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.BlackList.objects.common(user=self.request.user)
+        return models.BlackList.objects.my_list(user=self.request.user)
 
 
 class BlackListCreateView(generics.CreateAPIView):
@@ -430,8 +430,7 @@ class BlackListDestroyView(generics.DestroyAPIView):
     """
     View for destroy blacklist request
     """
-
     def get_object(self):
         """Override get_object method"""
-        return get_object_or_404(models.BlackList.objects.by_users(
+        return get_object_or_404(models.BlackList.objects.by_profiles(
             owner=self.request.user.profile, foe=self.kwargs.get('profile_id')))
