@@ -308,3 +308,7 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+
+# Increase upload maximum file size
+DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
