@@ -69,6 +69,6 @@ class PushNotification(BaseMixin):
                 'title': str(self.title),
                 'body': str(self.description),
             },
-            'icon': 'statusbar_icn',
+            'icon': 'ic_launcher',
         })
         return result
