@@ -14,6 +14,7 @@ class CarMarkQuerySet(models.QuerySet):
     def annotate_full_search(self, *args, **kwargs):
         return self.annotate(
             search=SearchVector(
+                'name',
                 'carmodel__name',
             ),
         )
@@ -37,6 +38,7 @@ class CarModelQuerySet(models.QuerySet):
     def annotate_full_search(self, *args, **kwargs):
         return self.annotate(
             search=SearchVector(
+                'name',
                 'mark__name',
             ),
         )
@@ -69,14 +71,16 @@ class CarColor(NameMixin, BaseMixin):
     verbose_name_plural = _('Car colors')
 
 
-class CarManager(models.Manager):
-    """Custom Manager for Car"""
-    pass
-
-
 class CarQuerySet(models.QuerySet):
     """Custom Query for Car"""
-    pass
+
+    def annotate_full_search(self, *args, **kwargs):
+        return self.annotate(
+            search=SearchVector(
+                'mark__name',
+                'car_model__name',
+            ),
+        )
 
 
 class Car(BaseMixin):
@@ -86,6 +90,8 @@ class Car(BaseMixin):
                              on_delete=models.CASCADE)
     car_model = models.ForeignKey('CarModel',
                                   on_delete=models.CASCADE)
+
+    objects = CarQuerySet.as_manager()
 
     class Meta:
         """Meta class"""

@@ -8,21 +8,22 @@ from car import models
 class CarListFilterSet(django_filters.FilterSet):
     """Filters for CarList"""
 
-    mark_name = django_filters.CharFilter(field_name='mark__name')
-    model_name = django_filters.CharFilter(field_name='car_model__name')
-    model_id = django_filters.NumberFilter(field_name='car_model')
-    mark_id = django_filters.NumberFilter(field_name='mark')
+    search = django_filters.CharFilter(method='search_filter')
 
     class Meta:
         """Meta class."""
 
         model = models.Car
         fields = [
-            'mark_name',
-            'model_name',
-            'model_id',
-            'mark_id'
+            'search'
         ]
+
+    def search_filter(self, queryset, name, value):
+        """Full text search"""
+        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
+        if not qs.exists() or len(value) > 3:
+            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
+        return qs
 
 
 class CarColorFilterSet(django_filters.FilterSet):
@@ -49,15 +50,14 @@ class CarMarkListFilterSet(django_filters.FilterSet):
         model = models.CarMark
         fields = [
             'search',
-            'name',
             'model_id'
         ]
 
     def search_filter(self, queryset, name, value):
         """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value)
+        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
         if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value)
+            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
         return qs
 
 
@@ -73,15 +73,14 @@ class CarModelListFilterSet(django_filters.FilterSet):
         model = models.CarModel
         fields = [
             'search',
-            'name',
             'mark_id',
         ]
 
     def search_filter(self, queryset, name, value):
         """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value)
+        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
         if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value)
+            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
         return qs
 
 

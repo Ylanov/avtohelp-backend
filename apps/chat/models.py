@@ -115,7 +115,8 @@ class ChatRoomQuerySet(models.QuerySet):
     def friendly(self, participant):
         """Only friendly rooms"""
         return self.exclude(participants__id__in=Subquery(
-            profile_models.BlackList.objects.common(participant).values('foe_id')))
+            profile_models.BlackList.objects.my_list(participant).values('foe_id'))).exclude(participants__id__in=Subquery(
+            profile_models.BlackList.objects.in_list(participant).values('owner_id')))
 
     def friends(self, participant):
         """Filter by friend flag"""
@@ -128,7 +129,7 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def by_participant(self, participant):
         """Find room by participant"""
-        return self.filter(participants=participant).friendly(participant)
+        return self.filter(participants=participant).friendly(participant=participant)
 
     def public(self):
         """Find if room already exists"""
