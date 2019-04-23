@@ -35,7 +35,9 @@ class AssistanceRequestCountView(views.APIView):
     """
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
-        return Response({'count': models.AssistanceRequest.objects.available(user=request.user).count()})
+        return Response({
+            'count': models.AssistanceRequest.objects.available(user=request.user).exclude(user=request.user).count()
+        })
 
 
 class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):
