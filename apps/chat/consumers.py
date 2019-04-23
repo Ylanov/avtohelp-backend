@@ -129,29 +129,35 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         # Check they are in this room
         if room_id not in self.rooms:
             raise ClientError("ROOM_ACCESS_DENIED")
+
         user = self.scope["user"]
 
-        # Get the room and send to the group about it
-        room = await utils_methods.by_user_and_room_id(user, room_id)
+        # Check if user can write in connected chat room
+        condition = await utils_methods.check_friendliness(user, room_id)
 
-        # Make a record in the DB
-        letter = await utils_methods.create_chat_message(room_id=room_id,
-                                                         message=message,
-                                                         sender=user)
-        await self.channel_layer.group_send(
-            room.group_name,
-            {
-                "type": "chat.message",
-                "room_id": room_id,
-                "profile_id": user.profile.id,
-                "first_name": user.get_first_name(),
-                "last_name": user.get_last_name(),
-                "avatar": user.get_avatar(),
-                'datetime': f'{letter.created.isoformat()}',
-                "message": message,
-                "message_id": letter.id
-            }
-        )
+        if condition is True:
+            # Get the room and send to the group about it
+            room = await utils_methods.by_user_and_room_id(user, room_id)
+
+            # Make a record in the DB
+            letter = await utils_methods.create_chat_message(room_id=room_id,
+                                                             message=message,
+                                                             sender=user)
+
+            await self.channel_layer.group_send(
+                room.group_name,
+                {
+                    "type": "chat.message",
+                    "room_id": room_id,
+                    "profile_id": user.profile.id,
+                    "first_name": user.get_first_name(),
+                    "last_name": user.get_last_name(),
+                    "avatar": user.get_avatar(),
+                    'datetime': f'{letter.created.isoformat()}',
+                    "message": message,
+                    "message_id": letter.id
+                }
+            )
 
     async def read_message(self, room_id, messages):
         """

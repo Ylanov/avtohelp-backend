@@ -6,6 +6,8 @@ from django.core.cache import caches
 from django.utils import timezone
 
 from chat import models as chat_models
+from userprofile import models as profile_models
+from django.db import models
 from utils import api_exceptions
 
 
@@ -45,6 +47,15 @@ def create_chat_message(sender: object, room_id: int, message: str):
                                                message=message)
     obj.save()
     return obj
+
+
+@database_sync_to_async
+def check_friendliness(user, room_id):
+    room = chat_models.ChatRoom.objects.get(id=room_id)
+    condition = user in room.participants.all().exclude(
+        models.Q(id__in=(profile_models.BlackList.objects.common(user).values('foe_id'))) |
+        models.Q(id__in=models.Subquery(profile_models.BlackList.objects.common(user).values('owner_id'))))
+    return condition
 
 
 @database_sync_to_async
