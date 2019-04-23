@@ -132,7 +132,9 @@ class ProfileCar(BaseMixin):
     owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
     car = models.ForeignKey('car.Car', on_delete=models.PROTECT)
     color = models.ForeignKey('car.CarColor', on_delete=models.CASCADE)
-    license_plate = models.CharField(max_length=255, verbose_name=_('License plate'))
+    license_plate = models.CharField(max_length=255,
+                                     verbose_name=_('License plate'),
+                                     blank=True, null=True, default=None)
 
     class Meta:
         """Meta class"""
