@@ -89,7 +89,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     # RESPONSE
     phone = PhoneNumberField(read_only=True, source='user.phone')
     city_detail = catalog_serializers.CityDetailSerializer(source='city', read_only=True)
-    car_detail = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
+    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first', read_only=True)
     # ANNOTATED FIELDS
     friend = serializers.BooleanField()
     foe = serializers.BooleanField()
@@ -106,7 +106,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
-                  'phone', 'city', 'city_detail', 'car_detail', 'friend',
+                  'phone', 'city', 'city_detail', 'profile_car', 'friend',
                   'foe', 'online', 'friend_request')
 
 
