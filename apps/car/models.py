@@ -5,11 +5,24 @@ from django.contrib.gis.db import models as gis_models
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.gis.db.models.functions import Distance
 from colorful.fields import RGBColorField
+from django.contrib.postgres.search import SearchVector
+
+
+class CarMarkQuerySet(models.QuerySet):
+    """QuerySet for model CarMark"""
+
+    def annotate_full_search(self, *args, **kwargs):
+        return self.annotate(
+            search=SearchVector(
+                'carmodel__name',
+            ),
+        )
 
 
 class CarMark(BaseMixin, NameMixin):
     """Car brands model"""
-    pass
+
+    objects = CarMarkQuerySet.as_manager()
 
     class Meta:
         """Meta model"""
@@ -18,10 +31,22 @@ class CarMark(BaseMixin, NameMixin):
         verbose_name_plural = _('Car brands')
 
 
+class CarModelQuerySet(models.QuerySet):
+    """QuerySet for model CarModel"""
+
+    def annotate_full_search(self, *args, **kwargs):
+        return self.annotate(
+            search=SearchVector(
+                'mark__name',
+            ),
+        )
+
+
 class CarModel(BaseMixin, NameMixin):
     """Models for car models"""
 
     mark = models.ForeignKey('CarMark', on_delete=models.CASCADE)
+    objects = CarModelQuerySet.as_manager()
 
     class Meta:
         """Meta class"""

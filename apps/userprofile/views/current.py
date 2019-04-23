@@ -290,9 +290,9 @@ class FriendRequestCreateView(generics.CreateAPIView):
     """
     View for creating friend request
     REQUEST:
-    {"user_id": IntegerField}
+    {"profile": IntegerField}
     RESPONSE:
-    {}
+    object
     """
     serializer_class = serializers.FriendRequestCreateSerializer
     queryset = models.FriendRequest.objects.select_related('owner', 'owner__profile').all()

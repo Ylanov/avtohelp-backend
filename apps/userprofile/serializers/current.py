@@ -347,6 +347,9 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
 
         if models.FriendRequest.objects.from_me_to_user(attrs['owner'], attrs['invited']).exists():
             raise api_exceptions.FriendRequestAlreadyExists(attrs['owner'], attrs['invited'])
+
+        if models.BlackList.objects.are_foes(owner=attrs['owner'], user=attrs['invited']):
+            raise api_exceptions.AreFoesError(attrs['owner'], attrs['invited'])
         return attrs
 
     def create(self, validated_data):

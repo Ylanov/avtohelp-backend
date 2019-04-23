@@ -40,7 +40,7 @@ class CarColorFilterSet(django_filters.FilterSet):
 class CarMarkListFilterSet(django_filters.FilterSet):
     """Filters for CarMark"""
 
-    model_name = django_filters.CharFilter(field_name='carmodel__name')
+    search = django_filters.CharFilter(method='search_filter')
     model_id = django_filters.NumberFilter(field_name='carmodel__id')
 
     class Meta:
@@ -48,27 +48,41 @@ class CarMarkListFilterSet(django_filters.FilterSet):
 
         model = models.CarMark
         fields = [
+            'search',
             'name',
-            'model_name',
-            'model_id',
+            'model_id'
         ]
+
+    def search_filter(self, queryset, name, value):
+        """Full text search"""
+        qs = queryset.annotate_full_search().filter(search=value)
+        if not qs.exists() or len(value) > 3:
+            qs = queryset.annotate_full_search().filter(search__icontains=value)
+        return qs
 
 
 class CarModelListFilterSet(django_filters.FilterSet):
     """Filters for CarModel"""
 
-    mark_name = django_filters.CharFilter(field_name='mark__name')
     mark_id = django_filters.NumberFilter(field_name='mark__id')
+    search = django_filters.CharFilter(method='search_filter')
 
     class Meta:
         """Meta class."""
 
         model = models.CarModel
         fields = [
+            'search',
             'name',
-            'mark_name',
             'mark_id',
         ]
+
+    def search_filter(self, queryset, name, value):
+        """Full text search"""
+        qs = queryset.annotate_full_search().filter(search=value)
+        if not qs.exists() or len(value) > 3:
+            qs = queryset.annotate_full_search().filter(search__icontains=value)
+        return qs
 
 
 class CenterFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
