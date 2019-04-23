@@ -44,15 +44,17 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.filter(room=room_id)
 
     def annotate_read_status(self, user):
-        return self.annotate(
-            read=models.Case(
-                models.When(
-                    id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
-                    then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        # return self.annotate(
+        #     read=models.Case(
+        #         models.When(
+        #             id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
+        #             then=True),
+        #         output_field=models.BooleanField(default=False),
+        #         default=False
+        #     )
+        # )
+        # todo: temp solution
+        return self.annotate(read=models.Value(True, models.BooleanField()))
 
 
 class ChatMessageManager(models.Manager):
