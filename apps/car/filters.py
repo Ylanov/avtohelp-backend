@@ -40,13 +40,23 @@ class CarListFilterSet(django_filters.FilterSet):
 class CarColorFilterSet(django_filters.FilterSet):
     """Filters for CarList"""
 
+    color_name = django_filters.CharFilter(method='by_color_name')
+
     class Meta:
         """Meta class."""
 
         model = models.CarColor
         fields = [
-            'name',
+            'color_name',
         ]
+
+    def by_color_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(name=value)
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(name__icontains=value)
+            return qs
+        return queryset
 
 
 class CarMarkListFilterSet(django_filters.FilterSet):
