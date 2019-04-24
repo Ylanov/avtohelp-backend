@@ -5,9 +5,11 @@ from userprofile import models
 class ProfileListFilterSet(django_filters.FilterSet):
     """ProfileList filter set."""
 
-    first_name = django_filters.CharFilter(method='by_first_name')
-    last_name = django_filters.CharFilter(method='by_last_name')
+    # first_name = django_filters.CharFilter(method='by_first_name')
+    # last_name = django_filters.CharFilter(method='by_last_name')
     license_plate = django_filters.CharFilter(method='by_license_plate')
+
+    search = django_filters.CharFilter(method='full_text_search')
 
     online = django_filters.BooleanFilter()
     friend = django_filters.BooleanFilter()
@@ -20,26 +22,36 @@ class ProfileListFilterSet(django_filters.FilterSet):
             'online',
             'friend',
 
-            'first_name',
-            'last_name',
+            'search',
+
+            # 'first_name',
+            # 'last_name',
             'license_plate'
         ]
 
-    def by_first_name(self, queryset, name, value):
+    def full_text_search(self, queryset, name, value):
         if value:
-            qs = queryset.filter(first_name__contains=value)
+            qs = queryset.annotate_full_text_search().filter(search__contains=value)
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(first_name__icontains=value)
+                qs = queryset.annotate_full_text_search().filter(search__icontains=value)
             return qs
         return queryset
 
-    def by_last_name(self, queryset, name, value):
-        if value:
-            qs = queryset.filter(last_name__contains=value)
-            if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(last_name__icontains=value)
-            return qs
-        return queryset
+    # def by_first_name(self, queryset, name, value):
+    #     if value:
+    #         qs = queryset.filter(first_name__contains=value)
+    #         if not qs.exists() or len(value) > 3:
+    #             qs = queryset.filter(first_name__icontains=value)
+    #         return qs
+    #     return queryset
+    #
+    # def by_last_name(self, queryset, name, value):
+    #     if value:
+    #         qs = queryset.filter(last_name__contains=value)
+    #         if not qs.exists() or len(value) > 3:
+    #             qs = queryset.filter(last_name__icontains=value)
+    #         return qs
+    #     return queryset
 
     def by_license_plate(self, queryset, name, value):
         if value:
