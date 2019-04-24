@@ -57,12 +57,13 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
     """Serializer for model ChatRoom"""
 
     participants = ChatRoomParticipantsSerializer(many=True)
-    last_message = LastChatMessageSerializer(source='chatmessage_set.last')
+    last_message = LastChatMessageSerializer(source='chatmessage_set.first')
 
     class Meta:
         """Meta class"""
         model = models.ChatRoom
-        fields = ('id', 'created', 'participants', 'image', 'name', 'last_message')
+        fields = ('id', 'created', 'participants',
+                  'image', 'name', 'last_message')
 
 
 class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
