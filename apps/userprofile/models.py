@@ -90,15 +90,6 @@ class ProfileQuerySet(models.QuerySet):
             )
         )
 
-    def annotate_full_search(self, *args, **kwargs):
-        return self.annotate(
-            search=SearchVector(
-                'first_name',
-                'last_name',
-                'user__profilecar__license_plate'
-            ),
-        )
-
 
 class Profile(BaseMixin, ImageMixin):
     """Profile model"""

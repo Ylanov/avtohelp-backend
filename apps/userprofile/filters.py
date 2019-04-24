@@ -5,9 +5,12 @@ from userprofile import models
 class ProfileListFilterSet(django_filters.FilterSet):
     """ProfileList filter set."""
 
+    first_name = django_filters.CharFilter(method='by_first_name')
+    last_name = django_filters.CharFilter(method='by_last_name')
+    license_plate = django_filters.CharFilter(method='by_license_plate')
+
     online = django_filters.BooleanFilter()
     friend = django_filters.BooleanFilter()
-    search = django_filters.CharFilter(method='search_filter')
 
     class Meta:
         """Meta class."""
@@ -16,17 +19,35 @@ class ProfileListFilterSet(django_filters.FilterSet):
         fields = [
             'online',
             'friend',
-            'search'
+
+            'first_name',
+            'last_name',
+            'license_plate'
         ]
 
-    def search_filter(self, queryset, name, value):
-        """Full text search"""
-        qs = queryset.annotate_full_search().filter(search__contains=value).distinct(
-            'created', 'first_name', 'last_name')
-        if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct(
-                'created', 'first_name', 'last_name')
-        return qs
+    def by_first_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(first_name__contains=value)
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(first_name__icontains=value)
+            return qs
+        return queryset
+
+    def by_last_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(last_name__contains=value)
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(last_name__icontains=value)
+            return qs
+        return queryset
+
+    def by_license_plate(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(user__profilecar__license_plate__contains=value).distinct()
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(user__profilecar__license_plate__icontains=value).distinct()
+            return qs
+        return queryset
 
 
 class ProfileGalleryListFilterSet(django_filters.FilterSet):
