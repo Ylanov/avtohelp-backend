@@ -8,22 +8,8 @@ from colorful.fields import RGBColorField
 from django.contrib.postgres.search import SearchVector
 
 
-class CarMarkQuerySet(models.QuerySet):
-    """QuerySet for model CarMark"""
-
-    def annotate_full_search(self, *args, **kwargs):
-        return self.annotate(
-            search=SearchVector(
-                'name',
-                'carmodel__name',
-            ),
-        )
-
-
 class CarMark(BaseMixin, NameMixin):
     """Car brands model"""
-
-    objects = CarMarkQuerySet.as_manager()
 
     class Meta:
         """Meta model"""
@@ -32,23 +18,10 @@ class CarMark(BaseMixin, NameMixin):
         verbose_name_plural = _('Car brands')
 
 
-class CarModelQuerySet(models.QuerySet):
-    """QuerySet for model CarModel"""
-
-    def annotate_full_search(self, *args, **kwargs):
-        return self.annotate(
-            search=SearchVector(
-                'name',
-                'mark__name',
-            ),
-        )
-
-
 class CarModel(BaseMixin, NameMixin):
     """Models for car models"""
 
     mark = models.ForeignKey('CarMark', on_delete=models.CASCADE)
-    objects = CarModelQuerySet.as_manager()
 
     class Meta:
         """Meta class"""
@@ -71,18 +44,6 @@ class CarColor(NameMixin, BaseMixin):
     verbose_name_plural = _('Car colors')
 
 
-class CarQuerySet(models.QuerySet):
-    """Custom Query for Car"""
-
-    def annotate_full_search(self, *args, **kwargs):
-        return self.annotate(
-            search=SearchVector(
-                'mark__name',
-                'car_model__name',
-            ),
-        )
-
-
 class Car(BaseMixin):
     """Common Car model"""
 
@@ -90,8 +51,6 @@ class Car(BaseMixin):
                              on_delete=models.CASCADE)
     car_model = models.ForeignKey('CarModel',
                                   on_delete=models.CASCADE)
-
-    objects = CarQuerySet.as_manager()
 
     class Meta:
         """Meta class"""

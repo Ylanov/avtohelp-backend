@@ -8,22 +8,33 @@ from car import models
 class CarListFilterSet(django_filters.FilterSet):
     """Filters for CarList"""
 
-    search = django_filters.CharFilter(method='search_filter')
+    mark_name = django_filters.CharFilter(method='by_mark_name')
+    model_name = django_filters.CharFilter(method='by_model_name')
 
     class Meta:
         """Meta class."""
 
         model = models.Car
         fields = [
-            'search'
+            'mark_name',
+            'model_name',
         ]
 
-    def search_filter(self, queryset, name, value):
-        """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
-        if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
-        return qs
+    def by_mark_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(mark__name=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(mark__name__icontains=value).distinct('id')
+            return qs
+        return queryset
+
+    def by_model_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(car_model__name__contains=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(car_model__name__icontains=value).distinct('id')
+            return qs
+        return queryset
 
 
 class CarColorFilterSet(django_filters.FilterSet):
@@ -41,47 +52,65 @@ class CarColorFilterSet(django_filters.FilterSet):
 class CarMarkListFilterSet(django_filters.FilterSet):
     """Filters for CarMark"""
 
-    search = django_filters.CharFilter(method='search_filter')
-    model_id = django_filters.NumberFilter(field_name='carmodel__id')
+    model_name = django_filters.CharFilter(method='by_model_name')
+    mark_name = django_filters.CharFilter(method='by_mark_name')
 
     class Meta:
         """Meta class."""
 
         model = models.CarMark
         fields = [
-            'search',
-            'model_id'
+            'model_name',
+            'mark_name'
         ]
 
-    def search_filter(self, queryset, name, value):
-        """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
-        if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
-        return qs
+    def by_model_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(carmodel__name__contains=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(carmodel__name__icontains=value).distinct('id')
+            return qs
+        return queryset
+
+    def by_mark_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(name__contains=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(name__icontains=value).distinct('id')
+            return qs
+        return queryset
 
 
 class CarModelListFilterSet(django_filters.FilterSet):
     """Filters for CarModel"""
 
-    mark_id = django_filters.NumberFilter(field_name='mark__id')
-    search = django_filters.CharFilter(method='search_filter')
+    mark_name = django_filters.CharFilter(method='by_mark_name')
+    model_name = django_filters.CharFilter(method='by_model_name')
 
     class Meta:
         """Meta class."""
 
         model = models.CarModel
         fields = [
-            'search',
-            'mark_id',
+            'mark_name',
+            'model_name'
         ]
 
-    def search_filter(self, queryset, name, value):
-        """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value).distinct('id')
-        if not qs.exists() or len(value) > 3:
-            qs = queryset.annotate_full_search().filter(search__icontains=value).distinct('id')
-        return qs
+    def by_mark_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(mark__name=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(mark__name__icontains=value).distinct('id')
+            return qs
+        return queryset
+
+    def by_model_name(self, queryset, name, value):
+        if value:
+            qs = queryset.filter(name=value).distinct('id')
+            if not qs.exists() or len(value) > 3:
+                qs = queryset.filter(name__icontains=value).distinct('id')
+            return qs
+        return queryset
 
 
 class CenterFilter(django_filters.BaseInFilter, django_filters.NumberFilter):

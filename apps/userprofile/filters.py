@@ -21,7 +21,7 @@ class ProfileListFilterSet(django_filters.FilterSet):
 
     def search_filter(self, queryset, name, value):
         """Full text search"""
-        qs = queryset.annotate_full_search().filter(search=value).distinct(
+        qs = queryset.annotate_full_search().filter(search__contains=value).distinct(
             'created', 'first_name', 'last_name')
         if not qs.exists() or len(value) > 3:
             qs = queryset.annotate_full_search().filter(search__icontains=value).distinct(
