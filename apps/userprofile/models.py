@@ -94,7 +94,8 @@ class ProfileQuerySet(models.QuerySet):
         """Full-text search"""
         return self.annotate(search=SearchVector(
             'first_name',
-            'last_name'
+            'last_name',
+            'user__profilecar__license_plate'
         ))
 
 

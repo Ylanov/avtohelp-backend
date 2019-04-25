@@ -1,6 +1,7 @@
 import django_filters
 from userprofile import models
-
+from django.contrib.postgres.search import SearchQuery
+from django.db import models as db_models
 
 class ProfileListFilterSet(django_filters.FilterSet):
     """ProfileList filter set."""
@@ -31,8 +32,16 @@ class ProfileListFilterSet(django_filters.FilterSet):
 
     def full_text_search(self, queryset, name, value):
         if value:
-            qs = queryset.annotate_full_text_search().filter(search__contains=value)
-            if not qs.exists() or len(value) > 3:
+            # Parse search parameters in value
+            query_params = [item.strip() for item in value.split(' ')]
+            # Full-text search
+            qs = queryset.annotate_full_text_search().filter(
+                search=SearchQuery(query_params[0]) |
+                       SearchQuery(query_params[1] if len(query_params) == 2 else '') |
+                       SearchQuery(query_params[2] if len(query_params) == 3 else '')
+            )
+            # If qs is empty find something
+            if not qs.exists():
                 qs = queryset.annotate_full_text_search().filter(search__icontains=value)
             return qs
         return queryset
