@@ -126,16 +126,16 @@ def notify_chat_participants(sender_id, participants):
 
 
 @shared_task
-def notify_assistance_request():
+def notify_assistance_request(sender_id):
     """Notify users about assistance request"""
-    devices = FCMDevice.objects.all()
+    devices = FCMDevice.objects.exclude(user_id=sender_id).filter(active=True)
     for device in devices:
         notification = base_models.PushNotification.objects.create(
             user=device.user,
             title=_('New assistance request'),
             description=_('New assistance request was published')
         )
-        count = devices.send_message(**notification.get_push_dict())
+        count = device.send_message(**notification.get_push_dict())
         if count.get('success') > 0:
             notification.status = True
             notification.save()

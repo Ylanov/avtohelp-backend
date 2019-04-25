@@ -105,6 +105,6 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     def send_push_notification(self):
         """Notify all users about new assistance request"""
         if settings.USE_CELERY:
-            tasks.notify_assistance_request.delay()
+            tasks.notify_assistance_request.delay(sender_id=self.user.id)
         else:
-            tasks.notify_assistance_request()
+            tasks.notify_assistance_request(sender_id=self.user.id)
