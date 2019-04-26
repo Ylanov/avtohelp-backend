@@ -2,6 +2,7 @@
 from .base import *
 
 DEBUG = True
+USE_CELERY = True
 
 ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
