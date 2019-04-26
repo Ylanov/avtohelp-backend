@@ -7,7 +7,7 @@ from django.contrib.gis.db.models.functions import Distance
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.gis.geos import Point
 from django.conf import settings
-from utils import tasks
+from project import celery as tasks
 
 
 class AssistanceRequestQuerySet(models.QuerySet):

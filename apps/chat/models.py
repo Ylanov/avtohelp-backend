@@ -6,7 +6,7 @@ from userprofile import models as profile_models
 from utils.mixins import BaseMixin, ImageMixin
 from django.core.cache import caches
 
-from utils import tasks
+from project import celery as tasks
 
 from django.conf import settings
 

@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from online_users.models import OnlineUserActivity as activity
 
 from utils.mixins import BaseMixin, ImageMixin
-from utils import tasks
+from project import celery as tasks
 from django.conf import settings
 
 

@@ -4,7 +4,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Common path section
-PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 
 CONFIG_FILE = f'{PROJECT_ROOT}/roadhelper.ini'
@@ -24,11 +23,11 @@ if configuration == 'local':
 elif configuration == 'development':
     # development server settings
     from .development import *
+elif configuration == 'production':
+    # production server settings
+    from .production import *
 # elif configuration == 'stage':
 #     # development server settings
 #     from .stage import *
-# elif configuration == 'production':
-#     # production server settings
-#     from .production import *
 else:
     from .base import *

@@ -1,6 +1,6 @@
-import logging
 from datetime import timedelta
 
+import requests
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -10,9 +10,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 from account.models import User
 from utils.methods import generate_sms_code
 from utils.mixins import BaseMixin
-from utils.tasks import send_verification_sms
-
-logger = logging.getLogger('AUTHORIZATION')
 
 
 # Create your models here.
@@ -27,11 +24,6 @@ class SMSCodeManager(models.Manager):
         if status:
             obj.status = status
         obj.save()
-
-        if settings.USE_CELERY:
-            send_verification_sms.delay(sms_code_id=obj.id)
-        else:
-            send_verification_sms(sms_code_id=obj.id)
         return obj
 
     def decline_all_others(self, obj):
@@ -112,6 +104,10 @@ class SMSCodeQuerySet(models.query.QuerySet):
 class SMSCode(BaseMixin):
     """Sms codes model."""
 
+    URL = 'http://smsc.ru/sys/send.php'
+    LOGIN = settings.SMS_LOGIN
+    PASSWORD = settings.SMS_PASSWORD
+
     WAITING = 0
     SENT = 1
     ACTIVATED = 2
@@ -152,14 +148,17 @@ class SMSCode(BaseMixin):
 
     def send_sms(self):
         """Send sms method."""
+        message = 'Код подтверждения - %s.\nВзаимопомощь на дороге' % self.code
+        params = {
+            'login': settings.SMS_LOGIN,
+            'psw': settings.SMS_PASSWORD,
+            # 'sender': settings.SMS_SENDER,
+            'phones': self.phone.as_e164,
+            'mes': message,
+        }
+        response = requests.post(url=self.URL, params=params)
         self.status = self.SENT
         self.save()
-        # put sms sending task in queue
-        # used as simple method due to celery issues
-        if settings.USE_CELERY:
-            send_verification_sms.delay(sms_code_id=self.id)
-        else:
-            logger.debug('Send SMS')
 
     def fake(self):
         """Fake send sms method"""

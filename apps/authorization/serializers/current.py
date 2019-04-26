@@ -1,16 +1,14 @@
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
 from account.models import User
 from authorization import models
-from catalog import models as catalog_models
 from userprofile import models as profile_models
-from utils import api_exceptions, tasks
-from utils.mixins import AuthorizationMixin
+from utils import api_exceptions
+from project import celery as tasks
 
 
 class PhoneVerificationSerializer(serializers.ModelSerializer):
@@ -51,8 +49,8 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         # make a new user
         user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
         # make a new sms
-        # todo: remove static verification code
         obj = models.SMSCode.objects.make(user=user, code=12345,  **validated_data)
+        tasks.send_verification_sms.delay(sms_code_id=obj.id)
         return obj
 
     def to_representation(self, instance):

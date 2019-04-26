@@ -14,12 +14,12 @@ import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Common path section
 PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
-DATADIR_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'datadir'))
 
-# # insert apps and libs dirs to sys.path
+# Insert apps and libs dirs to sys.path
 for path in ('apps', 'libs'):
     path = os.path.abspath(os.path.join(PROJECT_ROOT, '%s' % path))
     path in sys.path or sys.path.insert(0, path)
@@ -187,7 +187,7 @@ LOCALE_PATHS = (
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+# STATIC_ROOT = os.path.join(PUBLIC_ROOT, 'static')
 STATIC_URL = '/static/'
 
 MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
@@ -260,6 +260,13 @@ SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 USE_SMS = False  # Actual sms sending switcher
 
 
+# SMSC Settings
+SMS_SERVICE = 'http://smsc.ru/sys/send.php'
+SMS_LOGIN = 'ilyaarzumanyan92'
+SMS_PASSWORD = '93Damybee281'
+SMS_SENDER = 'RoadHelper'
+
+
 # CHAT
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
 
@@ -281,14 +288,6 @@ FCM_DJANGO_SETTINGS = {
 # Message PUSH-notifications
 LIMIT_UNREAD_MESSAGES = 3
 MESSAGES_UPDATE_PERIOD = 15
-
-
-# Cache
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-#     }
-# }
 
 
 # Save the session to the database on every single request

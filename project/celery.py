@@ -56,6 +56,134 @@ def check_request_relevance():
                 request.save()
 
 
+@app.task
+def send_verification_sms(sms_code_id):
+    """Send verification sms task."""
+    from authorization import models as auth_models
+    # Get sms code object
+    sms = auth_models.SMSCode.objects.get(id=sms_code_id)
+
+    if settings.USE_SMS is True:
+        # send actual sms if its allowed by server configuration
+        try:
+            sms.send_sms()
+            logger.info('SMS: sending try, ID=%d' % sms.id)
+        except:
+            logger.error('SMS: sending failed, ID=%d' % sms.id)
+    else:
+        # or fake it
+        sms.fake()
+        logger.info('SMS: debug sending, ID=%d' % sms.id)
+
+
+@app.task
+def reset_attempts(user_id):
+    """Reset user attempts"""
+    from authorization import models as auth_models
+    userlock_qs = auth_models.UserLock.objects.filter(user=user_id)
+    # reset attempts
+    if userlock_qs.exists():
+        userlock_qs.first().reset_attempts()
+
+
+@app.task
+def not_completed_authorization(user_id):
+    """Authorization was not completed"""
+    from authorization import models as auth_models
+    try:
+        reset_attempts(user_id=user_id)
+        auth_models.SMSCode.objects.decline_all_by_user(user_id=user_id)
+    except:
+        logger.info(f'ERROR: authorization was not completed for user {user_id}')
+
+
+@app.task
+def success_authorization(user_id, sms_code_id):
+    """Finish of success authorization"""
+    from authorization import models as auth_models
+    try:
+        reset_attempts(user_id=user_id)
+        change_smscode_status(sms_code_id=sms_code_id, status=auth_models.SMSCode.ACTIVATED)
+        auth_models.SMSCode.objects.decline_all_by_user(user=user_id)
+    except:
+        logger.info(f'ERROR: success authorization was not completed for user {user_id}')
+
+
+@app.task
+def change_smscode_status(sms_code_id, status):
+    """Change SMSCode object status"""
+    from authorization import models as auth_models
+    smscode = auth_models.SMSCode.objects.get(id=sms_code_id)
+    smscode.status = status
+    smscode.save()
+
+
+@app.task
+def notify_friend_request(invited_id):
+    """Notify user about new friend request"""
+    from base import models as base_models
+    from fcm_django.models import FCMDevice
+    notification = base_models.PushNotification.objects.create(
+        user_id=invited_id,
+        title=_('New friend request'),
+        description=_('A new friend request has been received')
+    )
+    devices = FCMDevice.objects.filter(user_id=invited_id)
+    if devices.exists():
+        count = devices.send_message(**notification.get_push_dict())
+        if count.get('success') > 0:
+            logger.info(f'Users notified: {count.get("success")}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications')
+
+
+@app.task
+def notify_chat_participants(sender_id, participants):
+    """Notify user about new friend request"""
+    from account import models as account_models
+    from base import models as base_models
+    from fcm_django.models import FCMDevice
+    for user_id in participants:
+        # Get sender user object
+        sender = account_models.User.objects.get(id=sender_id)
+        # Check if user is online
+        notification = base_models.PushNotification.objects.create(
+            user_id=user_id,
+            title=_('New message from chat'),
+            description=_(f'User {sender.get_full_name()} wrote a message')
+        )
+        devices = FCMDevice.objects.filter(user_id=user_id)
+
+        if devices.exists():
+            count = devices.send_message(**notification.get_push_dict())
+            if count.get('success') > 0:
+                notification.status = True
+                notification.save()
+                logger.info(f'Users notified: {count.get("success")}')
+            else:
+                logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
+
+
+@app.task
+def notify_assistance_request(sender_id):
+    """Notify users about assistance request"""
+    from base import models as base_models
+    from fcm_django.models import FCMDevice
+    devices = FCMDevice.objects.exclude(user_id=sender_id).filter(active=True)
+    for device in devices:
+        notification = base_models.PushNotification.objects.create(
+            user=device.user,
+            title=_('New assistance request'),
+            description=_('New assistance request was published')
+        )
+        count = device.send_message(**notification.get_push_dict())
+        if count.get('success') > 0:
+            notification.status = True
+            notification.save()
+            logger.info(f'Users notified: {count.get("success")}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
+
 # Unused
 # @app.task
 # def notify_unread_messages():

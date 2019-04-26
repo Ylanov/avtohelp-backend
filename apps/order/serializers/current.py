@@ -1,8 +1,6 @@
 from django.contrib.gis.geos.point import Point
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
-from django.conf import settings
-from utils import tasks
 
 from order import models
 from userprofile.serializers import current as profile_serializers
