@@ -88,11 +88,11 @@ class ChatMessage(BaseMixin):
         if settings.USE_CELERY:
             tasks.notify_chat_participants.delay(
                 sender_id=self.sender.id,
-                participants=offline_users)
+                participants=list(offline_users))
         else:
             tasks.notify_chat_participants(
                 sender_id=self.sender.id,
-                participants=offline_users)
+                participants=list(offline_users))
 
 
 class ChatRoomManager(models.Manager):

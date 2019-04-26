@@ -2,8 +2,8 @@
 from .base import *
 
 DEBUG = True
-USE_CELERY = False
-USE_SMS = True
+USE_CELERY = True
+USE_SMS = False
 
 # Celery settings
 CELERY_BROKER_URL = 'redis://redis:6379/1'
