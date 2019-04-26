@@ -252,19 +252,11 @@ CORS_ALLOW_CREDENTIALS = False
 
 
 # SMS
-SMS_SEND_DELAY = 30
-SMS_EXPIRATION = 5  # minutes
-SMS_CODE_LENGTH = 5
-SMS_INPUT_ATTEMPTS = 2
+SMS_SEND_DELAY = 30  # seconds
+SMS_CODE_LENGTH = 5  # characters
+SMS_INPUT_ATTEMPTS = 2  # count of attempts
 SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 USE_SMS = False  # Actual sms sending switcher
-
-
-# SMSC Settings
-SMS_SERVICE = 'http://smsc.ru/sys/send.php'
-SMS_LOGIN = 'ilyaarzumanyan92'
-SMS_PASSWORD = '93Damybee281'
-SMS_SENDER = 'RoadHelper'
 
 
 # CHAT
@@ -283,6 +275,13 @@ FCM_DJANGO_SETTINGS = {
         "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"
     ),
 }
+
+
+# SMSC Settings
+SMS_SERVICE = 'http://smsc.ru/sys/send.php'
+SMS_LOGIN = 'ilyaarzumanyan92'
+SMS_PASSWORD = '93Damybee281'
+SMS_SENDER = 'RoadHelper'
 
 
 # Message PUSH-notifications
@@ -311,3 +310,16 @@ SWAGGER_SETTINGS = {
 
 # Increase upload maximum file size
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
+
+
+# CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://base:6379/13",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}

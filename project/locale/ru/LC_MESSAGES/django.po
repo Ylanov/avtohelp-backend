@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-26 06:53+0000\n"
+"POT-Creation-Date: 2019-04-26 08:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 msgid "Account"
 msgstr "Аккаунт"
 
-#: apps/account/models.py:51 apps/authorization/models.py:127
+#: apps/account/models.py:51 apps/authorization/models.py:125
 msgid "Phone"
 msgstr "Номер телефона"
 
@@ -40,7 +40,7 @@ msgstr "логин"
 msgid "email address"
 msgstr "Адрес электронной почты"
 
-#: apps/account/models.py:66 apps/authorization/models.py:129
+#: apps/account/models.py:66 apps/authorization/models.py:127
 #: apps/base/models.py:45 apps/order/models.py:81
 msgid "User"
 msgstr "Пользователь"
@@ -68,56 +68,56 @@ msgstr "Информация"
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: apps/authorization/models.py:120
+#: apps/authorization/models.py:118
 msgid "Waiting"
 msgstr "В ожидании"
 
-#: apps/authorization/models.py:121
+#: apps/authorization/models.py:119
 msgid "Sent"
 msgstr "Отправлен"
 
-#: apps/authorization/models.py:122
+#: apps/authorization/models.py:120
 msgid "Activated"
 msgstr "Активирован"
 
-#: apps/authorization/models.py:123
+#: apps/authorization/models.py:121
 msgid "Declined"
 msgstr "Отклонен"
 
-#: apps/authorization/models.py:124
+#: apps/authorization/models.py:122
 msgid "Expired"
 msgstr "Просрочен"
 
-#: apps/authorization/models.py:133
+#: apps/authorization/models.py:131
 msgid "Code"
 msgstr "Код"
 
-#: apps/authorization/models.py:140
+#: apps/authorization/models.py:138
 msgid "SMS code"
 msgstr "СМС-код"
 
-#: apps/authorization/models.py:141
+#: apps/authorization/models.py:139
 msgid "SMS codes"
 msgstr "СМС-коды"
 
-#: apps/authorization/models.py:153
+#: apps/authorization/models.py:151
 #, python-format
 msgid ""
-"Your code is %s. Use it to confirm your phone number.\n"
-"RoadHelper"
+"Verification code is %s.\n"
+"Road.Helper"
 msgstr ""
-"Ваш код - %s Используйте его, чтобы подтвердить свой номер телефона.\n"
+"Проверочный код: %s\n"
 "Взаимопомощь на дороге"
 
-#: apps/authorization/models.py:216
+#: apps/authorization/models.py:214
 msgid "Last datetime authorization attempt"
 msgstr "Последняя дата попытки авторизации"
 
-#: apps/authorization/models.py:222
+#: apps/authorization/models.py:220
 msgid "User lock"
 msgstr "Блокировка пользователя"
 
-#: apps/authorization/models.py:223
+#: apps/authorization/models.py:221
 msgid "User locks"
 msgstr "Блокировки пользователей"
 
@@ -311,15 +311,15 @@ msgstr "Текст сообщения"
 msgid "Chat"
 msgstr "Чат"
 
-#: apps/chat/models.py:165
+#: apps/chat/models.py:163
 msgid "Moderator"
 msgstr "Модератор"
 
-#: apps/chat/models.py:166
+#: apps/chat/models.py:164
 msgid "Participant"
 msgstr "Участник"
 
-#: apps/chat/models.py:175
+#: apps/chat/models.py:173
 msgid "Role"
 msgstr "Роль"
 
@@ -574,32 +574,6 @@ msgstr "Пользователь с этим телефоном уже суще�
 msgid "Invalid code"
 msgstr "Неправильный код"
 
-#: apps/utils/tasks.py:91
-msgid "New friend request"
-msgstr "Новый запрос на добавление в друзья"
-
-#: apps/utils/tasks.py:92
-msgid "A new friend request has been received"
-msgstr "Был получен новый запрос на добавление в друзья"
-
-#: apps/utils/tasks.py:112
-msgid "New message from chat"
-msgstr "Новое сообщение"
-
-#: apps/utils/tasks.py:113
-#, fuzzy
-#| msgid "User {sender.get_full_name()} wrote a message"
-msgid "User {sender.get_full_name()} wrote a message"
-msgstr "Пользователь {sender.get_full_name()} написал сообщение"
-
-#: apps/utils/tasks.py:134
-msgid "New assistance request"
-msgstr "Новый запрос помощи"
-
-#: apps/utils/tasks.py:135
-msgid "New assistance request was published"
-msgstr "Новый запрос помощи был опубликован"
-
 #: apps/versioning/apps.py:7
 msgid "Versioning"
 msgstr "Версионирование"
@@ -623,6 +597,32 @@ msgstr "Активный"
 #: apps/versioning/models.py:29
 msgid "Versions"
 msgstr "Версии"
+
+#: project/celery.py:128
+msgid "New friend request"
+msgstr "Новый запрос на добавление в друзья"
+
+#: project/celery.py:129
+msgid "A new friend request has been received"
+msgstr "Был получен новый запрос на добавление в друзья"
+
+#: project/celery.py:152
+msgid "New message from chat"
+msgstr "Новое сообщение"
+
+#: project/celery.py:153
+#, fuzzy
+#| msgid "User {sender.get_full_name()} wrote a message"
+msgid "User {sender.get_full_name()} wrote a message"
+msgstr "Пользователь {sender.get_full_name()} написал сообщение"
+
+#: project/celery.py:176
+msgid "New assistance request"
+msgstr "Новый запрос помощи"
+
+#: project/celery.py:177
+msgid "New assistance request was published"
+msgstr "Новый запрос помощи был опубликован"
 
 #: project/templates/roadhelper/reddoc.html:5
 msgid "API Documentation"

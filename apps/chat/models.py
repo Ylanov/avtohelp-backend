@@ -1,14 +1,12 @@
+from django.conf import settings
+from django.core.cache import caches
 from django.db import models
 from django.db.models import Subquery
 from django.utils.translation import ugettext_lazy as _
 
+from project import celery as tasks
 from userprofile import models as profile_models
 from utils.mixins import BaseMixin, ImageMixin
-from django.core.cache import caches
-
-from project import celery as tasks
-
-from django.conf import settings
 
 MSG_TYPE_MESSAGE = 0  # For standard messages
 MSG_TYPE_WARNING = 1  # For yellow messages

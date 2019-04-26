@@ -50,7 +50,10 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
         # make a new sms
         obj = models.SMSCode.objects.make(user=user, code=12345,  **validated_data)
-        tasks.send_verification_sms.delay(sms_code_id=obj.id)
+        if settings.USE_CELERY:
+            tasks.send_verification_sms.delay(sms_code_id=obj.id)
+        else:
+            tasks.send_verification_sms(sms_code_id=obj.id)
         return obj
 
     def to_representation(self, instance):

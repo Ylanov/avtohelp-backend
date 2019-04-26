@@ -148,7 +148,7 @@ class SMSCode(BaseMixin):
 
     def send_sms(self):
         """Send sms method."""
-        message = 'Код подтверждения - %s.\nВзаимопомощь на дороге' % self.code
+        message = _('Verification code is %s.\nRoad.Helper') % self.code
         params = {
             'login': settings.SMS_LOGIN,
             'psw': settings.SMS_PASSWORD,
@@ -156,7 +156,7 @@ class SMSCode(BaseMixin):
             'phones': self.phone.as_e164,
             'mes': message,
         }
-        response = requests.post(url=self.URL, params=params)
+        requests.post(url=self.URL, params=params)
         self.status = self.SENT
         self.save()
 

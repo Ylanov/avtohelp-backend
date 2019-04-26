@@ -1,4 +1,4 @@
-"""Local settings."""
+"""Development settings."""
 from .base import *
 
 DEBUG = True
@@ -6,16 +6,14 @@ USE_CELERY = True
 
 ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://base:6379/13",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-        }
-    }
-}
+
+# Celery settings
+CELERY_RESULT_BACKEND = 'redis://base:6379/13'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
 
 # Logging
 LOGGING = {
