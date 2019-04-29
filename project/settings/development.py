@@ -3,7 +3,8 @@ from .base import *
 
 DEBUG = True
 USE_CELERY = True
-USE_SMS = True
+USE_SMS = False  # Actual sms sending switcher
+
 
 ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
 

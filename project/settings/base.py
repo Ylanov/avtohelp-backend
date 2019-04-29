@@ -256,7 +256,6 @@ SMS_SEND_DELAY = 30  # seconds
 SMS_CODE_LENGTH = 5  # characters
 SMS_INPUT_ATTEMPTS = 2  # count of attempts
 SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
-USE_SMS = False  # Actual sms sending switcher
 
 
 # CHAT

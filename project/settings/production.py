@@ -1,7 +1,6 @@
 """Production server configuration."""
 from .base import *  # NOQA
 
-SEND_SMS = False
 USE_CELERY = False
 DEBUG = False
 
