@@ -10,8 +10,8 @@ class NewsletterModelAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'short_description', 'publish', 'publish_date')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
-        (_('Options'), {'fields': ('title', 'short_description', 'publish',
-                                   'publish_date', 'image')}),
+        (_('Options'), {'fields': ('title', 'text', 'short_description',
+                                   'publish', 'publish_date', 'image')}),
     )
 
 
