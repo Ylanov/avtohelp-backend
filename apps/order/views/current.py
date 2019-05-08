@@ -13,9 +13,7 @@ class AssistanceRequestMixin(object):
     def get_queryset(self):
         """Override get_queryset method"""
         return self.queryset.available(self.request.user).annotate_distance(
-            raw_coordinates=self.request.query_params.get('coordinates')).exclude(
-            user=self.request.user
-        )
+            raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
