@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-26 08:49+0000\n"
+"POT-Creation-Date: 2019-05-13 12:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -311,15 +311,15 @@ msgstr "Текст сообщения"
 msgid "Chat"
 msgstr "Чат"
 
-#: apps/chat/models.py:163
+#: apps/chat/models.py:167
 msgid "Moderator"
 msgstr "Модератор"
 
-#: apps/chat/models.py:164
+#: apps/chat/models.py:168
 msgid "Participant"
 msgstr "Участник"
 
-#: apps/chat/models.py:173
+#: apps/chat/models.py:177
 msgid "Role"
 msgstr "Роль"
 
@@ -606,15 +606,14 @@ msgstr "Новый запрос на добавление в друзья"
 msgid "A new friend request has been received"
 msgstr "Был получен новый запрос на добавление в друзья"
 
-#: project/celery.py:152
+#: project/celery.py:153
 msgid "New message from chat"
 msgstr "Новое сообщение"
 
-#: project/celery.py:153
-#, fuzzy
-#| msgid "User {sender.get_full_name()} wrote a message"
-msgid "User {sender.get_full_name()} wrote a message"
-msgstr "Пользователь {sender.get_full_name()} написал сообщение"
+#: project/celery.py:154
+#, python-format
+msgid "User %s wrote a message"
+msgstr "Пользователь %s написал сообщение"
 
 #: project/celery.py:176
 msgid "New assistance request"

@@ -59,7 +59,7 @@ class PushNotification(BaseMixin):
         verbose_name = _('Push notification')
         verbose_name_plural = _('Push notifications')
 
-    def get_push_dict(self):
+    def get_push_dict(self, **kwargs):
         """Make dict object, for push notification."""
         result = dict()
         result.update({
@@ -68,6 +68,7 @@ class PushNotification(BaseMixin):
             'data': {
                 'title': str(self.title),
                 'body': str(self.description),
+                **kwargs
             },
             'icon': 'ic_launcher',
         })

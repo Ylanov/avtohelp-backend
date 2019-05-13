@@ -138,11 +138,12 @@ def notify_friend_request(invited_id):
 
 
 @app.task
-def notify_chat_participants(sender_id, participants):
+def notify_chat_participants(sender_id, participants, room_id):
     """Notify user about new friend request"""
     from account import models as account_models
     from base import models as base_models
     from fcm_django.models import FCMDevice
+
     for user_id in participants:
         # Get sender user object
         sender = account_models.User.objects.get(id=sender_id)
@@ -150,12 +151,11 @@ def notify_chat_participants(sender_id, participants):
         notification = base_models.PushNotification.objects.create(
             user_id=user_id,
             title=_('New message from chat'),
-            description=_(f'User {sender.get_full_name()} wrote a message')
+            description=_('User %s wrote a message') % sender.get_full_name()
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
-
         if devices.exists():
-            count = devices.send_message(**notification.get_push_dict())
+            count = devices.send_message(**notification.get_push_dict(room_id=room_id))
             if count.get('success') > 0:
                 notification.status = True
                 notification.save()
