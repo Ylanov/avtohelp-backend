@@ -1,5 +1,8 @@
+import datetime
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from solo.models import SingletonModel
 
 from utils.mixins import BaseMixin, ImageMixin
 
@@ -73,3 +76,14 @@ class PushNotification(BaseMixin):
             'icon': 'ic_launcher',
         })
         return result
+
+
+class PushNotificationConfiguration(SingletonModel):
+    """Configuration for sending Push-notifications"""
+    radius = models.FloatField(default=50000)
+    geo_position_lifetime = models.TimeField(help_text=_('Lifetime for user geo-position'),
+                                             verbose_name=_('User geo-position lifetime'),
+                                             default=datetime.timedelta(minutes=30))
+
+    class Meta:
+        verbose_name = _("Push notification configuration")

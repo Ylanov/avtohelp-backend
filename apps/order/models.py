@@ -1,13 +1,14 @@
-from django.contrib.gis.db import models as gis_models
-from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
-from utils.mixins import BaseMixin, ImageMixin
-from django.contrib.gis.db.models.functions import Distance
-from phonenumber_field.modelfields import PhoneNumberField
-from django.contrib.gis.geos import Point
 from django.conf import settings
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+from django.db import models
+from django.db.models import Q
+from django.utils.translation import ugettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
+
 from project import celery as tasks
+from utils.mixins import BaseMixin, ImageMixin
 
 
 class AssistanceRequestQuerySet(models.QuerySet):

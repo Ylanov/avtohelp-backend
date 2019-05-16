@@ -1,5 +1,5 @@
 from django.contrib.gis.geos import Point
-from fcm_django.models import FCMDevice
+from userprofile.models import FCMDevice
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, exceptions
 

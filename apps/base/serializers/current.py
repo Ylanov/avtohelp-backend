@@ -24,6 +24,16 @@ class NewsDetailSerializer(serializers.ModelSerializer):
                   'publish_date', 'image')
 
 
+class PushNotificationConfigurationSerializer(serializers.ModelSerializer):
+    """Serialzer for PushNotificationConfiguration model"""
+
+    class Meta:
+        """Meta class"""
+
+        model = models.PushNotificationConfiguration
+        fields = ('radius', 'geo_position_lifetime')
+
+
 class NotificationListSerializer(serializers.ModelSerializer):
     """Notification list serializer"""
 

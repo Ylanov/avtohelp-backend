@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.search import SearchVector
 from django.db import models
+from fcm_django import models as fcm_models
 from django.db.models import Q, Subquery
 from django.utils.translation import ugettext_lazy as _
 from online_users.models import OnlineUserActivity as activity
@@ -8,6 +9,31 @@ from online_users.models import OnlineUserActivity as activity
 from utils.mixins import BaseMixin, ImageMixin
 from project import celery as tasks
 from django.conf import settings
+from django.contrib.gis.measure import Distance
+from base.models import PushNotificationConfiguration
+
+
+class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
+    """Firebase Cloud Messaging querysets"""
+
+    def by_geo_position(self, point):
+        """Filter by geo position"""
+        configuration = PushNotificationConfiguration.get_solo()
+        return self.filter(user__profilelocation__location__distance_lte=(point, Distance(m=configuration.radius)))
+
+
+class FCMDevice(fcm_models.AbstractFCMDevice):
+    """Firebase Cloud Messaging model"""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                             related_name='fcm_user',
+                             on_delete=models.CASCADE)
+
+    objects = fcm_models.FCMDeviceManager.from_queryset(FCMDeviceQuerySet)()
+
+    class Meta:
+        verbose_name = _('FCM device')
+        verbose_name_plural = _('FCM devices')
 
 
 class ProfileQuerySet(models.QuerySet):

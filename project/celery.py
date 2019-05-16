@@ -122,7 +122,7 @@ def change_smscode_status(sms_code_id, status):
 def notify_friend_request(invited_id):
     """Notify user about new friend request"""
     from base import models as base_models
-    from fcm_django.models import FCMDevice
+    from userprofile.models import FCMDevice
     notification = base_models.PushNotification.objects.create(
         user_id=invited_id,
         title=_('New friend request'),
@@ -142,7 +142,7 @@ def notify_chat_participants(sender_id, participants, room_id):
     """Notify user about new friend request"""
     from account import models as account_models
     from base import models as base_models
-    from fcm_django.models import FCMDevice
+    from userprofile.models import FCMDevice
 
     for user_id in participants:
         # Get sender user object
@@ -168,7 +168,7 @@ def notify_chat_participants(sender_id, participants, room_id):
 def notify_assistance_request(sender_id):
     """Notify users about assistance request"""
     from base import models as base_models
-    from fcm_django.models import FCMDevice
+    from userprofile.models import FCMDevice
     devices = FCMDevice.objects.exclude(user_id=sender_id).filter(active=True)
     for device in devices:
         notification = base_models.PushNotification.objects.create(

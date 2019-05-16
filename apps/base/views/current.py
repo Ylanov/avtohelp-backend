@@ -1,11 +1,11 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
 from base import models
 from base.serializers import current as serializers
 from utils import views as view_mixins
 from utils.paginations import NewsCursorPagination
-
 
 """
 VIEWSETS
@@ -37,6 +37,19 @@ class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewS
 """
 VIEWS
 """
+
+
+class PushNotificationConfigurationView(generics.GenericAPIView):
+    """
+    Generics for singleton model PushNotificationConfiguration
+    """
+
+    serializer_class = serializers.PushNotificationConfigurationSerializer
+
+    def get(self, request, *args, **kwargs):
+        """Override get method"""
+        obj = models.PushNotificationConfiguration.get_solo()
+        return Response(data=self.get_serializer(obj).data)
 
 
 # class NewsListView(generics.ListAPIView):
