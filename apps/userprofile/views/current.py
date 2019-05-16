@@ -67,7 +67,7 @@ class ProfileListView(generics.ListAPIView):
         return models.Profile.objects.annotate_online_status().annotate_friend_status(
             self.request.user).select_related(
             'user'
-        ).friendly(self.request.user).order_by('first_name', 'last_name')
+        ).friendly(self.request.user).valid().order_by('first_name', 'last_name')
 
 
 class MyProfileDetailView(generics.RetrieveUpdateAPIView):

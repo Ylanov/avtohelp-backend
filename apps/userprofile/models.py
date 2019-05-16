@@ -24,6 +24,10 @@ class ProfileQuerySet(models.QuerySet):
                             Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner_id')))
                             ).exclude(user=user)
 
+    def valid(self):
+        """Queryset that exclude profiles with null first name and last name"""
+        return self.exclude(first_name__isnull=True, last_name__isnull=True)
+
     def friends(self, user):
         """
         Queryset that return only friends
