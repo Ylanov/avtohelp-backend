@@ -4,32 +4,10 @@ from rest_framework import serializers
 
 from order import models
 from userprofile.serializers import current as profile_serializers
+from utils.serializers import GeoLocationSerializerMixin
 
 
-class AssistanceRequestMixin(serializers.ModelSerializer):
-    """AssistanceRequest mixin"""
-
-    geo_lat = serializers.SerializerMethodField()
-    geo_lon = serializers.SerializerMethodField()
-
-    class Meta:
-        """Meta-class"""
-
-        model = models.AssistanceRequest
-        fields = ('id', 'created', 'geo_lat', 'geo_lon')
-
-    def get_geo_lat(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.x
-
-    def get_geo_lon(self, obj):
-        """Point(longitude, latitude)"""
-        if isinstance(obj.location, Point):
-            return obj.location.y
-
-
-class AssistanceRequestListSerializer(AssistanceRequestMixin):
+class AssistanceRequestListSerializer(GeoLocationSerializerMixin, serializers.ModelSerializer):
     """List of AssistanceRequest objects by user"""
 
     profile_id = serializers.IntegerField(source='user.profile.id')

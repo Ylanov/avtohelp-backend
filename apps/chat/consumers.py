@@ -1,5 +1,4 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from channels.exceptions import StopConsumer
 from django.conf import settings
 
 from chat import models

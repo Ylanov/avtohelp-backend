@@ -2,11 +2,9 @@ from rest_framework import serializers
 from django.contrib.gis.geos.point import Point
 
 
-class CoordinatesSerializer(serializers.Serializer):
-    """
-    Added additional fields for show geo position in X, Y coord.
-    For catalog models
-    """
+class GeoLocationSerializerMixin(serializers.Serializer):
+    """GeoLocationMixin"""
+
     geo_lat = serializers.SerializerMethodField()
     geo_lon = serializers.SerializerMethodField()
 

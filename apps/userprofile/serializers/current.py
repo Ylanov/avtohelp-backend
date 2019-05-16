@@ -1,5 +1,4 @@
-from os.path import exists
-
+from django.contrib.gis.geos import Point
 from fcm_django.models import FCMDevice
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, exceptions
@@ -10,6 +9,7 @@ from catalog import models as catalog_models
 from catalog.serializers import current as catalog_serializers
 from userprofile import models
 from utils import api_exceptions
+from utils.serializers import GeoLocationSerializerMixin
 
 
 class FCMDeviceSerializer(serializers.ModelSerializer):
@@ -167,6 +167,39 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
         """Override validated data"""
         validated_data['owner'] = self.context.get('request').user
         return super(ProfileCarCreateSerializer, self).create(validated_data)
+
+
+class ProfileLocationUpdateSerializer(GeoLocationSerializerMixin, serializers.ModelSerializer):
+    """Serializer for ProfileLocation"""
+
+    # REQUEST
+    geo_lat = serializers.FloatField(allow_null=True)
+    geo_lon = serializers.FloatField(allow_null=True)
+
+    class Meta:
+        """Meta class"""
+        model = models.ProfileLocation
+        fields = ('geo_lat', 'geo_lon')
+
+    def validate(self, attrs):
+        # if geo_lat and geo_lon was sent
+        geo_lat = attrs.pop('geo_lat') if 'geo_lat' in attrs else None
+        geo_lon = attrs.pop('geo_lon') if 'geo_lon' in attrs else None
+        if geo_lat and geo_lon:
+            # Point(longitude, latitude)
+            attrs['location'] = Point(geo_lat, geo_lon)
+        return attrs
+
+    def to_representation(self, instance):
+        """Override to_representation method"""
+        if instance.location and isinstance(instance.location, Point):
+            # Point(longitude, latitude)
+            setattr(instance, 'geo_lat', instance.location.x)
+            setattr(instance, 'geo_lon', instance.location.y)
+        else:
+            setattr(instance, 'geo_lat', float(0))
+            setattr(instance, 'geo_lon', float(0))
+        return super().to_representation(instance)
 
 
 class ProfileCarListSerializer(serializers.ModelSerializer):

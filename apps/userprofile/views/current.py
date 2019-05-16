@@ -150,6 +150,18 @@ class ProfileDetailView(generics.RetrieveAPIView):
             self.request.user)
 
 
+class ProfileLocationUpdateView(generics.UpdateAPIView):
+    """
+    View for updating user profile location.
+    Allowed HTTP-requests: (UPDATE)
+    """
+
+    serializer_class = serializers.ProfileLocationUpdateSerializer
+
+    def get_object(self):
+        """Override get_object method"""
+        return self.request.user.profilelocation
+
 # Car
 
 

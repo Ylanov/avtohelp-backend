@@ -1,7 +1,7 @@
 from rest_framework import serializers
+
 from car import models
-from utils.serializers import CoordinatesSerializer
-from os.path import exists
+from utils.serializers import GeoLocationSerializerMixin
 
 
 class CarListSerializer(serializers.ModelSerializer):
@@ -105,7 +105,7 @@ class CarServiceCategorySerializer(serializers.ModelSerializer):
         return obj.get_full_image_url(request=self.context.get('request'))
 
 
-class ServiceListSerializer(serializers.ModelSerializer, CoordinatesSerializer):
+class ServiceListSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
     """Service list serializer"""
 
     distance = serializers.SerializerMethodField()
@@ -136,7 +136,7 @@ class ServiceStationsCategoriesSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'image')
 
 
-class ServiceDetailSerializer(serializers.ModelSerializer, CoordinatesSerializer):
+class ServiceDetailSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
     """Service detail serializer"""
 
     class Meta:

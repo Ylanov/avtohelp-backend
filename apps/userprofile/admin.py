@@ -65,5 +65,5 @@ admin.site.register(FriendRequest, FriendRequestModelAdmin)
 admin.site.register(FriendList, FriendListModelAdmin)
 admin.site.register(BlackList, BlackListModelAdmin)
 admin.site.register(ProfileCar, ProfileCarModelAdmin)
-# admin.site.register(ProfileLocation, ProfileLocationModelAdmin)
+admin.site.register(ProfileLocation, ProfileLocationModelAdmin)
 
