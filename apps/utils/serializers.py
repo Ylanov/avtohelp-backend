@@ -11,12 +11,12 @@ class GeoLocationSerializerMixin(serializers.Serializer):
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.location, Point):
-            return obj.location.y
+            return obj.location.x
 
     def get_geo_lon(self, obj):
         """Point(longitude, latitude)"""
         if isinstance(obj.location, Point):
-            return obj.location.x
+            return obj.location.y
 
 
 class GeoPositonMixin(serializers.Serializer):
