@@ -24,14 +24,28 @@ class NewsDetailSerializer(serializers.ModelSerializer):
                   'publish_date', 'image')
 
 
+class PushNotificationScheduleSerializer(serializers.ModelSerializer):
+    """Serializer for PushNotificationSchedule model"""
+
+    hours = serializers.IntegerField(source='time.hour')
+    minutes = serializers.IntegerField(source='time.minute')
+
+    class Meta:
+        """Meta class"""
+        model = models.PushNotificationSchedule
+        fields = ('hours', 'minutes')
+
+
 class PushNotificationConfigurationSerializer(serializers.ModelSerializer):
-    """Serialzer for PushNotificationConfiguration model"""
+    """Serializer for PushNotificationConfiguration model"""
+
+    schedule = PushNotificationScheduleSerializer(many=True, source='notification_schedule')
 
     class Meta:
         """Meta class"""
 
         model = models.PushNotificationConfiguration
-        fields = ('radius', 'geo_position_lifetime')
+        fields = ('radius', 'geo_position_lifetime', 'schedule')
 
 
 class NotificationListSerializer(serializers.ModelSerializer):

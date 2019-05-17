@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
-from .models import Newsletter, PushNotification, PushNotificationConfiguration
+from .models import Newsletter, PushNotification, PushNotificationConfiguration, PushNotificationSchedule
 from solo.admin import SingletonModelAdmin
 
 
@@ -27,3 +27,4 @@ class PushNotificationModelAdmin(admin.ModelAdmin):
 admin.site.register(Newsletter, NewsletterModelAdmin)
 admin.site.register(PushNotification, PushNotificationModelAdmin)
 admin.site.register(PushNotificationConfiguration, SingletonModelAdmin)
+admin.site.register(PushNotificationSchedule)

@@ -78,12 +78,28 @@ class PushNotification(BaseMixin):
         return result
 
 
+class PushNotificationSchedule(models.Model):
+    """Push-notification schedule"""
+
+    time = models.TimeField(verbose_name=_("time"))
+
+    class Meta:
+        verbose_name = _('Push-notification schedule')
+        verbose_name_plural = _('Push-notification schedules')
+
+    def __str__(self):
+        """String representation"""
+        return f'{self.time.isoformat()}'
+
+
 class PushNotificationConfiguration(SingletonModel):
     """Configuration for sending Push-notifications"""
-    radius = models.FloatField(default=5000, blank=True, null=True)
-    geo_position_lifetime = models.TimeField(help_text=_('Lifetime for user geo-position'),
-                                             verbose_name=_('User geo-position lifetime'),
-                                             blank=True, null=True)
+
+    radius = models.FloatField(blank=True, null=True,
+                               default=5000, help_text=_('Radius in meters'))
+    geo_position_lifetime = models.TimeField(blank=True, null=True,
+                                             help_text=_('Profile geo-position lifetime'))
+    notification_schedule = models.ManyToManyField(PushNotificationSchedule)
 
     class Meta:
         verbose_name = _("Push notification configuration")
