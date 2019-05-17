@@ -80,10 +80,10 @@ class PushNotification(BaseMixin):
 
 class PushNotificationConfiguration(SingletonModel):
     """Configuration for sending Push-notifications"""
-    radius = models.FloatField(default=50000)
+    radius = models.FloatField(default=5000, blank=True, null=True)
     geo_position_lifetime = models.TimeField(help_text=_('Lifetime for user geo-position'),
                                              verbose_name=_('User geo-position lifetime'),
-                                             default=datetime.timedelta(minutes=30))
+                                             blank=True, null=True)
 
     class Meta:
         verbose_name = _("Push notification configuration")
