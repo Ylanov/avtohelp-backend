@@ -44,12 +44,12 @@ class PushNotificationConfigurationView(generics.GenericAPIView):
     Generics for singleton model PushNotificationConfiguration
     """
 
-    serializer_class = serializers.PushNotificationConfigurationSerializer
+    serializer_class = serializers.PushNotificationScheduleSerializer
 
     def get(self, request, *args, **kwargs):
         """Override get method"""
         obj = models.PushNotificationConfiguration.get_solo()
-        return Response(data=self.get_serializer(obj).data)
+        return Response(data=self.get_serializer(obj.notification_schedule, many=True).data)
 
 
 # class NewsListView(generics.ListAPIView):

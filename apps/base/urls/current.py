@@ -11,8 +11,8 @@ router.register(r'news', views.NewsViewSet)
 router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
-    path('notifications/configuration', views.PushNotificationConfigurationView.as_view(),
-         name='notification-configuration')
+    path('notifications/schedule', views.PushNotificationConfigurationView.as_view(),
+         name='notification-schedule')
     # path('news', views.NewsListView.as_view(), name='news-list'),
     # path('news/<int:pk>', views.NewsDetailView, name='news-detail'),
     # path('notifications', views.NotificationListView.as_view(), name='notifications-list'),
