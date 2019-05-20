@@ -86,6 +86,7 @@ class PushNotificationSchedule(models.Model):
     class Meta:
         verbose_name = _('Push-notification schedule')
         verbose_name_plural = _('Push-notification schedules')
+        ordering = ('time', )
 
     def __str__(self):
         """String representation"""
