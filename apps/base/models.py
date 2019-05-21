@@ -96,11 +96,15 @@ class PushNotificationSchedule(models.Model):
 class PushNotificationConfiguration(SingletonModel):
     """Configuration for sending Push-notifications"""
 
-    radius = models.FloatField(blank=True, null=True,
-                               default=5000, help_text=_('Radius in meters'))
-    geo_position_lifetime = models.TimeField(blank=True, null=True, default=datetime.time(hour=6),
+    radius = models.FloatField(blank=True, null=True, default=5000,
+                               verbose_name=_('Radius'),
+                               help_text=_('Radius in meters'))
+    geo_position_lifetime = models.TimeField(blank=True, null=True,
+                                             default=datetime.time(hour=6),
+                                             verbose_name=_('Geo position lifetime'),
                                              help_text=_('Profile geo-position lifetime'))
-    notification_schedule = models.ManyToManyField(PushNotificationSchedule)
+    notification_schedule = models.ManyToManyField(PushNotificationSchedule,
+                                                   verbose_name=_('Notification schedule'))
 
     class Meta:
         verbose_name = _("Push notification configuration")
