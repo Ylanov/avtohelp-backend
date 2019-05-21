@@ -98,7 +98,7 @@ class PushNotificationConfiguration(SingletonModel):
 
     radius = models.FloatField(blank=True, null=True,
                                default=5000, help_text=_('Radius in meters'))
-    geo_position_lifetime = models.TimeField(blank=True, null=True,
+    geo_position_lifetime = models.TimeField(blank=True, null=True, default=datetime.time(hour=6),
                                              help_text=_('Profile geo-position lifetime'))
     notification_schedule = models.ManyToManyField(PushNotificationSchedule)
 

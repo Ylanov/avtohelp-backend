@@ -1,10 +1,13 @@
 """Account app models."""
 
 from django.contrib.auth.models import AbstractUser, UserManager as AbstractUserManager
+from django.contrib.gis.db.models.functions import Distance
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
+from base.models import PushNotificationConfiguration
 from userprofile.models import Profile, ProfileGallery, ProfileLocation
 from utils.mixins import BaseMixin
 
@@ -19,6 +22,32 @@ class UserQuerySet(models.QuerySet):
     def by_phone(self, phone):
         """Queryset by user phone"""
         return self.filter(phone=phone)
+
+    def annotate_geo_position_relevance(self):
+        """Is the geo-position information current?"""
+        geo_pos_settings = PushNotificationConfiguration.get_solo()
+        return self.annotate(geo_position_is_valid=models.Case(
+            #  Check if geo position is not Null
+            models.When(profilelocation__location__isnull=False,
+                        then=True),
+            #  Check modified date
+            models.When(profilelocation__modified__lte=(
+                    timezone.now() - timezone.timedelta(hours=geo_pos_settings.geo_position_lifetime.hour)),
+                then=True),
+            models.When(profilelocation__modified__lte=(
+                    timezone.now() - timezone.timedelta(minutes=geo_pos_settings.geo_position_lifetime.minute)),
+                then=True),
+            output_field=models.BooleanField(default=False),
+            default=False
+        ))
+
+    def annotate_distance_from_assistance_request(self, assistance_request):
+        """Annotate distance between user location and assistance request"""
+        return self.annotate_geo_position_relevance().annotate(distance=models.Case(
+            models.When(
+                geo_position_is_valid=True,
+                then=Distance('profilelocation__location', assistance_request.location))
+        ))
 
 
 class UserManager(AbstractUserManager):

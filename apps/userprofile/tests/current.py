@@ -117,7 +117,9 @@ class TestProfile(APITestCase):
         """Common test for retrieving profiles list"""
 
         # Create additional users
-        User.objects.make(phone='+79000000002')
+        u_1 = User.objects.make(phone='+79000000002')
+        u_1.profile.first_name, u_1.profile.last_name = 'Test', 'Testovich'
+        u_1.profile.save()
 
         # Authorize user 1
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -143,7 +145,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_2 in BlackList
         BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -168,7 +175,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -195,8 +207,16 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
+
         user_4 = User.objects.make(phone='+79000000004')
+        user_4.profile.first_name, user_4.profile.last_name = 'Test', 'Testovich'
+        user_4.profile.save()
 
         # Put user_2 in BlackList
         BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -219,6 +239,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         api_path = '%s:userprofile:profile-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': user_2.profile.id}))
@@ -260,7 +282,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -282,7 +309,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -303,7 +335,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
@@ -324,7 +361,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
@@ -345,7 +387,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
@@ -366,7 +413,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
@@ -388,7 +440,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Put user_3 in FriendList
         FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=False)
@@ -410,6 +467,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
@@ -429,6 +488,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
 
@@ -447,6 +508,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
 
@@ -464,6 +527,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
 
@@ -479,7 +544,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Create friend request for user_3
         FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
@@ -501,7 +571,12 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
         user_3 = User.objects.make(phone='+79000000003')
+        user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
+        user_3.profile.save()
 
         # Create friend request for user_3
         friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
@@ -522,6 +597,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Create friend request for user_2
         friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
@@ -542,6 +619,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Put user_2 to friends
         friend_request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -559,6 +638,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Put user_2 to friends
         friend_request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
@@ -578,6 +659,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Before request
         blacked_before = BlackList.objects.count()
@@ -602,6 +685,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Put user_2 in BlackList
         black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -621,6 +706,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Put user_2 in BlackList
         black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -639,6 +726,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Before request
         blacked_before = BlackList.objects.count()
@@ -656,6 +745,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         api_path = '%s:userprofile:friendrequest-create' % self.VERSION
         response = self.client.post(reverse(api_path), data={'profile': user_2.profile.id})
@@ -684,6 +775,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         api_path = '%s:userprofile:friendrequest-create' % self.VERSION
         response = self.client.post(reverse(api_path), data={'profile': user_2.profile.id})
@@ -820,6 +913,8 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Create images for gallery
         ProfileGallery.objects.create(profile=self.user_1.profile)
@@ -857,6 +952,8 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Create images for gallery
         profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
@@ -922,6 +1019,8 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Create images for gallery
         profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
@@ -956,6 +1055,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Added user_2 to friend list
         friend_request = FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
@@ -970,6 +1071,8 @@ class TestProfile(APITestCase):
         """Test case for correct value of annotated field friend"""
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Authorize user_1
         token, created = Token.objects.get_or_create(user=user_2)
@@ -992,6 +1095,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Added user_2 to black list
         BlackList.objects.create(owner=self.user_1, foe=user_2)
@@ -1005,6 +1110,8 @@ class TestProfile(APITestCase):
         """Test case for correct value of annotated field foe"""
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Authorize user_1
         token, created = Token.objects.get_or_create(user=user_2)
@@ -1026,6 +1133,8 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
 
         # Create friend request for user_2
         FriendRequest.objects.create(owner=self.user_1, invited=user_2)

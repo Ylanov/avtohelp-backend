@@ -98,7 +98,7 @@ class TestCatalog(APITestCase):
     def test_list_car_colors_w_filter(self):
         """Test view for getting list of users cars colors w/ filter by color name"""
         api_path = '%s:car:carcolor-list' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path), data={'name': self.color_2.name})
+        response = self.client.get(reverse(api_path), data={'color_name': self.color_2.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarColor.objects.filter(name=self.color_2.name).count())
 
@@ -115,11 +115,7 @@ class TestCatalog(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarMark.objects.filter(carmodel__name=self.toyota_model.name).count())
 
-        response = self.client.get(reverse(api_path), data={'model_id': self.toyota_model.id})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), CarMark.objects.filter(carmodel__id=self.toyota_model.id).count())
-
-        response = self.client.get(reverse(api_path), data={'name': self.toyota.name})
+        response = self.client.get(reverse(api_path), data={'mark_name': self.toyota.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), CarMark.objects.filter(name=self.toyota.name).count())
 
@@ -143,11 +139,7 @@ class TestCatalog(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), CarModel.objects.filter(mark__name=self.toyota.name).count())
 
-        response = self.client.get(reverse(api_path), data={'mark_id': self.toyota.id})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), CarModel.objects.filter(mark__id=self.toyota.id).count())
-
-        response = self.client.get(reverse(api_path), data={'name': self.toyota_model.name})
+        response = self.client.get(reverse(api_path), data={'model_name': self.toyota_model.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), CarModel.objects.filter(name=self.toyota_model.name).count())
 
@@ -182,14 +174,6 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path), data={'model_name': self.toyota_model.name})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), Car.objects.filter(car_model__name=self.toyota_model.name).count())
-
-        response = self.client.get(reverse(api_path), data={'mark_id': self.toyota.id})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Car.objects.filter(mark__id=self.toyota.id).count())
-
-        response = self.client.get(reverse(api_path), data={'model_id': self.toyota_model.id})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Car.objects.filter(car_model__id=self.toyota_model.id).count())
 
     def test_car_detail(self):
         """Test view for getting detail of user car"""

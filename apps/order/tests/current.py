@@ -8,6 +8,7 @@ from rest_framework.test import APITestCase
 from account import models as account_models
 from catalog import models as catalog_models
 from car import models as car_models
+from base import models as base_models
 from order import models
 from userprofile import models as profile_models
 
@@ -48,21 +49,24 @@ class TestOrder(APITestCase):
         self.user_2 = account_models.User.objects.make(phone='+79000000002')
         self.user_3 = account_models.User.objects.make(phone='+79000000003')
 
+        # Create devices
+        self.device_1 = profile_models.FCMDevice.objects.create(user=self.user_1, active=True)
+        self.device_2 = profile_models.FCMDevice.objects.create(user=self.user_2, active=True)
+        self.device_3 = profile_models.FCMDevice.objects.create(user=self.user_3, active=True)
+
         # Create assistance requests
         models.AssistanceRequest.objects.create(user=self.user_1,
                                                 issue='Issue 1',
                                                 description='Description',
                                                 location=Point(45.061016, 38.944007, srid=4326))
-        self.assistance_request = models.AssistanceRequest.objects.create(user=self.user_2,
-                                                                          issue='Issue 2',
-                                                                          description='Description',
-                                                                          location=Point(55.062003, 28.940738, srid=4326))
+        self.assistance_request_1 = models.AssistanceRequest.objects.create(user=self.user_2,
+                                                                            issue='Issue 2',
+                                                                            description='Description',
+                                                                            location=Point(55.062003, 28.940738, srid=4326))
         models.AssistanceRequest.objects.create(user=self.user_3,
                                                 issue='Issue 3',
                                                 description='Description',
                                                 location=Point(65.062003, 18.940738, srid=4326))
-
-
 
         # Create user cars
         self.car_1 = car_models.Car.objects.create(mark=self.toyota,
@@ -133,12 +137,12 @@ class TestOrder(APITestCase):
     def test_service_list_query_2(self):
         """Test service list query - filter by profile id"""
         query = {
-            'profile_id': self.assistance_request.user.profile.id
+            'profile_id': self.assistance_request_1.user.profile.id
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0].get('profile_id'), self.assistance_request.user.profile.id)
+        self.assertEqual(response.data[0].get('profile_id'), self.assistance_request_1.user.profile.id)
 
     def test_service_list_query_3(self):
         """Test service list query - filter by distance"""
@@ -148,8 +152,8 @@ class TestOrder(APITestCase):
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0].get('distance'), 0.0)  # output in meters
-        self.assertEqual(response.data[1].get('distance'), 1504877.55296152)  # output in meters
+        self.assertEqual(response.data[1].get('distance'), 0.0)  # output in meters
+        self.assertEqual(response.data[2].get('distance'), 1504877.55296152)  # output in meters
 
     def test_count_created_assistance_requests(self):
         """
@@ -188,6 +192,22 @@ class TestOrder(APITestCase):
         )
         response = self.client.get(reverse(api_path, kwargs={'pk': assistance_request.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sent_notification_by_distance_and_location_relevance(self):
+        """Test sent notification by distance and location relevance"""
+        self.user_2.profilelocation.location = Point(x=45.04934, y=38.960508, srid=4326)
+        self.user_2.profilelocation.save()
+        assistance_request = models.AssistanceRequest.objects.create(user=self.user_2,
+                                                                     issue='Issue 1',
+                                                                     description='Description',
+                                                                     location=Point(45.05934, 38.960508, srid=4326))
+        singleton = base_models.PushNotificationConfiguration.get_solo()
+        devices = profile_models.FCMDevice.objects.filter(active=True) \
+            .annotate_device_geo_position_relevance() \
+            .filter(geo_position_is_valid=True) \
+            .annotate_device_distance_from_assistance_request(assistance_request=assistance_request) \
+            .filter(distance__lte=singleton.radius)
+        self.assertEqual(devices.count(), 1)
 
     # def test_update_assistance_request(self):
     #     """Test update of created assurance requests"""

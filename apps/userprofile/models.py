@@ -9,8 +9,9 @@ from online_users.models import OnlineUserActivity as activity
 from utils.mixins import BaseMixin, ImageMixin
 from project import celery as tasks
 from django.conf import settings
-from django.contrib.gis.measure import Distance
+from django.contrib.gis.db.models.functions import Distance
 from base.models import PushNotificationConfiguration
+from django.utils import timezone
 
 
 class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
@@ -21,6 +22,38 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
         configuration = PushNotificationConfiguration.get_solo()
         return self.filter(user__profilelocation__location__distance_lte=(point, Distance(m=configuration.radius)))
 
+    def annotate_device_geo_position_relevance(self):
+        """Is the device geo-position information current?"""
+        geo_pos_settings = PushNotificationConfiguration.get_solo()
+        return self.annotate(geo_position_is_valid=models.Case(
+            #  Check if geo position is not Null
+            models.When(user__profilelocation__location__isnull=False,
+                        then=True),
+
+            #  Check modified date
+            models.When(user__profilelocation__modified__lte=(
+                    timezone.now() - timezone.timedelta(hours=geo_pos_settings.geo_position_lifetime.hour)),
+                then=True),
+            models.When(user__profilelocation__modified__lte=(
+                    timezone.now() - timezone.timedelta(minutes=geo_pos_settings.geo_position_lifetime.minute)),
+                then=True),
+            output_field=models.BooleanField(default=False),
+            default=False
+        ))
+
+    def annotate_device_distance_from_assistance_request(self, assistance_request):
+        """Annotate distance between user device location and assistance request"""
+        return self.annotate_device_geo_position_relevance().annotate(distance=models.Case(
+            models.When(
+                geo_position_is_valid=True,
+                then=Distance('user__profilelocation__location', assistance_request.location))
+        ))
+
+
+class FCMDeviceManager(models.Manager):
+    def get_queryset(self):
+        return FCMDeviceQuerySet(self.model)
+
 
 class FCMDevice(fcm_models.AbstractFCMDevice):
     """Firebase Cloud Messaging model"""
@@ -29,7 +62,7 @@ class FCMDevice(fcm_models.AbstractFCMDevice):
                              related_name='fcm_user',
                              on_delete=models.CASCADE)
 
-    objects = fcm_models.FCMDeviceManager.from_queryset(FCMDeviceQuerySet)()
+    objects = FCMDeviceManager()
 
     class Meta:
         verbose_name = _('FCM device')

@@ -33,7 +33,7 @@ class TestCatalog(TestCase):
 
         api_path = '%s:authorization:verify' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.post(reverse(api_path), data=data)
-        sms_code = SMSCode.objects.filter(phone=data.get('phone')).first()
+        sms_code = SMSCode.objects.filter(phone=self.phone).first()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(sms_code.status, sms_code.SENT)
 

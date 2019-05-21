@@ -165,11 +165,26 @@ def notify_chat_participants(sender_id, participants, room_id):
 
 
 @app.task
-def notify_assistance_request(sender_id):
+def notify_assistance_request(request_id, sender_id):
     """Notify users about assistance request"""
     from base import models as base_models
+    from order import models as order_models
     from userprofile.models import FCMDevice
-    devices = FCMDevice.objects.exclude(user_id=sender_id).filter(active=True)
+
+    #  Settings
+    singleton = base_models.PushNotificationConfiguration.get_solo()
+    #  Assistance request
+    request = order_models.AssistanceRequest.objects.get(id=request_id)
+
+    #  Get active devices
+    devices = FCMDevice.objects.filter(active=True)\
+        .annotate_device_geo_position_relevance()\
+        .filter(geo_position_is_valid=True)\
+        .annotate_device_distance_from_assistance_request(assistance_request=request)\
+        .filter(distance__lte=singleton.radius) \
+        .exclude(user=sender_id)
+
+    #  Sent PUSH-notifications for filtered users
     for device in devices:
         notification = base_models.PushNotification.objects.create(
             user=device.user,

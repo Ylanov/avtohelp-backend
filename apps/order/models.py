@@ -41,7 +41,7 @@ class AssistanceRequestQuerySet(models.QuerySet):
             Q(user__blacklist_owner__foe=user) |
             Q(user__blacked_user__owner=user))
 
-    def annotate_distance(self, raw_coordinates):
+    def annotate_distance(self, raw_coordinates=None, latitude=None, longitude=None):
         """
         Annotate service distance from position
         raw_coordinates can contain -
@@ -51,6 +51,8 @@ class AssistanceRequestQuerySet(models.QuerySet):
         if raw_coordinates:
             x, y = raw_coordinates.split(',')[0], raw_coordinates.split(',')[1]
             return self.annotate(distance=Distance('location', Point(float(x), float(y), srid=4326)))
+        elif latitude and longitude:
+            return self.annotate(distance=Distance('location', Point(float(latitude), float(longitude), srid=4326)))
         return self
 
 
@@ -106,6 +108,6 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     def send_push_notification(self):
         """Notify all users about new assistance request"""
         if settings.USE_CELERY:
-            tasks.notify_assistance_request.delay(sender_id=self.user.id)
+            tasks.notify_assistance_request.delay(request_id=self.id, sender_id=self.user.id)
         else:
-            tasks.notify_assistance_request(sender_id=self.user.id)
+            tasks.notify_assistance_request(request_id=self.id, sender_id=self.user.id)
