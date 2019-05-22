@@ -27,19 +27,16 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
         geo_pos_settings = PushNotificationConfiguration.get_solo()
         hours, minutes = geo_pos_settings.geo_position_lifetime.hour, geo_pos_settings.geo_position_lifetime.minute
 
-        return self.annotate(geo_position_is_valid=models.Case(models.When(
-            user__profilelocation__modified__gte=timezone.now() - timezone.timedelta(hours=hours, minutes=minutes),
-            then=True),
+        return self.annotate(geo_position_is_valid=models.Case(
+            models.When(
+                user__profilelocation__modified__gte=timezone.now() - timezone.timedelta(hours=hours, minutes=minutes),
+                then=True),
             output_field=models.BooleanField(default=False), default=False
         ))
 
     def annotate_device_distance_from_assistance_request(self, assistance_request):
         """Annotate distance between user device location and assistance request"""
-        return self.annotate_device_geo_position_relevance().annotate(distance=models.Case(
-            models.When(
-                geo_position_is_valid=True,
-                then=Distance('user__profilelocation__location', assistance_request.location))
-        ))
+        return self.annotate(distance=Distance('user__profilelocation__location', assistance_request.location))
 
 
 class FCMDeviceManager(models.Manager):

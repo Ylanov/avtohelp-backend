@@ -165,7 +165,7 @@ def notify_chat_participants(sender_id, participants, room_id):
 
 
 @app.task
-def notify_assistance_request(request_id, sender_id):
+def notify_assistance_request(request_id):
     """Notify users about assistance request"""
     from base import models as base_models
     from order import models as order_models
@@ -176,13 +176,26 @@ def notify_assistance_request(request_id, sender_id):
     #  Assistance request
     request = order_models.AssistanceRequest.objects.get(id=request_id)
 
-    #  Get active devices
+    """
+    Get active devices
+    
+    Filter devices by active state
+    .annotate_device_geo_position_relevance()
+    annotate field that geo position updated not earlier than value that set in singleton object
+    
+    .annotate_device_distance_from_assistance_request(assistance_request=request)
+    annotate field distance, that evaluate by this func Distance('profilelocation', assistance_request.location)
+    
+    .filter(distance__lte=singleton.radius)
+    filter on it and check if annotated field value (annotated distance) is less or equal than radius in 
+    singleton object 
+    """
     devices = FCMDevice.objects.filter(active=True)\
         .annotate_device_geo_position_relevance()\
         .filter(geo_position_is_valid=True)\
         .annotate_device_distance_from_assistance_request(assistance_request=request)\
         .filter(distance__lte=singleton.radius) \
-        .exclude(user=sender_id)
+        .exclude(user=request.user)
 
     #  Sent PUSH-notifications for filtered users
     for device in devices:
