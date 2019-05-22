@@ -25,20 +25,12 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
     def annotate_device_geo_position_relevance(self):
         """Is the device geo-position information current?"""
         geo_pos_settings = PushNotificationConfiguration.get_solo()
-        return self.annotate(geo_position_is_valid=models.Case(
-            #  Check if geo position is not Null
-            models.When(user__profilelocation__location__isnull=False,
-                        then=True),
+        hours, minutes = geo_pos_settings.geo_position_lifetime.hour, geo_pos_settings.geo_position_lifetime.minute
 
-            #  Check modified date
-            models.When(user__profilelocation__modified__lte=(
-                    timezone.now() - timezone.timedelta(hours=geo_pos_settings.geo_position_lifetime.hour)),
-                then=True),
-            models.When(user__profilelocation__modified__lte=(
-                    timezone.now() - timezone.timedelta(minutes=geo_pos_settings.geo_position_lifetime.minute)),
-                then=True),
-            output_field=models.BooleanField(default=False),
-            default=False
+        return self.annotate(geo_position_is_valid=models.Case(models.When(
+            user__profilelocation__modified__gte=timezone.now() - timezone.timedelta(hours=hours, minutes=minutes),
+            then=True),
+            output_field=models.BooleanField(default=False), default=False
         ))
 
     def annotate_device_distance_from_assistance_request(self, assistance_request):

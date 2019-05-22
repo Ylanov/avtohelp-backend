@@ -3,11 +3,11 @@ import random
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.core.cache import caches
+from django.db import models
 from django.utils import timezone
 
 from chat import models as chat_models
 from userprofile import models as profile_models
-from django.db import models
 from utils import api_exceptions
 
 
