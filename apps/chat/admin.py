@@ -6,6 +6,14 @@ from django.utils.translation import ugettext_lazy as _
 from chat import models
 
 
+class ChatMessagesInlineModel(admin.TabularInline):
+    """Inline model for ChatMessage"""
+    model = models.ChatMessage
+    readonly_fields = ('sender', 'message', 'created')
+    fields = readonly_fields
+    extra = 0
+
+
 class ChatRoomInlineModel(admin.StackedInline):
     """Inline for model ChatRoom"""
     model = models.ChatRoom
@@ -13,6 +21,7 @@ class ChatRoomInlineModel(admin.StackedInline):
 
 class ChatRoomAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
+    inlines = (ChatMessagesInlineModel,)
     readonly_fields = ('id', 'created', 'modified')
     list_display = readonly_fields + ('is_public',)
     filter_horizontal = ('participants',)
@@ -52,7 +61,7 @@ class ChatMessageAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
     readonly_fields = ('id', 'created', 'modified', 'get_room_link', 'get_room_id', 'message')
     list_display = readonly_fields[:-2]
-    ordering = ('-created', 'id')
+    ordering = ('-timestamp', 'id')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
         (_('Room\'s data'), {'fields': ('get_room_id', 'get_room_link')}),
@@ -106,4 +115,4 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
 
 admin.site.register(models.ChatRoom, ChatRoomAdminModel)
 admin.site.register(models.ChatMessage, ChatMessageAdminModel)
-admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
+# admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)

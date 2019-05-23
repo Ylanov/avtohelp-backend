@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-21 14:46+0000\n"
+"POT-Creation-Date: 2019-05-23 14:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgid "email address"
 msgstr "Адрес электронной почты"
 
 #: apps/account/models.py:98 apps/authorization/models.py:127
-#: apps/base/models.py:48 apps/order/models.py:84
+#: apps/base/models.py:48 apps/chat/models.py:188 apps/order/models.py:84
 msgid "User"
 msgstr "Пользователь"
 
@@ -58,8 +58,8 @@ msgstr "Информация о пользователе"
 msgid "SMS data"
 msgstr "Дата СМС-сообщения"
 
-#: apps/authorization/admin.py:15 apps/base/admin.py:13 apps/chat/admin.py:20
-#: apps/chat/admin.py:57 apps/chat/admin.py:85 apps/order/admin.py:16
+#: apps/authorization/admin.py:15 apps/base/admin.py:13 apps/chat/admin.py:29
+#: apps/chat/admin.py:66 apps/chat/admin.py:94 apps/order/admin.py:16
 #: apps/userprofile/admin.py:30
 msgid "Info"
 msgstr "Информация"
@@ -182,7 +182,7 @@ msgid "Event"
 msgstr "Событие"
 
 #: apps/base/models.py:52 apps/order/models.py:92
-#: apps/userprofile/models.py:322
+#: apps/userprofile/models.py:311
 msgid "Status"
 msgstr "Статус"
 
@@ -267,7 +267,7 @@ msgid "Car"
 msgstr "Автомобиль"
 
 #: apps/car/models.py:92 apps/order/admin.py:15 apps/order/models.py:90
-#: apps/userprofile/admin.py:29 apps/userprofile/models.py:212
+#: apps/userprofile/admin.py:29 apps/userprofile/models.py:201
 msgid "Location"
 msgstr "Местоположение"
 
@@ -307,39 +307,39 @@ msgstr "Город"
 msgid "Cities"
 msgstr "Города"
 
-#: apps/chat/admin.py:21 apps/chat/admin.py:58
+#: apps/chat/admin.py:30 apps/chat/admin.py:67
 msgid "Room's data"
 msgstr "Информация о комнате чата"
 
-#: apps/chat/admin.py:59
+#: apps/chat/admin.py:68
 msgid "Message"
 msgstr "Сообщение"
 
-#: apps/chat/admin.py:69
+#: apps/chat/admin.py:78
 msgid "Link to chat room"
 msgstr "Ссылка на объект комнаты чата"
 
-#: apps/chat/admin.py:75
+#: apps/chat/admin.py:84
 msgid "Room ID"
 msgstr "Идентификатор комнаты чата"
 
-#: apps/chat/admin.py:86
+#: apps/chat/admin.py:95
 msgid "Date's"
 msgstr "Даты"
 
-#: apps/chat/admin.py:87
+#: apps/chat/admin.py:96
 msgid "Message's data"
 msgstr "Информация о сообщении"
 
-#: apps/chat/admin.py:88
+#: apps/chat/admin.py:97 apps/chat/models.py:73
 msgid "Sender"
 msgstr "Отправитель"
 
-#: apps/chat/admin.py:98
+#: apps/chat/admin.py:107
 msgid "Link to chat message"
 msgstr "Ссылка на объект сообщения"
 
-#: apps/chat/admin.py:104
+#: apps/chat/admin.py:113
 msgid "Message text"
 msgstr "Текст сообщения"
 
@@ -347,17 +347,68 @@ msgstr "Текст сообщения"
 msgid "Chat"
 msgstr "Чат"
 
-#: apps/chat/models.py:167
+#: apps/chat/models.py:76 apps/chat/models.py:192
+#, fuzzy
+#| msgid "Room ID"
+msgid "Room"
+msgstr "Идентификатор комнаты чата"
+
+#: apps/chat/models.py:77
+msgid "Text message"
+msgstr "Новое сообщение"
+
+#: apps/chat/models.py:79
+msgid "Recording date"
+msgstr "Дата записи в БД"
+
+#: apps/chat/models.py:86
+msgid "Chat message"
+msgstr "Сообщение"
+
+#: apps/chat/models.py:87
+msgid "Chat messages"
+msgstr "Сообщения"
+
+#: apps/chat/models.py:151 apps/userprofile/models.py:159
+#: apps/utils/mixins.py:88
+msgid "Name"
+msgstr "Имя"
+
+#: apps/chat/models.py:154
+msgid "Participants"
+msgstr "Участники"
+
+#: apps/chat/models.py:156
+msgid "is public"
+msgstr "Публичная"
+
+#: apps/chat/models.py:162
+msgid "Chat room"
+msgstr "Чат-комната"
+
+#: apps/chat/models.py:163
+msgid "Chat rooms"
+msgstr "Чат-комнаты"
+
+#: apps/chat/models.py:181
 msgid "Moderator"
 msgstr "Модератор"
 
-#: apps/chat/models.py:168
+#: apps/chat/models.py:182
 msgid "Participant"
 msgstr "Участник"
 
-#: apps/chat/models.py:177
+#: apps/chat/models.py:194
 msgid "Role"
 msgstr "Роль"
+
+#: apps/chat/models.py:198
+msgid "Chat role"
+msgstr "Чат"
+
+#: apps/chat/models.py:199
+msgid "Chat roles"
+msgstr "Роли чата"
 
 #: apps/documentation/apps.py:10
 msgid "Documentation"
@@ -458,98 +509,94 @@ msgstr "Выключить выбранные устройства"
 msgid "User profile"
 msgstr "Профиль пользователя"
 
-#: apps/userprofile/models.py:68
+#: apps/userprofile/models.py:57
 msgid "FCM device"
 msgstr "Firebase Cloud Messaging Device"
 
-#: apps/userprofile/models.py:69
+#: apps/userprofile/models.py:58
 #, fuzzy
 #| msgid "Services"
 msgid "FCM devices"
 msgstr "Сервисы"
 
-#: apps/userprofile/models.py:170 apps/utils/mixins.py:88
-msgid "Name"
-msgstr "Имя"
-
-#: apps/userprofile/models.py:172
+#: apps/userprofile/models.py:161
 msgid "Last name"
 msgstr "Фамилия"
 
-#: apps/userprofile/models.py:182
+#: apps/userprofile/models.py:171
 msgid "Profile"
 msgstr "Профиль"
 
-#: apps/userprofile/models.py:183
+#: apps/userprofile/models.py:172
 msgid "Profiles"
 msgstr "Профили"
 
-#: apps/userprofile/models.py:198
+#: apps/userprofile/models.py:187
 msgid "License plate"
 msgstr "Номерной знак автомобиля"
 
-#: apps/userprofile/models.py:204
+#: apps/userprofile/models.py:193
 msgid "Profile car"
 msgstr "Автомобили пользователя"
 
-#: apps/userprofile/models.py:205
+#: apps/userprofile/models.py:194
 msgid "Profile cars"
 msgstr "Автомобили пользователей"
 
-#: apps/userprofile/models.py:218
+#: apps/userprofile/models.py:207
 msgid "Profile location"
 msgstr "Местоположение пользователя"
 
-#: apps/userprofile/models.py:219
+#: apps/userprofile/models.py:208
 msgid "Profile locations"
 msgstr "Местоположения пользователей"
 
-#: apps/userprofile/models.py:258
+#: apps/userprofile/models.py:247
 msgid "Gallery item"
 msgstr "Галлерея"
 
-#: apps/userprofile/models.py:259
+#: apps/userprofile/models.py:248
 msgid "Gallery items"
-msgstr "Галлереи"
+msgstr "Галереи"
 
-#: apps/userprofile/models.py:316 apps/userprofile/models.py:385
-#: apps/userprofile/models.py:444
+#: apps/userprofile/models.py:305 apps/userprofile/models.py:374
+#: apps/userprofile/models.py:433
 msgid "Owner"
 msgstr "Владелец"
 
-#: apps/userprofile/models.py:319
+#: apps/userprofile/models.py:308
 msgid "Invited user"
 msgstr "Приглашенный пользователь"
 
-#: apps/userprofile/models.py:328 apps/userprofile/models.py:329
+#: apps/userprofile/models.py:317 apps/userprofile/models.py:318
 msgid "Friend request"
 msgstr "Запрос в друзья"
 
-#: apps/userprofile/models.py:388
+#: apps/userprofile/models.py:377
 msgid "Friend"
 msgstr "Друг"
 
-#: apps/userprofile/models.py:392
+#: apps/userprofile/models.py:381
 msgid "Request"
 msgstr "Запрос"
 
-#: apps/userprofile/models.py:400
+#: apps/userprofile/models.py:389
 msgid "Friend list"
 msgstr "Список друзей"
 
-#: apps/userprofile/models.py:401
+#: apps/userprofile/models.py:390
 msgid "Friend lists"
 msgstr "Списки друзей"
 
-#: apps/userprofile/models.py:447
+#: apps/userprofile/models.py:436
 msgid "Foe"
 msgstr "Враг"
 
-#: apps/userprofile/models.py:455
+#: apps/userprofile/models.py:444
 msgid "Black list"
 msgstr "Черный список"
 
-#: apps/userprofile/models.py:456
+#: apps/userprofile/models.py:445
 msgid "Black lists"
 msgstr "Черные списки"
 
@@ -708,11 +755,11 @@ msgstr "Новое сообщение"
 msgid "User %s wrote a message"
 msgstr "Пользователь %s написал сообщение"
 
-#: project/celery.py:191
+#: project/celery.py:204
 msgid "New assistance request"
 msgstr "Новый запрос помощи"
 
-#: project/celery.py:192
+#: project/celery.py:205
 msgid "New assistance request was published"
 msgstr "Новый запрос помощи был опубликован"
 

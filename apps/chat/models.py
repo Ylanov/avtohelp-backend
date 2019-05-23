@@ -69,16 +69,22 @@ class ChatMessageManager(models.Manager):
 class ChatMessage(BaseMixin):
     """Chat messages"""
     sender = models.ForeignKey('account.User',
-                               on_delete=models.CASCADE)
+                               on_delete=models.CASCADE,
+                               verbose_name=_('Sender'))
     room = models.ForeignKey('ChatRoom',
-                             on_delete=models.CASCADE)
-    message = models.TextField()
+                             on_delete=models.CASCADE,
+                             verbose_name=_('Room'))
+    message = models.TextField(verbose_name=_('Text message'))
+    timestamp = models.DateTimeField(blank=True, default=None, null=True,
+                                     verbose_name=_('Recording date'))
 
     objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
 
     class Meta:
         """Meta class"""
         ordering = ('-created',)
+        verbose_name = _('Chat message')
+        verbose_name_plural = _('Chat messages')
 
     def send_push_notification_offline_users(self):
         """Sent push notification to offline users in chat room exclude sender"""
@@ -141,12 +147,20 @@ class ChatRoomQuerySet(models.QuerySet):
 class ChatRoom(BaseMixin, ImageMixin):
     """Chat room"""
     name = models.CharField(max_length=24,
-                            blank=True, default=None, null=True)
+                            blank=True, default=None, null=True,
+                            verbose_name=_('Name'))
     participants = models.ManyToManyField('account.User',
-                                          related_name='participants')
-    is_public = models.BooleanField(default=False)
+                                          related_name='participants',
+                                          verbose_name=_('Participants'))
+    is_public = models.BooleanField(default=False,
+                                    verbose_name=_('is public'))
 
     objects = ChatRoomManager.from_queryset(ChatRoomQuerySet)()
+
+    class Meta:
+        """Meta class"""
+        verbose_name = _('Chat room')
+        verbose_name_plural = _('Chat rooms')
 
     @property
     def group_name(self):
@@ -170,12 +184,19 @@ class ChatRole(BaseMixin):
 
     user = models.ForeignKey('account.User',
                              related_name='user_role',
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             verbose_name=_('User'))
     room = models.ForeignKey('ChatRoom',
                              related_name='room_role',
-                             on_delete=models.CASCADE)
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, verbose_name=_('Role'),
-                                            default=PARTICIPANT, blank=True, null=True)
+                             on_delete=models.CASCADE,
+                             verbose_name=_('Room'))
+    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=PARTICIPANT,
+                                            blank=True, null=True, verbose_name=_('Role'))
+
+    class Meta:
+        """Meta class"""
+        verbose_name = _('Chat role')
+        verbose_name_plural = _('Chat roles')
 
 
 class ChatReadMessageQuerySet(models.QuerySet):
