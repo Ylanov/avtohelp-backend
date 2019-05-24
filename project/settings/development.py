@@ -6,7 +6,7 @@ USE_CELERY = True
 USE_SMS = False  # Actual sms sending switcher
 
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
+ALLOWED_HOSTS = ['roadhelper.spider.ru', 'roadhelper-prod.spider.ru', ]
 
 
 # Celery settings
