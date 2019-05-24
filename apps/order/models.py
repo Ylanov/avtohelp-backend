@@ -6,6 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+from django.db import transaction
 
 from project import celery as tasks
 from utils.mixins import BaseMixin, ImageMixin
@@ -108,6 +109,6 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     def send_push_notification(self):
         """Notify all users about new assistance request"""
         if settings.USE_CELERY:
-            tasks.notify_assistance_request.delay(self.id)
+            transaction.on_commit(lambda: tasks.notify_assistance_request.delay(self.id))
         else:
-            tasks.notify_assistance_request(self.id)
+            transaction.on_commit(lambda: tasks.notify_assistance_request(self.id))
