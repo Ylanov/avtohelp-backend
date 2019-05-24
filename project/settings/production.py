@@ -1,8 +1,13 @@
 """Production server configuration."""
 from .base import *  # NOQA
 
-USE_CELERY = False
+ALLOWED_HOSTS = ['roadhelper-prod.spider.ru', ]
+
+
 DEBUG = False
+USE_CELERY = True
+USE_SMS = True  # Actual sms sending switcher
+
 
 # Celery settings
 CELERY_RESULT_BACKEND = 'redis://base:6379/13'
