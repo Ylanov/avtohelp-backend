@@ -2,4 +2,4 @@
 
 sleep 5
 
-celery -A project -B -l info
+celery -A project worker -B -l info
