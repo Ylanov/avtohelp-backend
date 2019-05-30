@@ -74,13 +74,13 @@ class ProfileCarDetailSerializer(serializers.ModelSerializer):
 class ProfileViewSerializer(serializers.ModelSerializer):
     """Profile serializer for Requests"""
 
-    car_detail = ProfileCarDetailSerializer(source='user.profilecar_set.first')
+    profile_car = ProfileCarDetailSerializer(source='user.profilecar_set.first')
 
     class Meta:
         """Meta class"""
 
         model = models.Profile
-        fields = ('id', 'first_name', 'last_name', 'car_detail')
+        fields = ('id', 'first_name', 'last_name', 'profile_car')
 
 
 class ProfileSerializer(serializers.ModelSerializer):
