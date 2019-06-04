@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
+from account import models as account_models
 from utils.mixins import BaseMixin, ImageMixin
 
 
@@ -26,17 +27,52 @@ class Newsletter(BaseMixin, ImageMixin):
         verbose_name_plural = _('Newsletter')
 
 
+class PushNotificationManager(models.Manager):
+    """PushNotification manager"""
+
+    def make_friend_request_notification(self, user):
+        """Make common notification for friend request"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+        obj = self.model(
+            user_id=user_id,
+            title=_('New friend request'),
+            description=_('A new friend request has been received'),
+            event=self.model.FRIEND_REQUEST
+        )
+        obj.save()
+        return obj
+
+    def make_assistance_request_notification(self, user):
+        """Make common notification for assistance request"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+        obj = self.model(
+            user_id=user_id,
+            title=_('New assistance request'),
+            description=_('New assistance request was published'),
+            event=self.model.CREATE_REQUEST
+        )
+        obj.save()
+        return obj
+
+
+class PushNotificationQuerySet(models.QuerySet):
+    """PushNotification querysets"""
+    pass
+
+
 class PushNotification(BaseMixin):
     """Push-notification model"""
 
     INITIALIZE = 0
     CREATE_REQUEST = 1
     NEW_MESSAGE = 2
+    FRIEND_REQUEST = 3
 
     EVENT_CHOICES = (
         (INITIALIZE, _('Initialization')),
         (CREATE_REQUEST, _('Create assistance request')),
-        (NEW_MESSAGE, _('New message'))
+        (NEW_MESSAGE, _('New message')),
+        (FRIEND_REQUEST, _('Friend request'))
     )
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
@@ -55,6 +91,8 @@ class PushNotification(BaseMixin):
         default=0,
         blank=True
     )
+
+    objects = PushNotificationManager.from_queryset(PushNotificationQuerySet)()
 
     class Meta:
         """Meta class"""

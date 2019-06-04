@@ -123,11 +123,7 @@ def notify_friend_request(invited_id):
     """Notify user about new friend request"""
     from base import models as base_models
     from userprofile.models import FCMDevice
-    notification = base_models.PushNotification.objects.create(
-        user_id=invited_id,
-        title=_('New friend request'),
-        description=_('A new friend request has been received')
-    )
+    notification = base_models.PushNotification.objects.make_friend_request_notification(user=invited_id)
     devices = FCMDevice.objects.filter(user_id=invited_id)
     if devices.exists():
         raw_result = devices.send_message(**notification.get_push_dict())
@@ -203,11 +199,7 @@ def notify_assistance_request(request_id):
 
     #  Sent PUSH-notifications for filtered users
     for device in devices:
-        notification = base_models.PushNotification.objects.create(
-            user=device.user,
-            title=_('New assistance request'),
-            description=_('New assistance request was published')
-        )
+        notification = base_models.PushNotification.objects.make_assistance_request_notification(user=device.user)
         raw_result = device.send_message(**notification.get_push_dict())
         result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
         if result.get('success'):

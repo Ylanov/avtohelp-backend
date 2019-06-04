@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-23 14:25+0000\n"
+"POT-Creation-Date: 2019-06-04 11:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,7 +41,7 @@ msgid "email address"
 msgstr "Адрес электронной почты"
 
 #: apps/account/models.py:98 apps/authorization/models.py:127
-#: apps/base/models.py:48 apps/chat/models.py:188 apps/order/models.py:84
+#: apps/base/models.py:79 apps/chat/models.py:206 apps/order/models.py:85
 msgid "User"
 msgstr "Пользователь"
 
@@ -59,7 +59,7 @@ msgid "SMS data"
 msgstr "Дата СМС-сообщения"
 
 #: apps/authorization/admin.py:15 apps/base/admin.py:13 apps/chat/admin.py:29
-#: apps/chat/admin.py:66 apps/chat/admin.py:94 apps/order/admin.py:16
+#: apps/chat/admin.py:66 apps/chat/admin.py:96 apps/order/admin.py:16
 #: apps/userprofile/admin.py:30
 msgid "Info"
 msgstr "Информация"
@@ -129,7 +129,7 @@ msgstr "Опции"
 msgid "Base"
 msgstr "База"
 
-#: apps/base/models.py:14 apps/base/models.py:42
+#: apps/base/models.py:14 apps/base/models.py:73
 msgid "Title"
 msgstr "Заголовок"
 
@@ -161,76 +161,97 @@ msgstr "Новости"
 msgid "Newsletter"
 msgstr "Новости"
 
+#: apps/base/models.py:36
+msgid "New friend request"
+msgstr "Новый запрос на добавление в друзья"
+
 #: apps/base/models.py:37
+msgid "A new friend request has been received"
+msgstr "Был получен новый запрос на добавление в друзья"
+
+#: apps/base/models.py:46
+msgid "New assistance request"
+msgstr "Новый запрос помощи"
+
+#: apps/base/models.py:47
+msgid "New assistance request was published"
+msgstr "Новый запрос помощи был опубликован"
+
+#: apps/base/models.py:67
 msgid "Initialization"
 msgstr "Инициализация"
 
-#: apps/base/models.py:38
+#: apps/base/models.py:68
 msgid "Create assistance request"
 msgstr "Создать запрос о помощи"
 
-#: apps/base/models.py:39
+#: apps/base/models.py:69
 msgid "New message"
 msgstr "Новое сообщение"
 
-#: apps/base/models.py:43 apps/car/models.py:91 apps/order/models.py:89
+#: apps/base/models.py:70 apps/userprofile/models.py:317
+#: apps/userprofile/models.py:318
+msgid "Friend request"
+msgstr "Запрос в друзья"
+
+#: apps/base/models.py:74 apps/car/models.py:91 apps/order/models.py:90
 msgid "Description"
 msgstr "Описание"
 
-#: apps/base/models.py:46
+#: apps/base/models.py:77
 msgid "Event"
 msgstr "Событие"
 
-#: apps/base/models.py:52 apps/order/models.py:92
+#: apps/base/models.py:83 apps/order/models.py:93
 #: apps/userprofile/models.py:311
 msgid "Status"
 msgstr "Статус"
 
-#: apps/base/models.py:54
+#: apps/base/models.py:85
 msgid "Sent notifications count"
 msgstr "Количество отправленных Push-уведомлений"
 
-#: apps/base/models.py:62
+#: apps/base/models.py:95
 msgid "Push notification"
 msgstr "Push-уведомление"
 
-#: apps/base/models.py:63
+#: apps/base/models.py:96
 msgid "Push notifications"
 msgstr "Push-уведомления"
 
-#: apps/base/models.py:84
+#: apps/base/models.py:117
 msgid "time"
 msgstr "Время"
 
-#: apps/base/models.py:87
+#: apps/base/models.py:120
 msgid "Push-notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:88
+#: apps/base/models.py:121
 msgid "Push-notification schedules"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:100
+#: apps/base/models.py:133
 msgid "Radius"
 msgstr "Радиус"
 
-#: apps/base/models.py:101
+#: apps/base/models.py:134
 msgid "Radius in meters"
 msgstr "Радиус в метрах"
 
-#: apps/base/models.py:104
+#: apps/base/models.py:137
 msgid "Geo position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:105
+#: apps/base/models.py:138
 msgid "Profile geo-position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:107
+#: apps/base/models.py:140
 msgid "Notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:110
+#: apps/base/models.py:143
 msgid "Push notification configuration"
 msgstr "Конфигурация отправки Push-уведомлений"
 
@@ -266,7 +287,7 @@ msgstr "Цвета автомобилей"
 msgid "Car"
 msgstr "Автомобиль"
 
-#: apps/car/models.py:92 apps/order/admin.py:15 apps/order/models.py:90
+#: apps/car/models.py:92 apps/order/admin.py:15 apps/order/models.py:91
 #: apps/userprofile/admin.py:29 apps/userprofile/models.py:201
 msgid "Location"
 msgstr "Местоположение"
@@ -323,23 +344,23 @@ msgstr "Ссылка на объект комнаты чата"
 msgid "Room ID"
 msgstr "Идентификатор комнаты чата"
 
-#: apps/chat/admin.py:95
+#: apps/chat/admin.py:97
 msgid "Date's"
 msgstr "Даты"
 
-#: apps/chat/admin.py:96
+#: apps/chat/admin.py:98
 msgid "Message's data"
 msgstr "Информация о сообщении"
 
-#: apps/chat/admin.py:97 apps/chat/models.py:73
+#: apps/chat/admin.py:99 apps/chat/models.py:73
 msgid "Sender"
 msgstr "Отправитель"
 
-#: apps/chat/admin.py:107
+#: apps/chat/admin.py:109
 msgid "Link to chat message"
 msgstr "Ссылка на объект сообщения"
 
-#: apps/chat/admin.py:113
+#: apps/chat/admin.py:115
 msgid "Message text"
 msgstr "Текст сообщения"
 
@@ -347,7 +368,7 @@ msgstr "Текст сообщения"
 msgid "Chat"
 msgstr "Чат"
 
-#: apps/chat/models.py:76 apps/chat/models.py:192
+#: apps/chat/models.py:76 apps/chat/models.py:210
 #, fuzzy
 #| msgid "Room ID"
 msgid "Room"
@@ -369,44 +390,44 @@ msgstr "Сообщение"
 msgid "Chat messages"
 msgstr "Сообщения"
 
-#: apps/chat/models.py:151 apps/userprofile/models.py:159
+#: apps/chat/models.py:169 apps/userprofile/models.py:159
 #: apps/utils/mixins.py:88
 msgid "Name"
 msgstr "Имя"
 
-#: apps/chat/models.py:154
+#: apps/chat/models.py:172
 msgid "Participants"
 msgstr "Участники"
 
-#: apps/chat/models.py:156
+#: apps/chat/models.py:174
 msgid "is public"
 msgstr "Публичная"
 
-#: apps/chat/models.py:162
+#: apps/chat/models.py:180
 msgid "Chat room"
 msgstr "Чат-комната"
 
-#: apps/chat/models.py:163
+#: apps/chat/models.py:181
 msgid "Chat rooms"
 msgstr "Чат-комнаты"
 
-#: apps/chat/models.py:181
+#: apps/chat/models.py:199
 msgid "Moderator"
 msgstr "Модератор"
 
-#: apps/chat/models.py:182
+#: apps/chat/models.py:200
 msgid "Participant"
 msgstr "Участник"
 
-#: apps/chat/models.py:194
+#: apps/chat/models.py:212
 msgid "Role"
 msgstr "Роль"
 
-#: apps/chat/models.py:198
+#: apps/chat/models.py:216
 msgid "Chat role"
 msgstr "Чат"
 
-#: apps/chat/models.py:199
+#: apps/chat/models.py:217
 msgid "Chat roles"
 msgstr "Роли чата"
 
@@ -422,7 +443,7 @@ msgstr "Документация для API RoadHelper"
 msgid "RoadHelper integration API Documentation"
 msgstr "Документация для API RoadHelper"
 
-#: apps/order/admin.py:14 apps/order/models.py:105
+#: apps/order/admin.py:14 apps/order/models.py:106
 msgid "Assistance request"
 msgstr "Запрос на помощь"
 
@@ -430,31 +451,31 @@ msgstr "Запрос на помощь"
 msgid "Order"
 msgstr "Запрос"
 
-#: apps/order/models.py:78
+#: apps/order/models.py:79
 msgid "Assistance request is available"
 msgstr "Запрос на помощь доступен"
 
-#: apps/order/models.py:79
+#: apps/order/models.py:80
 msgid "Assistance request was expired"
 msgstr "Запрос на помощь был просрочен"
 
-#: apps/order/models.py:80
+#: apps/order/models.py:81
 msgid "Assistance request was canceled"
 msgstr "Запрос на помощь был отменен"
 
-#: apps/order/models.py:87
+#: apps/order/models.py:88
 msgid "Issue"
 msgstr "Проблема"
 
-#: apps/order/models.py:94
+#: apps/order/models.py:95
 msgid "User contact phone"
 msgstr "Контактный номер телефона пльзователя"
 
-#: apps/order/models.py:97
+#: apps/order/models.py:98
 msgid "Text address"
 msgstr "Текстовое представление адреса"
 
-#: apps/order/models.py:106
+#: apps/order/models.py:107
 msgid "Assistance requests"
 msgstr "Запросы помощи"
 
@@ -567,10 +588,6 @@ msgstr "Владелец"
 #: apps/userprofile/models.py:308
 msgid "Invited user"
 msgstr "Приглашенный пользователь"
-
-#: apps/userprofile/models.py:317 apps/userprofile/models.py:318
-msgid "Friend request"
-msgstr "Запрос в друзья"
 
 #: apps/userprofile/models.py:377
 msgid "Friend"
@@ -738,14 +755,6 @@ msgstr "Активный"
 msgid "Versions"
 msgstr "Версии"
 
-#: project/celery.py:128
-msgid "New friend request"
-msgstr "Новый запрос на добавление в друзья"
-
-#: project/celery.py:129
-msgid "A new friend request has been received"
-msgstr "Был получен новый запрос на добавление в друзья"
-
 #: project/celery.py:153
 msgid "New message from chat"
 msgstr "Новое сообщение"
@@ -754,14 +763,6 @@ msgstr "Новое сообщение"
 #, python-format
 msgid "User %s wrote a message"
 msgstr "Пользователь %s написал сообщение"
-
-#: project/celery.py:204
-msgid "New assistance request"
-msgstr "Новый запрос помощи"
-
-#: project/celery.py:205
-msgid "New assistance request was published"
-msgstr "Новый запрос помощи был опубликован"
 
 #: project/templates/roadhelper/reddoc.html:5
 msgid "API Documentation"

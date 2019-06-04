@@ -18,9 +18,11 @@ class NewsletterModelAdmin(admin.ModelAdmin):
 
 class PushNotificationModelAdmin(admin.ModelAdmin):
     """Custom page for PushNotification"""
-    common_fields = ('id', 'user', 'status', )
+    common_fields = ('id', 'user', 'status', 'event')
     readonly_fields = common_fields + ('created', 'modified')
     list_display = readonly_fields
+    list_filter = ('status', 'event')
+    search_fields = ('user__phone',)
 
 
 # Register your models here.
