@@ -10,11 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
-import os, sys
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.celery import CeleryIntegration
-
+import os
+import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,13 +24,6 @@ PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 for path in ('apps', 'libs'):
     path = os.path.abspath(os.path.join(PROJECT_ROOT, '%s' % path))
     path in sys.path or sys.path.insert(0, path)
-
-
-# Integration with Sentry
-sentry_sdk.init(
-    dsn="https://6dca49f5f11743338eecb732e335053c@sentry.io/1467323",
-    integrations=[DjangoIntegration(), CeleryIntegration()]
-)
 
 
 # Quick-start development settings - unsuitable for production

@@ -1,7 +1,18 @@
 """Production server configuration."""
 from .base import *  # NOQA
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+
 
 ALLOWED_HOSTS = ['roadhelper-prod.spider.ru', ]
+
+
+# Integration with Sentry
+sentry_sdk.init(
+    dsn="https://6dca49f5f11743338eecb732e335053c@sentry.io/1467323",
+    integrations=[DjangoIntegration(), CeleryIntegration()]
+)
 
 
 DEBUG = False

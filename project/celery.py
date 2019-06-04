@@ -130,9 +130,13 @@ def notify_friend_request(invited_id):
     )
     devices = FCMDevice.objects.filter(user_id=invited_id)
     if devices.exists():
-        count = devices.send_message(**notification.get_push_dict())
-        if count.get('success') > 0:
-            logger.info(f'Users notified: {count.get("success")}')
+        raw_result = devices.send_message(**notification.get_push_dict())
+        result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
+        if result.get('success'):
+            notification.status = True
+            notification.sent_count = result.get('success')
+            notification.save()
+            logger.info(f'User notified: {result.get("success")}')
         else:
             logger.info(f'Error was occurred when sending PUSH-notifications')
 
@@ -204,13 +208,15 @@ def notify_assistance_request(request_id):
             title=_('New assistance request'),
             description=_('New assistance request was published')
         )
-        count = device.send_message(**notification.get_push_dict())
-        if count.get('success') > 0:
+        raw_result = device.send_message(**notification.get_push_dict())
+        result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
+        if result.get('success'):
             notification.status = True
+            notification.sent_count = result.get('success')
             notification.save()
-            logger.info(f'Users notified: {count.get("success")}')
+            logger.info(f'User notified: {result.get("success")}')
         else:
-            logger.info(f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
+            logger.info(f'Error was occurred when sending PUSH-notifications')
 
 # Unused
 # @app.task

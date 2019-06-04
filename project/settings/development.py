@@ -1,5 +1,15 @@
 """Development settings."""
 from .base import *
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+
+
+# Integration with Sentry
+sentry_sdk.init(
+    dsn="https://6dca49f5f11743338eecb732e335053c@sentry.io/1467323",
+    integrations=[DjangoIntegration(), CeleryIntegration()]
+)
 
 DEBUG = True
 USE_CELERY = True
