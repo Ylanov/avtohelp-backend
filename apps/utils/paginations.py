@@ -26,6 +26,13 @@ class CustomCursorPagination(CursorPagination):
 
         return self.page_size
 
+    def inject_cursor_value(self, query: str = None) -> str:
+        q_list = query.split('&')
+        for query in q_list:
+            query = query.split('=')
+            if query[0] == 'cursor':
+                return query[1]
+
     def replace_query_param(self, url, key, val):
         """
         Given a URL and a key/val pair, set or replace an item in the query
@@ -35,7 +42,7 @@ class CustomCursorPagination(CursorPagination):
         query_dict = urlparse.parse_qs(query, keep_blank_values=True)
         query_dict[force_str(key)] = [force_str(val)]
         query = urlparse.urlencode(sorted(list(query_dict.items())), doseq=True)
-        return f'{query.split("=")[1]}'
+        return self.inject_cursor_value(query)
 
     def encode_cursor(self, cursor):
         """
