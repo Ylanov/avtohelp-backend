@@ -28,7 +28,7 @@ class ColorsViewSet(viewsets.ModelViewSet):
     """
     permission_classes = (IsAuthenticatedOrReadOnly,)
     serializer_class = serializers.CarColorDetailSerializer
-    queryset = models.CarColor.objects.all()
+    queryset = models.CarColor.objects.exclude(hex_color__isnull=True)
     filter_class = filters.CarColorFilterSet
     pagination_class = None
 
