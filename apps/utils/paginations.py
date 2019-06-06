@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import re
 from base64 import b64encode
 from collections import namedtuple
 
@@ -27,11 +28,10 @@ class CustomCursorPagination(CursorPagination):
         return self.page_size
 
     def inject_cursor_value(self, query: str = None) -> str:
-        q_list = query.split('&')
-        for query in q_list:
-            query = query.split('=')
-            if query[0] == 'cursor':
-                return query[1]
+        pattern = r'cursor[=]{1}[\w]*[%\w]+'
+        match = re.search(pattern, query)
+        if match:
+            return match.group().split('=')[1]
 
     def replace_query_param(self, url, key, val):
         """
