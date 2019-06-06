@@ -138,7 +138,7 @@ def notify_friend_request(invited_id):
 
 
 @app.task
-def notify_chat_participants(sender_id, participants, room_id):
+def notify_chat_participants(sender_id, participants):
     """Notify user about new friend request"""
     from account import models as account_models
     from base import models as base_models

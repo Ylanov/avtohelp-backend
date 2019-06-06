@@ -30,26 +30,53 @@ class Newsletter(BaseMixin, ImageMixin):
 class PushNotificationManager(models.Manager):
     """PushNotification manager"""
 
-    def make_friend_request_notification(self, user):
+    def make_friend_request_notification(self, user: (str, int, object)) -> object:
         """Make common notification for friend request"""
         user_id = user.id if isinstance(user, account_models.User) else user
-        obj = self.model(
-            user_id=user_id,
-            title=_('New friend request'),
-            description=_('A new friend request has been received'),
-            event=self.model.FRIEND_REQUEST
-        )
-        obj.save()
-        return obj
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('New friend request'),
+                description=_('A new friend request has been received'),
+                event=self.model.FRIEND_REQUEST
+            )
+            obj.save()
+            return obj
 
-    def make_assistance_request_notification(self, user):
+    def make_assistance_request_notification(self, user: (str, int, object)) -> object:
         """Make common notification for assistance request"""
         user_id = user.id if isinstance(user, account_models.User) else user
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('New assistance request'),
+                description=_('New assistance request was published'),
+                event=self.model.CREATE_REQUEST
+            )
+            obj.save()
+            return obj
+
+    def make_new_message_notification(self, user: (str, int, object), sender: (str, int, object)) -> object:
+        """Make common notification for new chat message"""
+        if not isinstance(user, account_models.User):
+            user_qs = account_models.User.objects.filter(id=user)
+            if user_qs.exists():
+                user = user_qs.first()
+            else:
+                return None
+
+        if not isinstance(sender, account_models.User):
+            sender_qs = account_models.User.objects.filter(id=sender)
+            if sender_qs.exists():
+                sender = sender_qs.first()
+            else:
+                return None
+
         obj = self.model(
-            user_id=user_id,
-            title=_('New assistance request'),
-            description=_('New assistance request was published'),
-            event=self.model.CREATE_REQUEST
+            user=user,
+            title=_('New message from chat'),
+            description=_('User %s wrote a message') % sender.get_full_name(),
+            event=self.model.NEW_MESSAGE
         )
         obj.save()
         return obj
