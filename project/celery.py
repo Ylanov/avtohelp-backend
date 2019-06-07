@@ -148,10 +148,9 @@ def notify_chat_participants(sender_id, participants):
         # Get sender user object
         sender = account_models.User.objects.get(id=sender_id)
         # Check if user is online
-        notification = base_models.PushNotification.objects.create(
-            user_id=user_id,
-            title=_('New message from chat'),
-            description=_('User %s wrote a message') % sender.get_full_name()
+        notification = base_models.PushNotification.objects.make_new_message_notification(
+            user=user_id,
+            sender=sender
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
         if devices.exists():
