@@ -230,6 +230,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'EXCEPTION_HANDLER': 'utils.api_exceptions.roadhelper_exception_handler'
 }
 
 
@@ -308,8 +309,10 @@ SWAGGER_SETTINGS = {
 }
 
 
+# UPLOAD FILES
 # Increase upload maximum file size
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 
 # CACHE
@@ -323,3 +326,5 @@ CACHES = {
         }
     }
 }
+
+
