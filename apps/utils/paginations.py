@@ -27,11 +27,25 @@ class CustomCursorPagination(CursorPagination):
 
         return self.page_size
 
-    def inject_cursor_value(self, query: str = None) -> str:
+    def inject_cursor_value(self, query: str, scheme: str = None, netloc: str = None,
+                            path: str = None, fragment: str = None) -> str:
+        """
+        # Eject cursor value without url and filters
+        Example of response:
+        ```
+            {
+                "next": "cD0yMDE5LTA2LTA2KzA4JTNBMjYlM0EyNi4zOTMxMjElMkIwMCUzQTAw"
+                ...
+            }
+        ```
+        """
         pattern = r'cursor[=]{1}[\w]*[%\w]+'
         match = re.search(pattern, query)
         if match:
             return match.group().split('=')[1]
+        else:
+            # Default mechanism to return cursor value (with url and filter params)
+            return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
 
     def replace_query_param(self, url, key, val):
         """
@@ -42,7 +56,7 @@ class CustomCursorPagination(CursorPagination):
         query_dict = urlparse.parse_qs(query, keep_blank_values=True)
         query_dict[force_str(key)] = [force_str(val)]
         query = urlparse.urlencode(sorted(list(query_dict.items())), doseq=True)
-        return self.inject_cursor_value(query)
+        return self.inject_cursor_value(query, scheme, netloc, path, fragment)
 
     def encode_cursor(self, cursor):
         """
