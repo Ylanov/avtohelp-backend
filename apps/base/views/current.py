@@ -18,7 +18,7 @@ class NewsViewSet(viewsets.ModelViewSet):
     """
     permission_classes = (AllowAny,)
     model = models.Newsletter
-    queryset = models.Newsletter.objects.all()
+    queryset = models.Newsletter.objects.filter(publish=True)
     serializer_class = serializers.NewsDetailSerializer
     pagination_class = NewsCursorPagination
 
