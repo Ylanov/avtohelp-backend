@@ -201,7 +201,7 @@ def notify_assistance_request(request_id):
     #  Sent PUSH-notifications for filtered users
     for device in devices:
         notification = base_models.PushNotification.objects.make_assistance_request_notification(user=device.user)
-        raw_result = device.send_message(**notification.get_push_dict())
+        raw_result = device.send_message(**notification.get_push_dict(request_id=request_id))
         result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
         if result.get('success'):
             notification.status = True
