@@ -56,6 +56,15 @@ class AssistanceRequestQuerySet(models.QuerySet):
             return self.annotate(distance=Distance('location', Point(float(latitude), float(longitude), srid=4326)))
         return self
 
+    def annotate_owner_status(self, user):
+
+        return self.annotate(is_owner=models.Case(
+            models.When(user=user,
+                        then=True),
+            output_field=models.BooleanField(default=False),
+            default=False
+        ))
+
 
 class AssistanceRequestManager(models.Manager):
     """Manager for AssistanceRequest model"""

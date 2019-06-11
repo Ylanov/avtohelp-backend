@@ -12,11 +12,13 @@ class AssistanceRequestListSerializer(GeoLocationSerializerMixin, serializers.Mo
 
     profile_id = serializers.IntegerField(source='user.profile.id')
     distance = serializers.SerializerMethodField()
+    is_owner = serializers.BooleanField()
 
     class Meta:
         """Meta class"""
         model = models.AssistanceRequest
-        fields = ('id', 'created', 'profile_id', 'issue', 'description', 'geo_lat', 'geo_lon', 'distance')
+        fields = ('id', 'created', 'profile_id', 'issue', 'description',
+                  'geo_lat', 'geo_lon', 'distance', 'is_owner')
 
     def get_distance(self, obj):
         """Get distance in meters"""

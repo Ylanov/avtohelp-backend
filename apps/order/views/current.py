@@ -26,6 +26,9 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     pagination_class = None
     filter_class = filters.AssistanceRequestFitlerSet
 
+    def get_queryset(self):
+        return super().get_queryset().annotate_owner_status(user=self.request.user)
+
 
 class AssistanceRequestCountView(views.APIView):
     """

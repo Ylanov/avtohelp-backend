@@ -115,6 +115,22 @@ class TestOrder(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_own_assistance_requests(self):
+        """
+        Test list of created assurance requests
+        Users: user_1, user_2, user_3
+        Blacked users: user_2
+        Assistance requests: AssistanceRequest(user_1),
+                             AssistanceRequest(user_2),
+                             AssistanceRequest(user_3)
+        Result: [AssistanceRequest(user_1), AssistanceRequest(user_2), AssistanceRequest(user_3),]
+        """
+        api_path = '%s:order:request-list' % self.VERSION
+
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0].get('is_owner'), True)
+
     def test_service_list_query(self):
         """Test service list query - from center & position"""
         query = {
