@@ -237,14 +237,9 @@ REST_FRAMEWORK = {
 # Thumbnail settings
 THUMBNAIL_ALIASES = {
     '': {
-        'tiny': {'size': (240, 124), 'crop': True},
-        'small': {'size': (320, 165), 'crop': True},
-        'average': {'size': (480, 248), 'crop': True},
-        'medium': {'size': (640, 330), 'crop': True},
-        'big': {'size': (960, 495), 'crop': True},
-        'large': {'size': (1280, 660), 'crop': True},
-        'gallery': {'size': (280, 186), 'crop': False},
-        'icon': {'size': (72, 72), 'crop': True}
+        'news_small': {'size': (900, 600), 'crop': True},
+        'news_big': {'size': (1600, 1200), 'crop': True},
+        'news_large': {'size': (2400, 1800), 'crop': True},
     },
 }
 

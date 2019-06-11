@@ -15,6 +15,8 @@ class NewsListSerializer(serializers.ModelSerializer):
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
+    image = serializers.ImageField(source='get_image')
+
     class Meta:
         """Meta class"""
 

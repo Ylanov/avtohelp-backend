@@ -30,7 +30,7 @@ def image_path(instance, filename):
 class ImageMixin(models.Model):
     """Image field model mixin."""
 
-    THUMBNAIL_KEY = 'gallery'
+    THUMBNAIL_KEY = 'news_small'
     image = ThumbnailerImageField(upload_to=image_path,
                                   blank=True, null=True, default=None,
                                   verbose_name=_('Image'))

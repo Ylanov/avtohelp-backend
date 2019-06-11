@@ -86,9 +86,11 @@ class ChatMessageAdminModel(admin.ModelAdmin):
 
 class ChatReadMessageAdminModel(admin.ModelAdmin):
     """Admin model for ChatReadMessage"""
+    # readonly_fields = ('id', 'created', 'modified',
+    #                    'message', 'user', 'get_message_link',
+    #                    'get_message_text')
     readonly_fields = ('id', 'created', 'modified',
-                       'message', 'user', 'get_message_link',
-                       'get_message_text')
+                       'get_message_link', 'get_message_text')
     list_display = ('id', 'created', 'modified', 'user', 'get_message_link')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'message')}),
@@ -115,4 +117,4 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
 
 admin.site.register(models.ChatRoom, ChatRoomAdminModel)
 admin.site.register(models.ChatMessage, ChatMessageAdminModel)
-# admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
+admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
