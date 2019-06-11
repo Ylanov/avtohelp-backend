@@ -2,8 +2,22 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework import status
-
 from utils.custom_statuses import HTTP_420_ENHACE_YOUR_CALM
+from rest_framework.views import exception_handler
+
+
+def roadhelper_exception_handler(exc, context):
+    # Call REST framework's default exception handler first,
+    # to get the standard error response.
+    response = exception_handler(exc, context)
+
+    # Change response data on format - {'detail': 'Error message'}
+    if response is not None and exc.default_code is 'invalid':
+        response.data = {
+            'field': f'{list(response.data.keys())[0]}',
+            'detail': f'{list(response.data.values())[0][0]}'
+        }
+    return response
 
 
 """
