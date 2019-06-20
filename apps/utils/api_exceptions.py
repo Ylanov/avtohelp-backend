@@ -7,16 +7,26 @@ from rest_framework.views import exception_handler
 
 
 def roadhelper_exception_handler(exc, context):
+    """
+        Returns the response that should be used for any given exception.
+
+        By default we handle the REST framework `APIException`, and also
+        Django's built-in `Http404` and `PermissionDenied` exceptions.
+
+        Any unhandled exceptions may return `None`, which will cause a 500 error
+        to be raised.
+        """
     # Call REST framework's default exception handler first,
     # to get the standard error response.
     response = exception_handler(exc, context)
 
     # Change response data on format - {'detail': 'Error message'}
-    if response is not None and exc.default_code is 'invalid':
-        response.data = {
-            'field': f'{list(response.data.keys())[0]}',
-            'detail': f'{list(response.data.values())[0][0]}'
-        }
+    if response and hasattr(exc, 'default_code'):
+        if exc.default_code is 'invalid':
+            response.data = {
+                'field': f'{list(response.data.keys())[0]}',
+                'detail': f'{list(response.data.values())[0][0]}'
+            }
     return response
 
 
