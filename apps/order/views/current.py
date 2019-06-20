@@ -18,9 +18,11 @@ class AssistanceRequestMixin(object):
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     """
-    Get user assistance request list w/ filters by fields
-    profile_id
-    distance
+    Get user assistance request list w/ filters by fields:
+    - profile_id
+    - coordinates
+    ordering by:
+    - distance
     """
     serializer_class = serializers.AssistanceRequestListSerializer
     pagination_class = None
