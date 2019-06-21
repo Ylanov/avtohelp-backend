@@ -42,17 +42,15 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.filter(room=room_id)
 
     def annotate_read_status(self, user):
-        # return self.annotate(
-        #     read=models.Case(
-        #         models.When(
-        #             id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
-        #             then=True),
-        #         output_field=models.BooleanField(default=False),
-        #         default=False
-        #     )
-        # )
-        # todo: temp solution
-        return self.annotate(read=models.Value(True, models.BooleanField()))
+        return self.annotate(
+            read=models.Case(
+                models.When(
+                    id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
+                    then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
 
 
 class ChatMessageManager(models.Manager):
@@ -207,9 +205,9 @@ class ChatReadMessageQuerySet(models.QuerySet):
 class ChatReadMessageManager(models.Manager):
     """Manager for model ChatReadMessage"""
 
-    def read(self, user, message):
+    def read(self, user_id, message):
         """Create a new object"""
-        obj = self.model(user=user, message=message)
+        obj = self.model(user_id=user_id, message=message)
         obj.save()
         return obj
 
