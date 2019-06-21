@@ -1,9 +1,12 @@
+from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, views
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from chat import models, filters, permissions
+from chat import filters
+from chat import models
+from chat import permissions
 from chat.serializers import current as serializers
 from utils.paginations import CustomCursorPagination
 
@@ -27,8 +30,8 @@ class ChatTotalUnreadMessageCountView(views.APIView):
         """Get count of assistance requests"""
         user = self.request.user
         return Response({
-            'count': models.ChatMessage.objects.annotate_read_status(user)\
-                                               .filter(read=False)\
+            'count': models.ChatMessage.objects.filter(room__participants=user)\
+                                               .filter(~Q(chatreadmessage__user=user))\
                                                .count()})
 
 
