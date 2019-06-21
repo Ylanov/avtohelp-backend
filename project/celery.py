@@ -212,10 +212,10 @@ def notify_assistance_request(request_id):
 
 
 @app.task
-def read_messages(reader_id):
+def read_messages(reader_id, room_id):
     """Set read flag is true by user"""
     from chat import models as chat_models
-    qs = chat_models.ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
+    qs = chat_models.ChatMessage.objects.filter(room_id=room_id).exclude(chatreadmessage__user_id=reader_id)
     if qs.exists():
         for message in qs:
             chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
