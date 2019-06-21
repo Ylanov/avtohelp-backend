@@ -1,4 +1,3 @@
-from django.db import models as django_db
 from django.shortcuts import render
 from rest_framework import generics, views
 from rest_framework.permissions import AllowAny
@@ -28,8 +27,8 @@ class ChatTotalUnreadMessageCountView(views.APIView):
         """Get count of assistance requests"""
         user = self.request.user
         return Response({
-            'count': models.ChatMessage.objects.filter(room__participants=user)\
-                                               .filter(~django_db.Q(chatreadmessage__user=user))\
+            'count': models.ChatMessage.objects.annotate_read_status(user)\
+                                               .filter(read=False)\
                                                .count()})
 
 

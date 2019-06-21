@@ -47,6 +47,9 @@ class ChatMessageQuerySet(models.QuerySet):
                 models.When(
                     id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
                     then=True),
+                models.When(
+                    room__participants=user,
+                    then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
             )
