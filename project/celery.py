@@ -5,7 +5,6 @@ from celery import Celery
 from celery.schedules import crontab
 from django.conf import settings
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
@@ -210,6 +209,26 @@ def notify_assistance_request(request_id):
             logger.info(f'User notified: {result.get("success")}')
         else:
             logger.info(f'Error was occurred when sending PUSH-notifications')
+
+
+@app.task
+def read_messages(reader_id):
+    """Set read flag is true by user"""
+    from chat import models as chat_models
+    qs = chat_models.ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
+    if qs.exists():
+        for message in qs:
+            chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
+
+
+@app.task
+def read_message(message_list, reader_id):
+    """Set read flag is true by user"""
+    from chat import models as chat_models
+    qs = chat_models.ChatMessage.objects.filter(id__in=message_list)
+    if qs.exists():
+        for message in qs:
+            chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
 
 # Unused
 # @app.task

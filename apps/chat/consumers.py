@@ -2,6 +2,7 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 
 from chat import models
+from project import celery as celery_tasks
 from utils import methods as utils_methods
 from utils.api_exceptions import ClientError
 
@@ -34,7 +35,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.join_room(content["room"])
             elif command == "send":
                 await self.send_room(content["room"], content["message"])
-            elif command == "read":
+            elif command == "read_message":
                 await self.read_message(content["room"], content["messages"])
             elif command == "leave":
                 # Leave the room
@@ -70,6 +71,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         # Store logged users in cache
         await utils_methods.chat_update_logged_users(user_id=self.scope["user"].id, room_id=room_id)
+
+        # Send to Celery for making all messages in the room read.
+        if settings.USE_CELERY:
+            celery_tasks.read_messages.delay(reader_id=self.scope["user"].id)
+        else:
+            celery_tasks.read_messages(reader_id=self.scope["user"].id)
 
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
@@ -163,8 +170,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if room_id not in self.rooms:
             raise ClientError("ROOM_ACCESS_DENIED")
 
-        # Make a record in the DB
-        await utils_methods.read_message(message_list=messages, reader=self.scope["user"])
+        # Send to Celery task for making a record in the DB
+        if settings.USE_CELERY:
+            celery_tasks.read_message.delay(message_list=messages, reader_id=self.scope["user"].id)
+        else:
+            celery_tasks.read_message(message_list=messages, reader_id=self.scope["user"].id)
+
 
     ##### Handlers for messages sent over the channel layer
 

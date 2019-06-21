@@ -8,7 +8,6 @@ from django.utils import timezone
 
 from chat import models as chat_models
 from userprofile import models as profile_models
-from utils import api_exceptions
 
 
 def generate_image_name():
@@ -62,17 +61,6 @@ def check_friendliness(user, room_id):
 def by_user_and_room_id(user, room_id):
     """Find room by user and room id"""
     return chat_models.ChatRoom.objects.by_participant(participant=user).filter(id=room_id).first()
-
-
-@database_sync_to_async
-def read_message(message_list, reader):
-    """Set read flag is true by user"""
-    qs = chat_models.ChatMessage.objects.filter(id__in=message_list)
-    if qs.exists():
-        for message in qs:
-            chat_models.ChatReadMessage.objects.read(user=reader, message=message)
-    else:
-        raise api_exceptions.MessagesNotFound()
 
 
 @database_sync_to_async
