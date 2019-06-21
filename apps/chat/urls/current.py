@@ -10,8 +10,6 @@ urlpatterns = [
     path('rooms/<int:pk>', views.ChatRoomDetailView.as_view(), name='room-detail'),
     path('rooms/private/create', views.PrivateChatRoomCreateView.as_view(), name='private-room-create'),
     path('messages/room/<int:pk>', views.ChatMessageListView.as_view(), name='message-list'),
-    path('messages/room/<int:pk>/count', views.ChatMessageCountView.as_view(), name='message-count'),
-    path('messages/room/<int:pk>/unread/count', views.ChatUnreadMessageCountView.as_view(), name='message-unread-count'),
     path('messages/unread/count', views.ChatTotalUnreadMessageCountView.as_view(), name='message-total-unread-count'),
     # Test use
     path('stream', views.ChatView.as_view(), name='chat'),

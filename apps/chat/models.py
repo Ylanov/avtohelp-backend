@@ -141,6 +141,13 @@ class ChatRoomQuerySet(models.QuerySet):
         """Find if room already exists"""
         return self.filter(is_public=True)
 
+    def annotate_unread_messages(self, user):
+        return self.annotate(unread_messages=models.Count('chatmessage',
+                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user)))
+
+    def annotate_message_count(self):
+        return self.annotate(message_count=models.Count('chatmessage'))
+
 
 class ChatRoom(BaseMixin, ImageMixin):
     """Chat room"""

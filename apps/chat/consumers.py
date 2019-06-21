@@ -74,9 +74,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         # Send to Celery for making all messages in the room read.
         if settings.USE_CELERY:
-            celery_tasks.read_messages.delay(reader_id=self.scope["user"].id)
+            celery_tasks.read_messages.delay(reader_id=self.scope["user"].id, room_id=room_id)
         else:
-            celery_tasks.read_messages(reader_id=self.scope["user"].id)
+            celery_tasks.read_messages(reader_id=self.scope["user"].id, room_id=room_id)
 
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(

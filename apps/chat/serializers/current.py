@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from chat import models
+
 from account.models import User
+from chat import models
 from userprofile import models as profile_models
 from utils import api_exceptions
 
@@ -58,12 +59,15 @@ class ChatRoomListSerializer(serializers.ModelSerializer):
 
     participants = ChatRoomParticipantsSerializer(many=True)
     last_message = LastChatMessageSerializer(source='chatmessage_set.first')
+    unread_messages = serializers.IntegerField(read_only=True)
+    message_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         """Meta class"""
         model = models.ChatRoom
         fields = ('id', 'created', 'participants',
-                  'image', 'name', 'last_message')
+                  'image', 'name', 'last_message',
+                  'unread_messages', 'message_count')
 
 
 class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):

@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from rest_framework import generics, views
-from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -19,25 +18,6 @@ class ChatMessageListView(generics.ListAPIView):
     def get_queryset(self):
         """Override get_queryset method"""
         return models.ChatMessage.objects.filter(room=self.kwargs.get('pk')).annotate_read_status(user=self.request.user)
-
-
-class ChatMessageCountView(views.APIView):
-    """MessageList view"""
-
-    def get(self, request, *args, **kwargs):
-        """Get count of assistance requests"""
-        return Response({
-            'count': models.ChatMessage.objects.filter(room=kwargs.get('pk')).count()})
-
-
-class ChatUnreadMessageCountView(views.APIView):
-    """MessageList view"""
-
-    def get(self, request, *args, **kwargs):
-        """Get count of assistance requests"""
-        return Response({
-            'count': models.ChatMessage.objects.annotate_read_status(
-                user=self.request.user).filter(room=kwargs.get('pk'), read=False).count()})
 
 
 class ChatTotalUnreadMessageCountView(views.APIView):
@@ -65,8 +45,10 @@ class ChatRoomListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get queryset method"""
-        return models.ChatRoom.objects.by_participant(
-            participant=self.request.user)
+        user = self.request.user
+        return models.ChatRoom.objects.by_participant(participant=user)\
+                                      .annotate_unread_messages(user) \
+                                      .annotate_message_count()
 
 
 class ChatView(generics.GenericAPIView):
