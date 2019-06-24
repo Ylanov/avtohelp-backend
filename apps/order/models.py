@@ -3,10 +3,10 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.db import models
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from django.db import transaction
 
 from project import celery as tasks
 from utils.mixins import BaseMixin, ImageMixin
@@ -42,19 +42,26 @@ class AssistanceRequestQuerySet(models.QuerySet):
             Q(user__blacklist_owner__foe=user) |
             Q(user__blacked_user__owner=user))
 
-    def annotate_distance(self, raw_coordinates=None, latitude=None, longitude=None):
+    def annotate_distance(self, raw_coordinates: list = None,
+                          latitude: float = None, longitude: float = None,
+                          point: Point = None):
         """
         Annotate service distance from position
         raw_coordinates can contain -
         - latitude (index 0),
         - longitude (index 1),
+
+        point parameter is Point object
         """
         if raw_coordinates:
             x, y = raw_coordinates.split(',')[0], raw_coordinates.split(',')[1]
             return self.annotate(distance=Distance('location', Point(float(x), float(y), srid=4326)))
         elif latitude and longitude:
             return self.annotate(distance=Distance('location', Point(float(latitude), float(longitude), srid=4326)))
-        return self
+        elif point:
+            return self.annotate(distance=Distance('location', point, srid=4326))
+        else:
+            return self
 
     def annotate_owner_status(self, user):
 

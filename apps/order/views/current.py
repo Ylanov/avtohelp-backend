@@ -1,6 +1,7 @@
 from rest_framework import generics, views
 from rest_framework.response import Response
 
+from base.models import PushNotificationConfiguration
 from order import models, filters
 from order.serializers import current as serializers
 
@@ -38,8 +39,13 @@ class AssistanceRequestCountView(views.APIView):
     """
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
+        user = request.user
+        push_config = PushNotificationConfiguration()
         return Response({
-            'count': models.AssistanceRequest.objects.available(user=request.user).count()
+            'count': models.AssistanceRequest.objects.available(user)\
+                                                     .annotate_distance(point=user.profilelocation.location)\
+                                                     .filter(distance__lte=push_config.radius)\
+                                                     .count()
         })
 
 
