@@ -8,7 +8,7 @@ from chat import filters
 from chat import models
 from chat import permissions
 from chat.serializers import current as serializers
-from utils.paginations import CustomCursorPagination
+from utils.paginations import CustomCursorPagination, ChatCursorPagination
 
 
 class ChatMessageListView(generics.ListAPIView):
@@ -47,13 +47,14 @@ class ChatRoomListView(generics.ListAPIView):
     """Chat room list view"""
     serializer_class = serializers.ChatRoomListSerializer
     filter_class = filters.ChatRoomListFilterSet
-    pagination_class = CustomCursorPagination
+    pagination_class = ChatCursorPagination
 
     def get_queryset(self):
         """Override get queryset method"""
         user = self.request.user
         return models.ChatRoom.objects.by_participant(participant=user)\
-                                      .annotate_unread_messages(user) \
+                                      .annotate_last_message_datetime()\
+                                      .annotate_unread_messages(user)\
                                       .annotate_message_count()
 
 

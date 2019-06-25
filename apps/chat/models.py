@@ -146,10 +146,15 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def annotate_unread_messages(self, user):
         return self.annotate(unread_messages=models.Count('chatmessage',
-                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user)))
+                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user),
+                                                          distinct=True))
 
     def annotate_message_count(self):
-        return self.annotate(message_count=models.Count('chatmessage'))
+        return self.annotate(message_count=models.Count('chatmessage',
+                                                        distinct=True))
+
+    def annotate_last_message_datetime(self):
+        return self.annotate(last_message_datetime=models.Max('chatmessage__created'))
 
 
 class ChatRoom(BaseMixin, ImageMixin):
