@@ -1,6 +1,7 @@
 """Account app models."""
 
-from django.contrib.auth.models import AbstractUser, UserManager as AbstractUserManager
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager as AbstractUserManager
 from django.contrib.gis.db.models.functions import Distance
 from django.db import models
 from django.utils import timezone
@@ -106,22 +107,43 @@ class User(AbstractUser, BaseMixin):
         """Regenerate auth token method"""
         self.auth_token.delete()
 
+    @property
     def get_first_name(self):
         """Return user first_name"""
         return self.profile.first_name if hasattr(self, 'profile') else None
 
+    @property
     def get_last_name(self):
         """Return user last"""
         return self.profile.last_name if hasattr(self, 'profile') else None
 
+    @property
     def get_full_name(self):
         """Return user full name"""
         return f'{self.profile.first_name} {self.profile.last_name}' if hasattr(self, 'profile') else self.id
 
+    @property
     def get_car_license_plate(self):
         """Return user profile car license plate"""
         return f'{self.profilecar_set.first().license_plate}' if self.profilecar_set.first() else None
 
+    @property
     def get_avatar(self):
         """Return user profile avatar"""
         return self.profile.get_image_url()
+
+    @property
+    def get_location_update_datetime(self):
+        """Return user location update datetime"""
+        return self.profilelocation.modified
+
+    @property
+    def location_is_valid(self):
+        """Return boolean value if user update location is valid or not"""
+        geo_pos_settings = PushNotificationConfiguration.get_solo()
+        hours, minutes = geo_pos_settings.geo_position_lifetime.hour, geo_pos_settings.geo_position_lifetime.minute
+        delta = timezone.now() - timezone.timedelta(hours=hours, minutes=minutes)
+        if self.get_location_update_datetime >= delta:
+            return True
+        else:
+            return False

@@ -40,13 +40,18 @@ class AssistanceRequestCountView(views.APIView):
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
         user = request.user
-        push_config = PushNotificationConfiguration()
-        return Response({
-            'count': models.AssistanceRequest.objects.available(user)\
-                                                     .annotate_distance(point=user.profilelocation.location)\
-                                                     .filter(distance__lte=push_config.radius)\
-                                                     .count()
-        })
+        push_config = PushNotificationConfiguration.get_solo()
+        if user.location_is_valid:
+            return Response({
+                'count': models.AssistanceRequest.objects.available(user)\
+                                                         .annotate_distance(point=user.profilelocation.location)\
+                                                         .filter(distance__lte=push_config.radius)\
+                                                         .count()
+            })
+        else:
+            return Response({
+                'count': 0
+            })
 
 
 class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):
@@ -109,6 +114,19 @@ class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView
     def get_queryset(self):
         """Override get_queryset method"""
         return self.queryset.by_user(user=self.request.user).available(user=self.request.user)
+
+
+class AssistanceRequestView(generics.RetrieveDestroyAPIView):
+    """
+    Get detail information of assistance request
+    """
+    serializer_class = serializers.AssistanceRequestCreateSerializer
+    queryset = models.AssistanceRequest.objects.all()
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.all().annotate_distance(
+            raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestDestroyView(generics.DestroyAPIView):

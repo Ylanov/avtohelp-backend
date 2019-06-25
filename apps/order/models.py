@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
+from base.models import PushNotificationConfiguration
 from project import celery as tasks
 from utils.mixins import BaseMixin, ImageMixin
 

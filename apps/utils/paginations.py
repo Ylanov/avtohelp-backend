@@ -79,3 +79,8 @@ class NewsCursorPagination(CustomCursorPagination):
     """Custom cursor pagination"""
 
     ordering = '-publish_date'
+
+
+class ChatCursorPagination(CustomCursorPagination):
+
+    ordering = '-last_message_datetime'
