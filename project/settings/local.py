@@ -2,7 +2,7 @@
 from .base import *
 
 DEBUG = True
-USE_CELERY = True
+USE_CELERY = False
 USE_SMS = False
 
 # Celery settings

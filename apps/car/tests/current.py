@@ -1,15 +1,15 @@
 from django.conf import settings
+from django.contrib.gis.geos import Point
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
 from car.models import (CarModel, CarMark, CarColor, Car,
                         CarServiceCategory, CarService)
-from userprofile.models import ProfileCar
 from catalog.models import City
-from django.contrib.gis.geos import Point
-from rest_framework.authtoken.models import Token
+from userprofile.models import ProfileCar
 
 
 class TestCatalog(APITestCase):
@@ -68,8 +68,8 @@ class TestCatalog(APITestCase):
         self.car_models = CarModel.objects.count()
 
         # Create car colors
-        self.color_1 = CarColor.objects.create(name='White')
-        self.color_2 = CarColor.objects.create(name='Black')
+        self.color_1 = CarColor.objects.create(name='White', hex_color='#FFFFFF')
+        self.color_2 = CarColor.objects.create(name='Black', hex_color='#000000')
         self.color_3 = CarColor.objects.create(name='Green')
         self.cars_colors = CarColor.objects.count()
 
@@ -93,7 +93,7 @@ class TestCatalog(APITestCase):
         api_path = '%s:car:carcolor-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), self.cars_colors)
+        self.assertEqual(len(response.data), CarColor.objects.filter(hex_color__isnull=False).count())
 
     def test_list_car_colors_w_filter(self):
         """Test view for getting list of users cars colors w/ filter by color name"""
@@ -105,7 +105,7 @@ class TestCatalog(APITestCase):
     def test_car_color_detail(self):
         """Test view for getting detail of car color"""
         api_path = '%s:car:carcolor-detail' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.color_1.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.color_1.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_cars_marks_w_filters(self):
@@ -122,7 +122,7 @@ class TestCatalog(APITestCase):
     def test_car_mark_detail(self):
         """Test view for getting detail of car mark"""
         api_path = '%s:car:carmark-detail' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_cars_model(self):
@@ -146,7 +146,7 @@ class TestCatalog(APITestCase):
     def test_car_model_detail(self):
         """Test view for getting detail of car model"""
         api_path = '%s:car:carmodel-detail' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota_model.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota_model.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_list_cars(self):
@@ -183,7 +183,7 @@ class TestCatalog(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         api_path = '%s:car:car-detail' % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.car_1.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.car_1.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_service_list(self):
@@ -218,5 +218,5 @@ class TestCatalog(APITestCase):
         """Test services detail view"""
 
         api_path = '%s:car:carservice-detail' % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={'pk': self.service_2.id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.service_2.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)

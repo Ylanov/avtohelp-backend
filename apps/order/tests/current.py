@@ -1,14 +1,14 @@
 from django.conf import settings
-from django.urls import reverse
 from django.contrib.gis.geos import Point
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account import models as account_models
-from catalog import models as catalog_models
-from car import models as car_models
 from base import models as base_models
+from car import models as car_models
+from catalog import models as catalog_models
 from order import models
 from userprofile import models as profile_models
 
@@ -182,6 +182,10 @@ class TestOrder(APITestCase):
         Result: {"count": 2}
 
         """
+        # Create user profile location
+        profile_location = self.user_1.profilelocation
+        profile_location.location = Point(x=45.061016, y=38.944007, srid=4326)
+        profile_location.save()
 
         # Authorize user_1
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -194,8 +198,7 @@ class TestOrder(APITestCase):
 
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'),
-                         models.AssistanceRequest.objects.available(user=self.user_1).count())
+        self.assertEqual(response.data.get('count'), 1)
 
     def test_detail_assistance_request(self):
         """Test detail of created assurance requests"""

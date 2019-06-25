@@ -5,8 +5,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
-from userprofile.models import BlackList, FriendList, FriendRequest
 from chat.models import ChatRoom, ChatMessage, ChatReadMessage
+from userprofile.models import BlackList, FriendList, FriendRequest
 from utils import api_exceptions
 
 
@@ -105,23 +105,6 @@ class TestChat(APITestCase):
     #     response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
     #     self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_chat_messages_count(self):
-        """Test view for count messages of chat room"""
-        # Create Chat Room
-        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-        room_2 = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
-
-        # Create messages
-        # room 1
-        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-        # room 2
-        ChatMessage.objects.create(sender=self.user_1, room=room_2, message='Hello')
-
-        api_path = '%s:chat:message-count' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
 
     # def test_chat_messages_list_filter_by_first_name(self):
     #     """Test view for messages of chat room w/ filter by first name"""
@@ -196,63 +179,29 @@ class TestChat(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    def test_chat_room_messages_count(self):
-        """Test count of messages in room by pk"""
-        # Authorize user_3, that not allowed to read this conversation
-        self.token, created = Token.objects.get_or_create(user=self.user_3)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        # Create Chat Room
-        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-
-        # Create messages
-        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-
-        api_path = '%s:chat:message-count' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.filter(room=room).count())
-
-    def test_chat_room_messages_unread_count(self):
-        """Test count of unread messages in room by pk"""
-        # Authorize user_3, that not allowed to read this conversation
-        self.token, created = Token.objects.get_or_create(user=self.user_3)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
-        # Create Chat Room
-        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-
-        # Create messages
-        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-        message = ChatMessage.objects.create(sender=self.user_2, room=room, message='Ay')
-        ChatReadMessage.objects.create(user=self.user_3, message=message)
-
-        api_path = '%s:chat:message-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.annotate_read_status(self.user_3).filter(room=room, read=False).count())
-
     def test_total_chat_room_messages_unread_count(self):
-        """Test total count of unread messages in rooms"""
+        """
+        Test total count of unread messages in rooms
+        Participants: user_1, user_2
+        """
         # Authorize user_3, that not allowed to read this conversation
-        self.token, created = Token.objects.get_or_create(user=self.user_3)
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         # Create Chat Room
-        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        room = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
 
         # Create messages
-        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-        message = ChatMessage.objects.create(sender=self.user_2, room=room, message='Ay')
-        ChatReadMessage.objects.create(user=self.user_3, message=message)
+        message_from_user_1_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
+        message_from_user_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
+        message_from_user_1_2 = ChatMessage.objects.create(sender=self.user_1, room=room, message='How u doin\'')
+        # Emulate read message
+        ChatReadMessage.objects.create(user=self.user_2, message=message_from_user_1_1)
 
-        api_path = '%s:chat:message-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
-        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), ChatMessage.objects.annotate_read_status(self.user_3).filter(read=False).count())
+        self.assertEqual(response.data.get('count'), 1)
 
     def test_room_create(self):
         """Test create chat room"""

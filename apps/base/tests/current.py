@@ -26,6 +26,9 @@ class TestCatalog(APITestCase):
         print(f"End test base app v{cls.VERSION}\n")
 
     def setUp(self):
+        # Create news
+        self.news = AutoFixture(models.Newsletter, field_values={'publish': True}).create(5)
+
         # Create City
         self.city = catalog_models.City.objects.create(name='City 1')
 
@@ -39,10 +42,6 @@ class TestCatalog(APITestCase):
 
     def test_news_list(self):
         """Test news list view"""
-
-        # Create news
-        AutoFixture(models.Newsletter).create(5)
-
         api_path = '%s:base:newsletter-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -51,11 +50,8 @@ class TestCatalog(APITestCase):
     def test_news_detail(self):
         """Test news detail view"""
 
-        # Create news
-        news = AutoFixture(models.Newsletter).create(5)
-
         api_path = '%s:base:newsletter-detail' % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={'pk': news[0].id}))
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.news[0].id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_notifications_list(self):
