@@ -38,11 +38,6 @@ class TestProfile(APITestCase):
         # Create users
         self.user_1 = User.objects.make(phone='+79000000001')
 
-        self.user_2 = User.objects.make(phone='+79000000002')
-        self.user_2.profile.first_name = 'Lev'
-        self.user_2.profile.last_name = 'Leshenko'
-        self.user_2.profile.save()
-
         # Create car brands
         self.toyota = CarMark.objects.create(name='Toyota')
         self.nissan = CarMark.objects.create(name='Nissan')
@@ -1153,6 +1148,12 @@ class TestProfile(APITestCase):
 
     def test_online_status(self):
         """Test case for check user online status"""
+        # Create additional users
+        self.user_2 = User.objects.make(phone='+79010000000')
+        self.user_2.profile.first_name = 'Lev'
+        self.user_2.profile.last_name = 'Leshenko'
+        self.user_2.profile.save()
+
         # Authorize user_1
         token, created = Token.objects.get_or_create(user=self.user_1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

@@ -3,7 +3,7 @@ from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.postgres.search import SearchVector
 from django.db import models
-from django.db.models import Q, Subquery
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from fcm_django import models as fcm_models
@@ -68,9 +68,9 @@ class ProfileQuerySet(models.QuerySet):
         :type user: object
         :return: ProfileQuerySet
         """
-        return self.exclude(Q(user_id__in=Subquery(BlackList.objects.common(user).values('foe_id'))) |
-                            Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner_id')))
-                            ).exclude(user=user)
+        return self.exclude(user__blacked_user__owner=user)\
+                   .exclude(user__blacklist_owner__foe=user)\
+                   .exclude(user=user)
 
     def valid(self):
         """Queryset that exclude profiles with null first name and last name"""
@@ -82,7 +82,11 @@ class ProfileQuerySet(models.QuerySet):
         :param user:
         :return: QuerySet
         """
-        return self.filter(user_id__in=Subquery(FriendList.objects.common(user).values('friend'))).exclude(user=user)
+        return self.filter(
+            # Check if USER is an initiator of friend request (is OWNER)
+            models.Q(user__friendlist_user__owner=user) |
+            # Check if USER is an invited person
+            models.Q(user__friendlist_owner__friend=user)).exclude(user=user)
 
     def annotate_online_status(self):
         """
