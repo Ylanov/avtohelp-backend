@@ -153,9 +153,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "type": "chat.message",
                 "room_id": room_id,
                 "profile_id": user.profile.id,
-                "first_name": user.get_first_name(),
-                "last_name": user.get_last_name(),
-                "avatar": user.get_avatar(),
+                "first_name": user.get_first_name,
+                "last_name": user.get_last_name,
+                "avatar": user.get_avatar,
                 'datetime': f'{letter.created.isoformat()}',
                 "message": message,
                 "message_id": letter.id

@@ -42,18 +42,14 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.filter(room=room_id)
 
     def annotate_read_status(self, user):
-        return self.annotate(
-            read=models.Case(
-                models.When(
-                    id__in=Subquery(ChatReadMessage.objects.filter(user=user).values('message_id')),
-                    then=True),
-                models.When(
-                    room__participants=user,
-                    then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        return self.annotate(read=models.Case(
+            models.When(
+                chatreadmessage__user=user,
+                then=True
+            ),
+            default=False,
+            output_field=models.BooleanField(default=False)
+        ))
 
 
 class ChatMessageManager(models.Manager):
