@@ -135,7 +135,7 @@ class User(AbstractUser, BaseMixin):
     @property
     def get_location_update_datetime(self):
         """Return user location update datetime"""
-        return self.profilelocation.modified
+        return self.profilelocation.modified if hasattr(self, 'profilelocation') else None
 
     @property
     def location_is_valid(self):
