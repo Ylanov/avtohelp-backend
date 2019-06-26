@@ -89,14 +89,14 @@ class ProfileQuerySet(models.QuerySet):
         Annotate online status
         :return: annotate field online status
         """
-        return self.annotate(
-            online=models.Case(
-                models.When(user_id__in=Subquery(activity.get_user_activities().values('user_id')),
-                            then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        return self.annotate(online=models.Case(
+            models.When(
+                models.Q(user__onlineuseractivity__user__isnull=False),
+                then=True
+            ),
+            default=False,
+            output_field=models.BooleanField(default=False)
+        ))
 
     def annotate_friend_status(self, user):
         """

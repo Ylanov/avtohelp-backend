@@ -1,12 +1,14 @@
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
+from online_users.models import OnlineUserActivity
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
-from catalog.models import City
 from car.models import CarColor, CarMark, CarModel, Car
+from catalog.models import City
 from userprofile.models import (Profile, BlackList, FriendList,
                                 FriendRequest, ProfileCar,
                                 ProfileGallery)
@@ -35,6 +37,11 @@ class TestProfile(APITestCase):
 
         # Create users
         self.user_1 = User.objects.make(phone='+79000000001')
+
+        self.user_2 = User.objects.make(phone='+79000000002')
+        self.user_2.profile.first_name = 'Lev'
+        self.user_2.profile.last_name = 'Leshenko'
+        self.user_2.profile.save()
 
         # Create car brands
         self.toyota = CarMark.objects.create(name='Toyota')
@@ -1143,3 +1150,20 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': user_2.profile.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('friend_request'), True)
+
+    def test_online_status(self):
+        """Test case for check user online status"""
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        # Create a record that the user is online
+        OnlineUserActivity.objects.create(user=self.user_2, last_activity=timezone.now())
+
+        api_path = '%s:userprofile:profile-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data={'online': True})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')),
+                         Profile.objects.annotate_online_status().filter(online=True).count())
+
+
