@@ -105,9 +105,9 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.annotate(friend=models.Case(
             models.When(
-                # Check if user is an initiator of friend request (is OWNER)
+                # Check if USER is an initiator of friend request (is OWNER)
                 models.Q(user__friendlist_user__owner=user) |
-                # Check if user is an invited person
+                # Check if USER is an invited person
                 models.Q(user__friendlist_owner__friend=user),
                 then=True
             ),
@@ -120,15 +120,17 @@ class ProfileQuerySet(models.QuerySet):
         Annotate foe status
         :return: annotated field
         """
-        return self.annotate(
-            foe=models.Case(
-                models.When(Q(user_id__in=Subquery(BlackList.objects.common(user).values('foe__id'))) |
-                            Q(user_id__in=Subquery(BlackList.objects.common(user).values('owner__id'))),
-                            then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        return self.annotate(foe=models.Case(
+            models.When(
+                # Check that the user is in the black list
+                models.Q(user__blacked_user__owner=user) |
+                # Check that the user is blacklisted
+                models.Q(user__blacklist_owner__foe=user),
+                then=True
+            ),
+            default=False,
+            output_field=models.BooleanField(default=False)
+        ))
 
     def annotate_friend_request_status(self, user):
         """
