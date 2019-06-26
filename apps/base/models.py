@@ -75,7 +75,7 @@ class PushNotificationManager(models.Manager):
         obj = self.model(
             user=user,
             title=_('New message from chat'),
-            description=_('User %s wrote a message') % sender.get_full_name(),
+            description=_('User %s wrote a message') % sender.get_full_name,
             event=self.model.NEW_MESSAGE
         )
         obj.save()
