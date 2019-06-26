@@ -1,17 +1,17 @@
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.db.models.functions import Distance
 from django.contrib.postgres.search import SearchVector
 from django.db import models
-from fcm_django import models as fcm_models
 from django.db.models import Q, Subquery
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from fcm_django import models as fcm_models
 from online_users.models import OnlineUserActivity as activity
 
-from utils.mixins import BaseMixin, ImageMixin
-from project import celery as tasks
-from django.conf import settings
-from django.contrib.gis.db.models.functions import Distance
 from base.models import PushNotificationConfiguration
-from django.utils import timezone
+from project import celery as tasks
+from utils.mixins import BaseMixin, ImageMixin
 
 
 class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
@@ -103,15 +103,17 @@ class ProfileQuerySet(models.QuerySet):
         Annotate friend status
         :return: annotated field
         """
-        return self.annotate(
-            friend=models.Case(
-                models.When(Q(user_id__in=Subquery(FriendList.objects.common(user).values('friend__id'))) |
-                            Q(user_id__in=Subquery(FriendList.objects.common(user).values('owner__id'))),
-                            then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        return self.annotate(friend=models.Case(
+            models.When(
+                # Check if user is an initiator of friend request (is OWNER)
+                models.Q(user__friendlist_user__owner=user) |
+                # Check if user is an invited person
+                models.Q(user__friendlist_owner__friend=user),
+                then=True
+            ),
+            default=False,
+            output_field=models.BooleanField(default=False)
+        ))
 
     def annotate_foe_status(self, user):
         """
