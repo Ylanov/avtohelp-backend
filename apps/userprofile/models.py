@@ -137,14 +137,15 @@ class ProfileQuerySet(models.QuerySet):
         Annotate annotate friend request status
         :return: annotated field
         """
-        return self.annotate(
-            friend_request=models.Case(
-                models.When(Q(user_id__in=Subquery(FriendRequest.objects.from_me(user).values('invited__id'))),
-                            then=True),
-                output_field=models.BooleanField(default=False),
-                default=False
-            )
-        )
+        return self.annotate(friend_request=models.Case(
+            models.When(
+                # Check if USER sent friend request
+                models.Q(user__friendrequest_invited__owner=user),
+                then=True
+            ),
+            default=False,
+            output_field=models.BooleanField(default=False)
+        ))
 
     def annotate_full_text_search(self):
         """Full-text search"""
