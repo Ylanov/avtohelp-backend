@@ -3,11 +3,9 @@ import random
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.core.cache import caches
-from django.db import models
 from django.utils import timezone
 
 from chat import models as chat_models
-from userprofile import models as profile_models
 
 
 def generate_image_name():
@@ -50,10 +48,8 @@ def create_chat_message(sender: object, room_id: int, message: str):
 
 @database_sync_to_async
 def check_friendliness(user, room_id):
-    room = chat_models.ChatRoom.objects.get(id=room_id)
-    condition = user in room.participants.all().exclude(
-        models.Q(id__in=(profile_models.BlackList.objects.common(user).values('foe_id'))) |
-        models.Q(id__in=models.Subquery(profile_models.BlackList.objects.common(user).values('owner_id'))))
+    filtered_qs = chat_models.ChatRoom.objects.friendly(user)
+    condition = room_id in list(i['id'] for i in filtered_qs.values('id'))
     return condition
 
 
