@@ -6,15 +6,21 @@ from order import models, filters
 from order.serializers import current as serializers
 
 
-class AssistanceRequestMixin(object):
+class AssistanceRequestBaseMixin:
+    """AssistanceRequest mixin"""
+
+    queryset = models.AssistanceRequest.objects.select_related('user__profile')
+
+
+class AssistanceRequestMixin(AssistanceRequestBaseMixin):
     """AssistanceRequestMixin"""
+
     model = models.AssistanceRequest
-    queryset = models.AssistanceRequest.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.available(self.request.user).annotate_distance(
-            raw_coordinates=self.request.query_params.get('coordinates'))
+        return self.queryset.available(self.request.user)\
+                            .annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
@@ -92,12 +98,11 @@ class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView
             raw_coordinates=self.request.query_params.get('coordinates'))
 
 
-class AssistanceRequestDetailView(generics.RetrieveAPIView):
+class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveAPIView):
     """
     Get detail information of assistance request
     """
     serializer_class = serializers.AssistanceRequestCreateSerializer
-    queryset = models.AssistanceRequest.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
@@ -116,16 +121,15 @@ class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView
         return self.queryset.by_user(user=self.request.user).available(user=self.request.user)
 
 
-class AssistanceRequestView(generics.RetrieveDestroyAPIView):
+class AssistanceRequestView(AssistanceRequestBaseMixin, generics.RetrieveDestroyAPIView):
     """
     Get detail information of assistance request
     """
     serializer_class = serializers.AssistanceRequestCreateSerializer
-    queryset = models.AssistanceRequest.objects.all()
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.all().annotate_distance(
+        return self.queryset.annotate_distance(
             raw_coordinates=self.request.query_params.get('coordinates'))
 
 

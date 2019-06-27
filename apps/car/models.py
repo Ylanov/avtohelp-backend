@@ -1,11 +1,11 @@
-from django.db import models
-from utils.mixins import BaseMixin, NameMixin, ImageMixin
-from django.utils.translation import ugettext_lazy as _
-from django.contrib.gis.db import models as gis_models
-from phonenumber_field.modelfields import PhoneNumberField
-from django.contrib.gis.db.models.functions import Distance
 from colorful.fields import RGBColorField
-from django.contrib.postgres.search import SearchVector
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.db.models.functions import Distance
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
+
+from utils.mixins import BaseMixin, NameMixin, ImageMixin
 
 
 class CarMark(BaseMixin, NameMixin):

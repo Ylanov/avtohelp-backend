@@ -46,7 +46,7 @@ class FCMDeviceViewSet(generics.GenericAPIView):
 # Profile
 
 
-class ProfileMixin(generics.GenericAPIView):
+class ProfileMixin:
     """Profile mixin"""
 
     queryset = models.Profile.objects.select_related('user')
@@ -56,12 +56,14 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
     """
     View for list of user profiles
     With filter by fields:
-    :param online: Search profile by online status
-    :param friend: Search profile by friend status
-    :param search: Search profile by fields - first name, last name, middle name, license plate
-    :type online: Boolean True
-    :type friend: Boolean False
-    :type search: CharField aa000aa 123
+        param online: Search profile by online status
+        type online: Boolean True
+
+        param friend: Search profile by friend status
+        type friend: Boolean False
+
+        param search: Search profile by fields - first name, last name, middle name, license plate
+        type search: CharField aa000aa 123
     """
 
     serializer_class = serializers.ProfileListSerializer
@@ -169,7 +171,7 @@ class ProfileLocationUpdateView(generics.UpdateAPIView):
 # Car
 
 
-class ProfileCarMixin(generics.GenericAPIView):
+class ProfileCarMixin:
     """ProfileCar mixin"""
 
     queryset = models.ProfileCar.objects.select_related('owner', 'car', 'color',
@@ -231,13 +233,13 @@ class ProfileCarListView(MyProfileCarMixin, generics.ListAPIView):
 # Gallery
 
 
-class ProfileGalleryMixin(generics.GenericAPIView):
+class ProfileGalleryMixin:
     """ProfileGallery mixin"""
 
     queryset = models.ProfileGallery.objects.select_related('profile')
 
 
-class MyProfileGalleryMixin(ProfileGalleryMixin):
+class MyProfileGalleryMixin(ProfileGalleryMixin, generics.GenericAPIView):
     """Mixin for ProfileGallery views"""
 
     def get_queryset(self):
@@ -301,7 +303,7 @@ class ProfileGalleryListView(ProfileGalleryMixin, generics.ListAPIView):
 # FriendList
 
 
-class FriendRequestMixin(generics.GenericAPIView):
+class FriendRequestMixin:
     """FriendRequest mixin"""
 
     queryset = models.FriendRequest.objects.select_related('owner__profile', 'invited__profile')
@@ -428,7 +430,7 @@ class InFriendRequestDeleteView(generics.DestroyAPIView):
 # Blacklist
 
 
-class ProfileBlackListMixin(generics.GenericAPIView):
+class ProfileBlackListMixin:
     """ProfileBlackLists mixin"""
 
     queryset = models.BlackList.objects.select_related('owner__profile', 'foe__profile')
