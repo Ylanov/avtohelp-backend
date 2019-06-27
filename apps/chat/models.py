@@ -143,7 +143,8 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def annotate_unread_messages(self, user):
         return self.annotate(unread_messages=models.Count('chatmessage',
-                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user),
+                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user) &
+                                                                 ~models.Q(chatmessage__sender=user),
                                                           distinct=True))
 
     def annotate_message_count(self):
