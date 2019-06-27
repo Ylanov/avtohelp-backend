@@ -92,75 +92,19 @@ class TestChat(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-    # def test_chat_messages_list(self):
-    #     """Test view for messages of chat room"""
-    #     # Create Chat Room
-    #     room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-    #
-    #     # Create messages
-    #     ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-    #
-    #     api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-    #     response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_chat_messages_list(self):
+        """Test view for messages of chat room"""
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
 
+        # Create messages
+        ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
+        ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
 
-    # def test_chat_messages_list_filter_by_first_name(self):
-    #     """Test view for messages of chat room w/ filter by first name"""
-    #     # Fill user profile
-    #     self.user.first_name = 'Anatoly'
-    #     self.user.save()
-    #
-    #     # Create Chat Room
-    #     room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-    #
-    #     # Create messages
-    #     ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='sup')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='what ur u doin')
-    #
-    #     api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-    #     filters = {'first_name': self.user.first_name}
-    #     response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #
-    # def test_chat_messages_list_filter_by_last_name(self):
-    #     """Test view for messages of chat room w/ filter by last name"""
-    #     # Fill user profile
-    #     self.user.last_name = 'Feteleu'
-    #     self.user.save()
-    #
-    #     # Create Chat Room
-    #     room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-    #
-    #     # Create messages
-    #     ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='sup')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='what ur u doin')
-    #
-    #     api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-    #     filters = {'last_name': self.user.last_name}
-    #     response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #
-    # def test_chat_messages_list_filter_by_sender_id(self):
-    #     """Test view for messages of chat room w/ filter by sender id"""
-    #     # Create Chat Room
-    #     room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
-    #
-    #     # Create messages
-    #     ChatMessage.objects.create(sender=self.user, room=room, message='Hi')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='Hello')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='sup')
-    #     ChatMessage.objects.create(sender=self.user_1, room=room, message='what ur u doin')
-    #
-    #     api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
-    #     filters = {'sender': self.user.id}
-    #     response = self.client.get(reverse(api_path, kwargs={'pk': room.id}), data=filters)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
+        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(len(response.data.get('results')))
 
     def test_chat_messages_list_1(self):
         """Test view for messages of chat room"""
@@ -381,3 +325,39 @@ class TestChat(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('results')[0].get('unread_messages'), 1)
 
+    def test_chat_messages_annotated_read_status(self):
+        """
+        Test chat messages annotated read status
+        Participants: user_1, user_2
+        Mechanism: user_1 sent user_2 message (m_1), user_2 reply user_1 twice (m_2, m_3)
+        """
+        # Authorize user_1, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create chat room
+        room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Create messages
+        m_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
+        m_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
+        m_3 = ChatMessage.objects.create(sender=self.user_2, room=room, message='sup')
+
+        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        for message in response.data.get('results'):
+            if message.get('sender').get('id') != self.user_1.id:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(message.get('read'), False)
+            else:
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(message.get('read'), True)
+
+        # Emulate messages reading
+        ChatReadMessage.objects.create(user=self.user_1, message=m_2)
+        ChatReadMessage.objects.create(user=self.user_1, message=m_3)
+        api_path = '%s:chat:message-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path, kwargs={'pk': room.id}))
+        for message in response.data.get('results'):
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            self.assertEqual(message.get('read'), True)

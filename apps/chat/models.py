@@ -45,6 +45,10 @@ class ChatMessageQuerySet(models.QuerySet):
                 chatreadmessage__user=user,
                 then=True
             ),
+            models.When(
+                sender=user,
+                then=True
+            ),
             default=False,
             output_field=models.BooleanField(default=False)
         ))

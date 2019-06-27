@@ -20,7 +20,8 @@ class ChatMessageListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk')).annotate_read_status(user=self.request.user)
+        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk'))\
+                                         .annotate_read_status(user=self.request.user)
 
 
 class ChatTotalUnreadMessageCountView(views.APIView):
