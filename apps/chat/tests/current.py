@@ -227,7 +227,7 @@ class TestChat(APITestCase):
         Correct count before block: 1
         Correct count after block, without readings: 0
         """
-        # Authorize user_3, that not allowed to read this conversation
+        # Authorize user_1, that not allowed to read this conversation
         self.token, created = Token.objects.get_or_create(user=self.user_1)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
@@ -346,3 +346,38 @@ class TestChat(APITestCase):
 
         self.assertEqual(chat_room, ChatRoom.objects.friends(self.user_1).first())
         self.assertEqual(ChatRoom.objects.friends(self.user_1).count(), 1)
+
+    def test_chat_room_unread_messages_counter(self):
+        """
+        Test counter of unread messages
+        Participants: user_1, user_2
+        Mechanism: user_1 wrote message to user_2 (m_1), user_2 wrote twice to user_1 (m_2 & m_3)
+        Correct count of unread messages: 2 (as user_1), 1 (as user_2)
+        """
+
+        # Authorize user_1, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+
+        # Create messages and check count
+        m_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
+
+        m_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
+        m_3 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Y ur silent?')
+
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path), kwargs={'pk': room.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('results')[0].get('unread_messages'), 2)
+
+        # Authorize user_1, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path), kwargs={'pk': room.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('results')[0].get('unread_messages'), 1)
+
