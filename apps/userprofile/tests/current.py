@@ -968,7 +968,7 @@ class TestProfile(APITestCase):
 
         api_path = '%s:userprofile:profile-gallery-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': profile_image.id}))
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_profile_gallery_detail_2(self):
         """Common test for retrieving detail of profile gallery object"""
