@@ -183,6 +183,9 @@ class TestChat(APITestCase):
         """
         Test total count of unread messages in rooms
         Participants: user_1, user_2
+        Mechanism: from user_1 to user_2 (m_1), from user_2 to user_1 (m_2),
+                   from user_2 to user_1 (m_3)
+        Messages: m_1, m_2, m_3
         """
         # Authorize user_3, that not allowed to read this conversation
         self.token, created = Token.objects.get_or_create(user=self.user_1)
@@ -192,11 +195,78 @@ class TestChat(APITestCase):
         room = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
 
         # Create messages
-        message_from_user_1_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
-        message_from_user_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
-        message_from_user_1_2 = ChatMessage.objects.create(sender=self.user_1, room=room, message='How u doin\'')
-        # Emulate read message
-        ChatReadMessage.objects.create(user=self.user_2, message=message_from_user_1_1)
+        m_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
+        m_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
+        m_3 = ChatMessage.objects.create(sender=self.user_2, room=room, message='How u doing')
+
+        # check counter without readings
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 2)
+
+        # check with readings
+        # emulate read message
+        ChatReadMessage.objects.create(user=self.user_1, message=m_2)
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get(
+            'current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 1)
+
+    def test_total_count_chat_room_unread_messages_w_blacklisted_user(self):
+        """
+        Test total count of unread chat room messages with blacklisted user
+        Participants: user_1, user_2
+        Blacklist: BlackList_obj (owner: user_1, foe: user_2)
+        Total messages: 3 (user_1 to user_2, user_2 to user_1, user_2 to user_1)
+        Total messages exclude message from blacklisted user: 1
+        Mechanism: user_1 write message to user_2 (M1), user_2 answered user_1 (M2),
+                   *user_1 blacklisted user_2*, user_2 try to reply user_1 (M3)
+
+        Correct count before block: 1
+        Correct count after block, without readings: 0
+        """
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        room = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+
+        # Create messages and check count
+        m_1 = ChatMessage.objects.create(sender=self.user_1, room=room, message='Hi')
+
+        m_2 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hello')
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get(
+            'current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 1)
+
+        # user_1 read user_2 message
+        ChatReadMessage.objects.create(user=self.user_1, message=m_2)
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get(
+            'current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 0)
+
+        # user_1 add user_2 to blacklist
+        bl = BlackList.objects.create(owner=self.user_1, foe=self.user_2)
+
+        # blacklisted user_2 try to sent message to user_1
+        m_3 = ChatMessage.objects.create(sender=self.user_2, room=room, message='Hey what\'s up??')
+
+        # check unread messages for user_1
+        api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get(
+            'current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), 0)
+
+        # check unread messages if we remove user_2 from blacklist user_1
+        bl.delete()
 
         api_path = '%s:chat:message-total-unread-count' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
@@ -230,3 +300,49 @@ class TestChat(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data.get('status_code'), api_exceptions.EqualIDError.extended_status_code)
 
+    def test_impossibility_chatting_with_blacklisted_user(self):
+        """
+        Test impossibility chatting with blacklisted user
+        Participants: user, user_1
+        ChatRoom: Room_1 (user, user_1)
+        user backlisted user_1
+        Now chat room list should return not a single room 'cause of Blacklist obj
+
+        """
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create Chat Room
+        ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        # Added to blacklist
+        BlackList.objects.create(owner=self.user, foe=self.user_1)
+
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), 0)
+
+    def test_possibility_chatting_only_with_friends(self):
+        """
+        Test possibility chatting only with friends
+        Participants: user, user_1
+        ChatRoom: Room_1 (user, user_1)
+        user add to friend user_1
+        Now chat room list should return only rooms when participants are friends
+
+        """
+        # Authorize user_3, that not allowed to read this conversation
+        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Added to friendlist
+        f_request = FriendRequest.objects.create(owner=self.user, invited=self.user_1, approved=True)
+        FriendList.objects.create(owner=self.user, friend=self.user_1, request=f_request)
+
+        # Create Chat Room
+        chat_room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+
+        self.assertEqual(chat_room, ChatRoom.objects.friends(self.user_1).first())
+        self.assertEqual(ChatRoom.objects.friends(self.user_1).count(), 1)

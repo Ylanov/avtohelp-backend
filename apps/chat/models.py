@@ -1,11 +1,9 @@
 from django.conf import settings
 from django.core.cache import caches
 from django.db import models
-from django.db.models import Subquery
 from django.utils.translation import ugettext_lazy as _
 
 from project import celery as tasks
-from userprofile import models as profile_models
 from utils.mixins import BaseMixin, ImageMixin
 
 MSG_TYPE_MESSAGE = 0  # For standard messages
@@ -119,14 +117,17 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(participants__id__in=Subquery(
-            profile_models.BlackList.objects.my_list(participant).values('foe_id'))).exclude(participants__id__in=Subquery(
-            profile_models.BlackList.objects.in_list(participant).values('owner_id')))
+        return self.exclude(participants__blacked_user__owner=participant)\
+                   .exclude(participants__blacklist_owner__foe=participant)
 
     def friends(self, participant):
         """Filter by friend flag"""
-        return self.filter(participants_id__in=Subquery(
-            profile_models.FriendList.objects.common(participant).values('friend_id')))
+        return self.filter(
+            # Check if USER is an initiator of friend request (is OWNER)
+            models.Q(participants__friendlist_user__owner=participant) |
+            # Check if USER is an invited person
+            models.Q(participants__friendlist_owner__friend=participant)
+        ).distinct()
 
     def private(self, initiator, participant):
         """Filter by two participants for find private room"""

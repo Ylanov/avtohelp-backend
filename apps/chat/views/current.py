@@ -30,7 +30,9 @@ class ChatTotalUnreadMessageCountView(views.APIView):
         """Get count of assistance requests"""
         user = self.request.user
         return Response({
-            'count': models.ChatMessage.objects.exclude(sender=user)
+            'count': models.ChatMessage.objects.exclude(sender=user)\
+                                               .exclude(room__participants__blacklist_owner__foe=user)\
+                                               .exclude(room__participants__blacked_user__owner=user)\
                                                .filter(room__participants=user)\
                                                .filter(~Q(chatreadmessage__user=user))\
                                                .count()})
