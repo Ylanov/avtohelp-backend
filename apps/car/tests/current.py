@@ -36,7 +36,7 @@ class TestCatalog(APITestCase):
         self.service_1 = CarService.objects.create(category=self.service_cat_1,
                                                    description='Description',
                                                    phone='+79112223344',
-                                                   location=Point(38.96633327007292, 45.04272063617574))
+                                                   location=Point(45.04272063617574, 38.96633327007292))
         self.service_2 = CarService.objects.create(category=self.service_cat_2,
                                                    description='Description',
                                                    phone='+79998887766',
@@ -88,6 +88,7 @@ class TestCatalog(APITestCase):
                                                     license_plate='aaa123aa 70')
         self.cars_count = Car.objects.count()
 
+    # CAR COLORS
     def test_list_car_colors(self):
         """Test view for getting list of users cars colors"""
         api_path = '%s:car:carcolor-list' % settings.AVAILABLE_VERSIONS.get('current')
@@ -108,7 +109,8 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': self.color_1.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_list_cars_marks_w_filters(self):
+    # CAR MARKS
+    def test_list_car_marks_w_filters(self):
         """Test view for getting list of users cars marks with filter by model name"""
         api_path = '%s:car:carmark-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path), data={'model_name': self.toyota_model.name})
@@ -125,14 +127,15 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_list_cars_model(self):
+    # CAR MODELS
+    def test_list_car_models(self):
         """Test view for getting list of users cars model"""
         api_path = '%s:car:carmodel-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.car_models)
 
-    def test_list_cars_model_w_filters(self):
+    def test_list_car_models_w_filters(self):
         """Test view for getting list of users cars model with filters"""
         api_path = '%s:car:carmodel-list' % settings.AVAILABLE_VERSIONS.get('current')
         response = self.client.get(reverse(api_path), data={'mark_name': self.toyota.name})
@@ -149,6 +152,7 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': self.toyota_model.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    # CARS
     def test_list_cars(self):
         """Test view for getting list of users cars"""
 
@@ -186,6 +190,7 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path, kwargs={'pk': self.car_1.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    # SERVICES
     def test_service_list(self):
         """Test services list view"""
 
@@ -195,7 +200,9 @@ class TestCatalog(APITestCase):
         self.assertEqual(len(response.data), CarService.objects.count())
 
     def test_service_list_query(self):
-        """Test service list query - from center & position"""
+        """
+        Test service list query with query params - from center & position
+        """
         query = {
             'from_center': ['45.034399, 39.012429, 1000000'],  # latitude, longitude, radius in meters
             'position': ['45.012123, 39.01234']  # latitude, longitude
@@ -204,7 +211,21 @@ class TestCatalog(APITestCase):
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0].get('distance'), 4964.72245848)  # output in meters
+        self.assertEqual(response.data[0].get('distance'), 5758.81266972)  # output in meters
+
+    def test_service_list_query_beyond_radius(self):
+        """
+        Test service list query with query params - from center & position,
+        but radius between user and car service is more than in 'from_center' query parameter
+        """
+        query = {
+            'from_center': ['45.034399, 39.012429, 5000'],  # latitude, longitude, radius in meters
+            'position': ['45.012123, 39.01234']  # latitude, longitude
+        }
+        api_path = '%s:car:carservice-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data=query)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
 
     def test_service_list_w_filters(self):
         """Test services list view w/ filters"""
@@ -220,3 +241,5 @@ class TestCatalog(APITestCase):
         api_path = '%s:car:carservice-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': self.service_2.pk}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    # SERVICE CATEGORIES

@@ -1,6 +1,7 @@
 from autofixture import AutoFixture
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -74,3 +75,22 @@ class TestCatalog(APITestCase):
         api_path = '%s:base:pushnotification-detail' % self.VERSION
         response = self.client.get(reverse(api_path, kwargs={'pk': self.notification.id}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_notification_schedule(self):
+        """Test method to get notification schedule data"""
+        # Requested data
+        scheduled_time = timezone.now().time()
+        data = models.PushNotificationConfiguration.get_solo()
+        data.notification_schedule.add(models.PushNotificationSchedule.objects.create(time=scheduled_time))
+        data.save()
+
+        # Authorize
+        self.token, created = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:base:notification-schedule' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNotNone(response.data)
+        self.assertEqual(response.data[0].get('hours'), scheduled_time.hour)
+        self.assertEqual(response.data[0].get('minutes'), scheduled_time.minute)
