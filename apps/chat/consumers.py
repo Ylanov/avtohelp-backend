@@ -191,8 +191,6 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "msg_type": models.MSG_TYPE_ENTER,
                 "room": event["room_id"],
                 "profile_id": event["profile_id"],
-                # todo: remove from production, need for /chat/stream view
-                # Instruct their client to finish opening the room
                 "join": event["room_id"],
             },
         )

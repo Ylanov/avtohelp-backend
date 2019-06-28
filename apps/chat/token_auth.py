@@ -1,9 +1,6 @@
-from channels.auth import AuthMiddlewareStack, SessionMiddleware
+from channels.auth import AuthMiddlewareStack
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.sessions.models import Session
 from rest_framework.authtoken.models import Token
-
-from account.models import User
 
 
 class TokenAuthMiddleware:
@@ -27,12 +24,12 @@ class TokenAuthMiddleware:
                 token_name, token_key = headers['authorization'].split()
                 token = Token.objects.get(key=token_key)
                 scope['user'] = token.user
-            else:
-                # todo: remove from production! uses for web view
-                cookie = {i.split('=')[0].lstrip(): i.split('=')[1] for i in headers.get('cookie').split(';')}
-                session = Session.objects.get(session_key=cookie.get('sessionid'))
-                session_data = session.get_decoded()
-                scope['user'] = User.objects.get(id=session_data.get('_auth_user_id'))
+            # else:
+            #     todo: uses for chat in web view
+            #     cookie = {i.split('=')[0].lstrip(): i.split('=')[1] for i in headers.get('cookie').split(';')}
+            #     session = Session.objects.get(session_key=cookie.get('sessionid'))
+            #     session_data = session.get_decoded()
+            #     scope['user'] = User.objects.get(id=session_data.get('_auth_user_id'))
         except:
             scope['user'] = AnonymousUser()
         return self.inner(scope)

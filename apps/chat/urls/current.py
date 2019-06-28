@@ -12,5 +12,5 @@ urlpatterns = [
     path('messages/room/<int:pk>', views.ChatMessageListView.as_view(), name='message-list'),
     path('messages/unread/count', views.ChatTotalUnreadMessageCountView.as_view(), name='message-total-unread-count'),
     # Test use
-    path('stream', views.ChatView.as_view(), name='chat'),
+    # path('stream', views.ChatView.as_view(), name='chat'),
 ]
