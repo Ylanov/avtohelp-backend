@@ -6,9 +6,9 @@ from rest_framework.authtoken.models import Token
 
 from account.models import User
 from authorization import models
+from project import celery as tasks
 from userprofile import models as profile_models
 from utils import api_exceptions
-from project import celery as tasks
 
 
 class PhoneVerificationSerializer(serializers.ModelSerializer):
@@ -36,10 +36,8 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
                 })
             elif qs.count() >= 3:
                 if not timezone.now() > qs.first().datetime_before_unlock:
-                    raise api_exceptions.TemporaryLockError(detail={
-                        'detail': api_exceptions.TemporaryLockError.default_detail,
-                        'remaining_time': qs.first().remain_before_unlock
-                    })
+                    raise api_exceptions.TemporaryLockError(
+                        remaining_time=qs.first().remain_before_unlock)
                 else:
                     models.SMSCode.objects.decline_all_by_phone(phone=phone)
         return attrs
@@ -92,7 +90,11 @@ class AuthorizationView(serializers.ModelSerializer):
 
     def validate(self, attrs):
         """Validation method"""
-        user = User.objects.get(phone=attrs.get('phone'))
+        user_qs = User.objects.filter(phone=attrs.get('phone'))
+        if not user_qs.exists():
+            raise api_exceptions.UserNotFound()
+        else:
+            user = user_qs.first()
 
         # check user code
         qs = models.SMSCode.objects.by_phone(user.phone).by_code(attrs.get('code')).sent()
@@ -114,26 +116,21 @@ class AuthorizationView(serializers.ModelSerializer):
             if user_lock.attempts == settings.SMS_INPUT_ATTEMPTS:
                 # check is it possible to try again
                 if user_lock.datetime_before_unlock > timezone.now():
-                    raise api_exceptions.TemporaryLockError(detail={
-                        'detail': api_exceptions.TemporaryLockError.default_detail,
-                        'remaining_time': user_lock.remain_before_unlock
-                    })
+                    raise api_exceptions.TemporaryLockError(
+                        remaining_time=user_lock.remain_before_unlock)
                 else:
                     if settings.USE_CELERY:
                         tasks.not_completed_authorization.delay(user_id=user.id)
                     else:
                         tasks.not_completed_authorization(user_id=user.id)
-                    raise api_exceptions.TemporaryLockError(detail={
-                        'detail': api_exceptions.TemporaryLockError.default_detail,
-                        'remaining_time': user_lock.remain_before_unlock
-                    })
+                    raise api_exceptions.TemporaryLockError(
+                        remaining_time=user_lock.remain_before_unlock)
             # regular behavior
             else:
                 user_lock.increment_attempts()
-                raise api_exceptions.CodeIsNotAcceptedError(detail={
-                    'remaining_attempts': settings.SMS_INPUT_ATTEMPTS - user_lock.attempts,
-                    'status_code': api_exceptions.CodeIsNotAcceptedError.extended_status_code
-                })
+                raise api_exceptions.CodeIsNotAcceptedError(
+                    remaining_attempts=settings.SMS_INPUT_ATTEMPTS - user_lock.attempts,
+                    status_code=api_exceptions.CodeIsNotAcceptedError.extended_status_code)
 
     def create(self, validated_data):
         """Create or retrieve object"""

@@ -2,8 +2,9 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import exceptions
 from rest_framework import status
-from utils.custom_statuses import HTTP_420_ENHACE_YOUR_CALM
 from rest_framework.views import exception_handler
+
+from utils.custom_statuses import HTTP_420_ENHACE_YOUR_CALM
 
 
 def roadhelper_exception_handler(exc, context):
@@ -68,12 +69,23 @@ class TemporaryLockError(exceptions.APIException):
     status_code = status.HTTP_423_LOCKED
     default_detail = _('Temporary Lock')
 
+    def __init__(self, remaining_time):
+        self.default_detail = dict(
+            detail=self.default_detail,
+            remaining_time=remaining_time)
+        super().__init__()
+
 
 class UserNotFound(exceptions.APIException):
     """User not found."""
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = _('User not found')
     extended_status_code = '%s.1' % status.HTTP_404_NOT_FOUND
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()
 
 
 class MessagesNotFound(exceptions.APIException):
@@ -100,6 +112,11 @@ class CodeIsNotAcceptedError(ValidationErrorMixin):
     """Invalid value send was sended"""
     default_detail = _('Invalid value was sended')
     extended_status_code = '%s.1' % ValidationErrorMixin.status_code
+
+    def __init__(self, remaining_attempts, status_code):
+        self.default_detail = dict(remaining_attempts=remaining_attempts,
+                                   status_code=status_code)
+        super().__init__()
 
 
 class CarBrandIsNotFound(ValidationErrorMixin):
