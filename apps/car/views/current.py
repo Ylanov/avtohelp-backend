@@ -4,7 +4,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
 from car import models, filters
 from car.serializers import current as serializers
-from utils.paginations import CustomCursorPagination
 
 """
 VIEWSETS
@@ -71,7 +70,7 @@ class ServiceStationsViewSet(viewsets.ReadOnlyModelViewSet):
             position_x = float(query.split(',')[0])
             position_y = float(query.split(',')[1])
             # Point(longitude, latitude)
-            position = Point(position_y, position_x, srid=4326)
+            position = Point(position_x, position_y, srid=4326)
             return self.queryset.annotate_distance(position)
         return self.queryset
 
