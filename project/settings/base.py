@@ -314,7 +314,7 @@ FILE_UPLOAD_PERMISSIONS = 0o644
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://base:6379/13",
+        "LOCATION": "redis://localhost:6379/13",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,

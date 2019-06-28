@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-04 11:30+0000\n"
+"POT-Creation-Date: 2019-06-27 14:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,28 +24,28 @@ msgstr ""
 msgid "Account"
 msgstr "Аккаунт"
 
-#: apps/account/models.py:83 apps/authorization/models.py:125
+#: apps/account/models.py:84 apps/authorization/models.py:125
 msgid "Phone"
 msgstr "Номер телефона"
 
-#: apps/account/models.py:84
+#: apps/account/models.py:85
 msgid "A user with that phone already exists."
 msgstr "Пользователь с указанным телефонным номером уже существует"
 
-#: apps/account/models.py:86
+#: apps/account/models.py:87
 msgid "username"
 msgstr "Логин"
 
-#: apps/account/models.py:88
+#: apps/account/models.py:89
 msgid "email address"
 msgstr "Адрес электронной почты"
 
-#: apps/account/models.py:98 apps/authorization/models.py:127
-#: apps/base/models.py:79 apps/chat/models.py:206 apps/order/models.py:85
+#: apps/account/models.py:99 apps/authorization/models.py:127
+#: apps/base/models.py:111 apps/chat/models.py:203 apps/order/models.py:102
 msgid "User"
 msgstr "Пользователь"
 
-#: apps/account/models.py:99
+#: apps/account/models.py:100
 msgid "Users"
 msgstr "Пользователи"
 
@@ -129,129 +129,138 @@ msgstr "Опции"
 msgid "Base"
 msgstr "База"
 
-#: apps/base/models.py:14 apps/base/models.py:73
+#: apps/base/models.py:15 apps/base/models.py:105
 msgid "Title"
 msgstr "Заголовок"
 
-#: apps/base/models.py:15
+#: apps/base/models.py:16
 msgid "Text"
 msgstr "Текст"
 
-#: apps/base/models.py:17
+#: apps/base/models.py:18
 msgid "Short description"
 msgstr "Краткое описание"
 
-#: apps/base/models.py:18
+#: apps/base/models.py:19
 msgid "Publish"
 msgstr "Опубликовать"
 
-#: apps/base/models.py:19
+#: apps/base/models.py:20
 msgid "Uses instead created if set"
 msgstr "Используется вместо даьы создания объекта"
 
-#: apps/base/models.py:20
+#: apps/base/models.py:21
 msgid "Publish date"
 msgstr "Дата публикации"
 
-#: apps/base/models.py:25
+#: apps/base/models.py:26
 msgid "News"
 msgstr "Новости"
 
-#: apps/base/models.py:26
+#: apps/base/models.py:27
 msgid "Newsletter"
 msgstr "Новости"
 
-#: apps/base/models.py:36
+#: apps/base/models.py:39
 msgid "New friend request"
 msgstr "Новый запрос на добавление в друзья"
 
-#: apps/base/models.py:37
+#: apps/base/models.py:40
 msgid "A new friend request has been received"
 msgstr "Был получен новый запрос на добавление в друзья"
 
-#: apps/base/models.py:46
+#: apps/base/models.py:52
 msgid "New assistance request"
 msgstr "Новый запрос помощи"
 
-#: apps/base/models.py:47
+#: apps/base/models.py:53
 msgid "New assistance request was published"
 msgstr "Новый запрос помощи был опубликован"
 
-#: apps/base/models.py:67
+#: apps/base/models.py:77
+msgid "New message from chat"
+msgstr "Новое сообщение"
+
+#: apps/base/models.py:78
+#, python-format
+msgid "User %s wrote a message"
+msgstr "Пользователь %s написал сообщение"
+
+#: apps/base/models.py:99
 msgid "Initialization"
 msgstr "Инициализация"
 
-#: apps/base/models.py:68
+#: apps/base/models.py:100
 msgid "Create assistance request"
 msgstr "Создать запрос о помощи"
 
-#: apps/base/models.py:69
+#: apps/base/models.py:101
 msgid "New message"
 msgstr "Новое сообщение"
 
-#: apps/base/models.py:70 apps/userprofile/models.py:317
-#: apps/userprofile/models.py:318
+#: apps/base/models.py:102 apps/userprofile/models.py:326
+#: apps/userprofile/models.py:327
 msgid "Friend request"
 msgstr "Запрос в друзья"
 
-#: apps/base/models.py:74 apps/car/models.py:91 apps/order/models.py:90
+#: apps/base/models.py:106 apps/car/models.py:91 apps/order/models.py:107
 msgid "Description"
 msgstr "Описание"
 
-#: apps/base/models.py:77
+#: apps/base/models.py:109
 msgid "Event"
 msgstr "Событие"
 
-#: apps/base/models.py:83 apps/order/models.py:93
-#: apps/userprofile/models.py:311
+#: apps/base/models.py:115 apps/order/models.py:110
+#: apps/userprofile/models.py:320
 msgid "Status"
 msgstr "Статус"
 
-#: apps/base/models.py:85
+#: apps/base/models.py:117
 msgid "Sent notifications count"
 msgstr "Количество отправленных Push-уведомлений"
 
-#: apps/base/models.py:95
+#: apps/base/models.py:127
 msgid "Push notification"
 msgstr "Push-уведомление"
 
-#: apps/base/models.py:96
+#: apps/base/models.py:128
 msgid "Push notifications"
 msgstr "Push-уведомления"
 
-#: apps/base/models.py:117
+#: apps/base/models.py:149
 msgid "time"
 msgstr "Время"
 
-#: apps/base/models.py:120
+#: apps/base/models.py:152
 msgid "Push-notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:121
+#: apps/base/models.py:153
 msgid "Push-notification schedules"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:133
+#: apps/base/models.py:165
 msgid "Radius"
 msgstr "Радиус"
 
-#: apps/base/models.py:134
+#: apps/base/models.py:166
 msgid "Radius in meters"
 msgstr "Радиус в метрах"
 
-#: apps/base/models.py:137
+#: apps/base/models.py:169
 msgid "Geo position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:138
+#: apps/base/models.py:170
 msgid "Profile geo-position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:140
+#: apps/base/models.py:172
 msgid "Notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:143
+#: apps/base/models.py:175
 msgid "Push notification configuration"
 msgstr "Конфигурация отправки Push-уведомлений"
 
@@ -287,8 +296,8 @@ msgstr "Цвета автомобилей"
 msgid "Car"
 msgstr "Автомобиль"
 
-#: apps/car/models.py:92 apps/order/admin.py:15 apps/order/models.py:91
-#: apps/userprofile/admin.py:29 apps/userprofile/models.py:201
+#: apps/car/models.py:92 apps/order/admin.py:15 apps/order/models.py:108
+#: apps/userprofile/admin.py:29 apps/userprofile/models.py:210
 msgid "Location"
 msgstr "Местоположение"
 
@@ -352,7 +361,7 @@ msgstr "Даты"
 msgid "Message's data"
 msgstr "Информация о сообщении"
 
-#: apps/chat/admin.py:99 apps/chat/models.py:73
+#: apps/chat/admin.py:99 apps/chat/models.py:72
 msgid "Sender"
 msgstr "Отправитель"
 
@@ -368,66 +377,66 @@ msgstr "Текст сообщения"
 msgid "Chat"
 msgstr "Чат"
 
-#: apps/chat/models.py:76 apps/chat/models.py:210
+#: apps/chat/models.py:75 apps/chat/models.py:207
 #, fuzzy
 #| msgid "Room ID"
 msgid "Room"
 msgstr "Идентификатор комнаты чата"
 
-#: apps/chat/models.py:77
+#: apps/chat/models.py:76
 msgid "Text message"
 msgstr "Текст сообщения"
 
-#: apps/chat/models.py:79
+#: apps/chat/models.py:78
 msgid "Recording date"
 msgstr "Дата записи в БД"
 
-#: apps/chat/models.py:86
+#: apps/chat/models.py:85
 msgid "Chat message"
 msgstr "Сообщение"
 
-#: apps/chat/models.py:87
+#: apps/chat/models.py:86
 msgid "Chat messages"
 msgstr "Сообщения"
 
-#: apps/chat/models.py:169 apps/userprofile/models.py:159
+#: apps/chat/models.py:166 apps/userprofile/models.py:168
 #: apps/utils/mixins.py:88
 msgid "Name"
 msgstr "Имя"
 
-#: apps/chat/models.py:172
+#: apps/chat/models.py:169
 msgid "Participants"
 msgstr "Участники"
 
-#: apps/chat/models.py:174
+#: apps/chat/models.py:171
 msgid "is public"
 msgstr "Публичная"
 
-#: apps/chat/models.py:180
+#: apps/chat/models.py:177
 msgid "Chat room"
 msgstr "Чат-комната"
 
-#: apps/chat/models.py:181
+#: apps/chat/models.py:178
 msgid "Chat rooms"
 msgstr "Чат-комнаты"
 
-#: apps/chat/models.py:199
+#: apps/chat/models.py:196
 msgid "Moderator"
 msgstr "Модератор"
 
-#: apps/chat/models.py:200
+#: apps/chat/models.py:197
 msgid "Participant"
 msgstr "Участник"
 
-#: apps/chat/models.py:212
+#: apps/chat/models.py:209
 msgid "Role"
 msgstr "Роль"
 
-#: apps/chat/models.py:216
+#: apps/chat/models.py:213
 msgid "Chat role"
 msgstr "Чат"
 
-#: apps/chat/models.py:217
+#: apps/chat/models.py:214
 msgid "Chat roles"
 msgstr "Роли чата"
 
@@ -443,7 +452,7 @@ msgstr "Документация для API RoadHelper"
 msgid "RoadHelper integration API Documentation"
 msgstr "Документация для API RoadHelper"
 
-#: apps/order/admin.py:14 apps/order/models.py:106
+#: apps/order/admin.py:14 apps/order/models.py:123
 msgid "Assistance request"
 msgstr "Запрос на помощь"
 
@@ -451,31 +460,31 @@ msgstr "Запрос на помощь"
 msgid "Order"
 msgstr "Запрос"
 
-#: apps/order/models.py:79
+#: apps/order/models.py:96
 msgid "Assistance request is available"
 msgstr "Запрос на помощь доступен"
 
-#: apps/order/models.py:80
+#: apps/order/models.py:97
 msgid "Assistance request was expired"
 msgstr "Запрос на помощь был просрочен"
 
-#: apps/order/models.py:81
+#: apps/order/models.py:98
 msgid "Assistance request was canceled"
 msgstr "Запрос на помощь был отменен"
 
-#: apps/order/models.py:88
+#: apps/order/models.py:105
 msgid "Issue"
 msgstr "Проблема"
 
-#: apps/order/models.py:95
+#: apps/order/models.py:112
 msgid "User contact phone"
 msgstr "Контактный номер телефона пльзователя"
 
-#: apps/order/models.py:98
+#: apps/order/models.py:115
 msgid "Text address"
 msgstr "Текстовое представление адреса"
 
-#: apps/order/models.py:107
+#: apps/order/models.py:124
 msgid "Assistance requests"
 msgstr "Запросы помощи"
 
@@ -540,88 +549,88 @@ msgstr "Firebase Cloud Messaging Device"
 msgid "FCM devices"
 msgstr "Сервисы"
 
-#: apps/userprofile/models.py:161
+#: apps/userprofile/models.py:170
 msgid "Last name"
 msgstr "Фамилия"
 
-#: apps/userprofile/models.py:171
+#: apps/userprofile/models.py:180
 msgid "Profile"
 msgstr "Профиль"
 
-#: apps/userprofile/models.py:172
+#: apps/userprofile/models.py:181
 msgid "Profiles"
 msgstr "Профили"
 
-#: apps/userprofile/models.py:187
+#: apps/userprofile/models.py:196
 msgid "License plate"
 msgstr "Номерной знак автомобиля"
 
-#: apps/userprofile/models.py:193
+#: apps/userprofile/models.py:202
 msgid "Profile car"
 msgstr "Автомобили пользователя"
 
-#: apps/userprofile/models.py:194
+#: apps/userprofile/models.py:203
 msgid "Profile cars"
 msgstr "Автомобили пользователей"
 
-#: apps/userprofile/models.py:207
+#: apps/userprofile/models.py:216
 msgid "Profile location"
 msgstr "Местоположение пользователя"
 
-#: apps/userprofile/models.py:208
+#: apps/userprofile/models.py:217
 msgid "Profile locations"
 msgstr "Местоположения пользователей"
 
-#: apps/userprofile/models.py:247
+#: apps/userprofile/models.py:256
 msgid "Gallery item"
 msgstr "Галлерея"
 
-#: apps/userprofile/models.py:248
+#: apps/userprofile/models.py:257
 msgid "Gallery items"
 msgstr "Галереи"
 
-#: apps/userprofile/models.py:305 apps/userprofile/models.py:374
-#: apps/userprofile/models.py:433
+#: apps/userprofile/models.py:314 apps/userprofile/models.py:383
+#: apps/userprofile/models.py:442
 msgid "Owner"
 msgstr "Владелец"
 
-#: apps/userprofile/models.py:308
+#: apps/userprofile/models.py:317
 msgid "Invited user"
 msgstr "Приглашенный пользователь"
 
-#: apps/userprofile/models.py:377
+#: apps/userprofile/models.py:386
 msgid "Friend"
 msgstr "Друг"
 
-#: apps/userprofile/models.py:381
+#: apps/userprofile/models.py:390
 msgid "Request"
 msgstr "Запрос"
 
-#: apps/userprofile/models.py:389
+#: apps/userprofile/models.py:398
 msgid "Friend list"
 msgstr "Список друзей"
 
-#: apps/userprofile/models.py:390
+#: apps/userprofile/models.py:399
 msgid "Friend lists"
 msgstr "Списки друзей"
 
-#: apps/userprofile/models.py:436
+#: apps/userprofile/models.py:445
 msgid "Foe"
 msgstr "Враг"
 
-#: apps/userprofile/models.py:444
+#: apps/userprofile/models.py:453
 msgid "Black list"
 msgstr "Черный список"
 
-#: apps/userprofile/models.py:445
+#: apps/userprofile/models.py:454
 msgid "Black lists"
 msgstr "Черные списки"
 
-#: apps/utils/api_exceptions.py:17
+#: apps/utils/api_exceptions.py:41
 msgid "Validation error."
 msgstr "Ошибка валидации"
 
-#: apps/utils/api_exceptions.py:38
+#: apps/utils/api_exceptions.py:62
 #, python-format
 msgid ""
 "Too often tried to request the code, try to request the code after %s "
@@ -630,80 +639,80 @@ msgstr ""
 "Были зафиксированы слишком частые попытки запросить код, попробуйте "
 "запросить код после %s секунд."
 
-#: apps/utils/api_exceptions.py:45
+#: apps/utils/api_exceptions.py:69
 msgid "Temporary Lock"
 msgstr "Временная блокировка"
 
-#: apps/utils/api_exceptions.py:51
+#: apps/utils/api_exceptions.py:75
 msgid "User not found"
 msgstr "Пользователь не найден"
 
-#: apps/utils/api_exceptions.py:58
+#: apps/utils/api_exceptions.py:82
 msgid "Message not found"
 msgstr "Сообщение не найдено"
 
-#: apps/utils/api_exceptions.py:66
+#: apps/utils/api_exceptions.py:90
 #, python-format
 msgid "City with ID %s, not found"
 msgstr "Город с идентификатором %s не найден в БД"
 
-#: apps/utils/api_exceptions.py:77
+#: apps/utils/api_exceptions.py:101
 msgid "Invalid value was sended"
 msgstr "Было передано неверное значение "
 
-#: apps/utils/api_exceptions.py:83
+#: apps/utils/api_exceptions.py:107
 msgid "Car brand is not found in DB"
 msgstr "Бренд машины не найден в БД"
 
-#: apps/utils/api_exceptions.py:94
+#: apps/utils/api_exceptions.py:118
 msgid "Model of car brand is not found in DB"
 msgstr "Модель машины не найдена в БД"
 
-#: apps/utils/api_exceptions.py:105
+#: apps/utils/api_exceptions.py:129
 msgid "Car color is not found in DB"
 msgstr "Цвет машины не найден в БД"
 
-#: apps/utils/api_exceptions.py:116
+#: apps/utils/api_exceptions.py:140
 #, python-format
 msgid "User ID %s and User ID %s are already friends"
 msgstr "Пользователь %s уже является другом %s"
 
-#: apps/utils/api_exceptions.py:127
+#: apps/utils/api_exceptions.py:151
 #, python-format
 msgid "User %s is already in User %s blacklist"
 msgstr "Пользователь %s уже находится в черном списке пользователя %s "
 
-#: apps/utils/api_exceptions.py:138
+#: apps/utils/api_exceptions.py:162
 #, python-format
 msgid "Friend request from User %s to User %s, already exists"
 msgstr ""
 "Запрос на добавление в друзья от пользователя %s, пользователю %s, уже "
 "существует"
 
-#: apps/utils/api_exceptions.py:149
+#: apps/utils/api_exceptions.py:173
 msgid "Sent IDs are the same"
 msgstr "Переданные идентификаторы идентичны"
 
-#: apps/utils/api_exceptions.py:160
+#: apps/utils/api_exceptions.py:184
 #, python-format
 msgid "User %s and User %s aren't friends"
 msgstr "Пользователь %s и пользователь %s не являюстя друзьями"
 
-#: apps/utils/api_exceptions.py:171
+#: apps/utils/api_exceptions.py:195
 #, python-format
 msgid "Chat room for User %s to User %s, already exists"
 msgstr "Чат для пользователей (%s и %s) уже существует"
 
-#: apps/utils/api_exceptions.py:182
+#: apps/utils/api_exceptions.py:206
 #, python-format
 msgid "User %s and User %s are foes"
 msgstr "Пользователь %s и пользователь %s являются врагами"
 
-#: apps/utils/api_exceptions.py:193
+#: apps/utils/api_exceptions.py:217
 msgid "Car is not found in DB"
 msgstr "Автомобиль не найден в БД"
 
-#: apps/utils/api_exceptions.py:204
+#: apps/utils/api_exceptions.py:228
 msgid "Query parameters passed incorrectly."
 msgstr "Были переданы неправильные параметры запроса"
 
@@ -754,15 +763,6 @@ msgstr "Активный"
 #: apps/versioning/models.py:29
 msgid "Versions"
 msgstr "Версии"
-
-#: project/celery.py:153
-msgid "New message from chat"
-msgstr "Новое сообщение"
-
-#: project/celery.py:154
-#, python-format
-msgid "User %s wrote a message"
-msgstr "Пользователь %s написал сообщение"
 
 #: project/templates/roadhelper/reddoc.html:5
 msgid "API Documentation"

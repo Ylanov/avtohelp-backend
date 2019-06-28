@@ -1,11 +1,11 @@
 """Production server configuration."""
-from .base import *  # NOQA
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
+from .base import *  # NOQA
 
-ALLOWED_HOSTS = ['roadhelper-prod.spider.ru', ]
+ALLOWED_HOSTS = ['avto-dobro.ru', '185.4.66.116', ]
 
 
 # Integration with Sentry
@@ -21,7 +21,7 @@ USE_SMS = True  # Actual sms sending switcher
 
 
 # Celery settings
-CELERY_RESULT_BACKEND = 'redis://base:6379/13'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/13'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
