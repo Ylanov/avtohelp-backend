@@ -134,7 +134,7 @@ class PushNotification(BaseMixin):
             'title': 'Автопомощь на дороге',
             'body': str(self.description),
             'data': {
-                'event': self.event,
+                'event_id': self.event,
                 'title': str(self.title),
                 'body': str(self.description),
                 **kwargs
