@@ -189,18 +189,19 @@ class TestProfile(APITestCase):
         FriendList.objects.create(owner=self.user_1, friend=user_2, request=request)
 
         api_path = '%s:userprofile:profile-list' % self.VERSION
-        response = self.client.get(reverse(api_path))
+        response = self.client.get(reverse(api_path), data={'friend': True})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), 2)
+        # Check friend status
+        self.assertTrue(response.data.get('results')[0].get('friend'))
+        self.assertEqual(len(response.data.get('results')), FriendList.objects.my_list(user=self.user_1).count())
 
     def test_profiles_list_4(self):
         """
-        Test for retrieving profiles list w/o friends profiles and blacked profiles
-            Users: user_1, user_2, user_3, user_4
+        Test for retrieving profiles list w/o friends profiles
+            Users: user_1, user_2, user_3
             Authorized user: user_1
             Users in FriendList: user_2
-            Users in BlackList: user_3
-            Result retrieving profile list: user_2, user_4
+            Result retrieving profile list: user_3
         """
 
         # Authorize user_1
@@ -216,21 +217,47 @@ class TestProfile(APITestCase):
         user_3.profile.first_name, user_3.profile.last_name = 'Test', 'Testovich'
         user_3.profile.save()
 
+        # Put user_2 in FriendList
+        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
+        FriendList.objects.create(owner=self.user_1, friend=user_2, request=request)
+
+        api_path = '%s:userprofile:profile-list' % self.VERSION
+        response = self.client.get(reverse(api_path), data={'friend': False})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), Profile.objects.valid()\
+                                                                           .annotate_friend_status(self.user_1)\
+                                                                           .exclude(friend=True)\
+                                                                           .exclude(user=self.user_1)\
+                                                                           .count()
+)
+        self.assertEqual(response.data.get('results')[0].get('id'), user_3.profile.id)
+
+    def test_profiles_list_5(self):
+        """
+        Test for check retrieving profiles only with first_name and last_name
+            Users: user_1, user_2, user_3, user_4
+            Authorized user: user_1
+            Users wo correct values of profile: user_3, user_4
+            Result retrieving profile list: user_2
+        """
+
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        # Create additional users
+        user_2 = User.objects.make(phone='+79000000002')
+        user_2.profile.first_name, user_2.profile.last_name = 'Test', 'Testovich'
+        user_2.profile.save()
+
+        user_3 = User.objects.make(phone='+79000000003')
         user_4 = User.objects.make(phone='+79000000004')
-        user_4.profile.first_name, user_4.profile.last_name = 'Test', 'Testovich'
-        user_4.profile.save()
-
-        # Put user_2 in BlackList
-        BlackList.objects.create(owner=self.user_1, foe=user_2)
-
-        # Put user_3 in FriendList
-        request = FriendRequest.objects.create(owner=self.user_1, invited=user_3, approved=True)
-        FriendList.objects.create(owner=self.user_1, friend=user_3, request=request)
 
         api_path = '%s:userprofile:profile-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data.get('results')), 2)
+        self.assertEqual(len(response.data.get('results')), Profile.objects.valid().count())
+        self.assertEqual(response.data.get('results')[0].get('id'), user_2.id)
 
     def test_profile_detail(self):
         """Test profile detail"""
@@ -292,13 +319,16 @@ class TestProfile(APITestCase):
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=True)
-        FriendList.objects.create(owner=self.user_1, friend=user_3, request=request)
+        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
 
         api_path = '%s:userprofile:my-friendrequest-list' % self.VERSION
+        # Check count of friend requests from inviter
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), FriendRequest.objects.all().not_approved().count())
+        self.assertEqual(response.data.get('results')[0].get('id'), request.id)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved()\
+                                                                          .from_me(self.user_1)\
+                                                                          .count())
 
     def test_my_friend_request_detail(self):
         """
@@ -352,6 +382,25 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().count())
+
+        # Check friend requests as invited persons
+        # Authorize user_2
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.to_me(user_2).count())
+
+        # Authorize user_3
+        self.token, created = Token.objects.get_or_create(user=user_3)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:friendrequest-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.to_me(user_3).count())
 
     def test_friend_request_to_user_2(self):
         """
@@ -456,8 +505,10 @@ class TestProfile(APITestCase):
         api_path = '%s:userprofile:my-friendrequest-list' % self.VERSION
         response = self.client.get(reverse(api_path), data={'person_id': user_2.profile.id})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved().from_me(
-            self.user_1).filter(invited=user_2).count())
+        self.assertEqual(response.data.get('count'), FriendRequest.objects.not_approved()\
+                                                                          .from_me(self.user_1)\
+                                                                          .filter(invited=user_2)\
+                                                                          .count())
 
     def test_friend_request_to_user_detail(self):
         """
@@ -608,10 +659,22 @@ class TestProfile(APITestCase):
         # Put user_2 to friend list
         FriendList.objects.create(owner=user_2, friend=self.user_1, request=friend_request)
 
+        # Check friends count as user_1
+        # Authorize user_1
         api_path = '%s:userprofile:friendlist-list' % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendList.objects.common(self.user_1).count())
+
+        # Check friends count as user_2
+        # Authorize user_2
+        self.token, created = Token.objects.get_or_create(user=user_2)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:friendlist-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendList.objects.common(user_2).count())
 
     def test_remove_friend_from_friendlist(self):
         """Test remove friend from friendlist"""
@@ -768,6 +831,17 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('count'), FriendList.objects.common(user_2).count())
+
+        # Check count of friends
+        # as friend
+        # Authorize user_1
+        self.token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+
+        api_path = '%s:userprofile:friendlist-list' % self.VERSION
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('count'), FriendList.objects.common(self.user_1).count())
 
     def test_add_to_friend_1(self):
         """Add user to friend list"""
@@ -1167,4 +1241,23 @@ class TestProfile(APITestCase):
         self.assertEqual(len(response.data.get('results')),
                          Profile.objects.annotate_online_status().filter(online=True).count())
 
+    def test_update_profile_location(self):
+        """
+        Update location of user
+        """
+        # Authorize user_1
+        token, created = Token.objects.get_or_create(user=self.user_1)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
+        data = {
+            'geo_lat': 45.849324,
+            'geo_lon': 38.960508
+        }
+
+        api_path = '%s:userprofile:update-profile-location' % self.VERSION
+        response = self.client.patch(reverse(api_path), data)
+        self.user_1.refresh_from_db()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertDictEqual(response.data, data)
+        self.assertEqual(response.data.get('geo_lat'), self.user_1.profilelocation.location.x)
+        self.assertEqual(response.data.get('geo_lon'), self.user_1.profilelocation.location.y)

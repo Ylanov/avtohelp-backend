@@ -116,7 +116,7 @@ class MyProfileDetailView(ProfileMixin, generics.RetrieveUpdateAPIView):
 class ProfileChangeAvatarView(ProfileMixin, generics.UpdateAPIView):
     """
     View for retrieving or update user profile.
-    Allowed HTTP-requests: (GET, PATCH, PUT)
+    Allowed HTTP-requests: (PATCH, PUT)
 
     Request (PATCH - partial):
     {
@@ -124,7 +124,7 @@ class ProfileChangeAvatarView(ProfileMixin, generics.UpdateAPIView):
     }
     Response (PATCH): {"avatar": "url"}
 
-    Request (PUT - partial):
+    Request (PUT - full):
     {
         "avatar": ImageField,
     }

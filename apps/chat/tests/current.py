@@ -361,3 +361,36 @@ class TestChat(APITestCase):
         for message in response.data.get('results'):
             self.assertEqual(response.status_code, status.HTTP_200_OK)
             self.assertEqual(message.get('read'), True)
+
+    def test_chat_room_list_filter_by_participant_id(self):
+        """Test retrieving chat rooms filtered by participant_id"""
+        # Create Chat Room
+        room_1 = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        room_2 = ChatRoom.objects.make(participants=[self.user, self.user_2], public=False)
+        room_3 = ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+        room_4 = ChatRoom.objects.make(participants=[self.user_1, self.user_3], public=False)
+
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path), data={'participant_id': self.user_1.profile.id})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), ChatRoom.objects.by_participant(self.user)\
+                                                                            .filter(participants=self.user_1.profile.id)\
+                                                                            .count())
+        self.assertEqual(response.data.get('results')[0].get('id'), room_1.id)
+
+    def test_chat_room_list_filter_by_publicity(self):
+        """
+        Test retrieving chat rooms filtered by status - public
+        """
+        # Create Chat Room
+        ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
+        ChatRoom.objects.make(participants=[self.user, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_2], public=False)
+        ChatRoom.objects.make(participants=[self.user_1, self.user_3], public=False)
+
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get('current')
+        response = self.client.get(reverse(api_path), data={'is_public': True})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data.get('results')), ChatRoom.objects.by_participant(self.user)\
+                                                                            .public()\
+                                                                            .count())
