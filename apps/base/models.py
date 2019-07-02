@@ -134,10 +134,12 @@ class PushNotification(BaseMixin):
             'title': 'Автопомощь на дороге',
             'body': str(self.description),
             'data': {
-                'event_id': self.event,
-                'title': str(self.title),
-                'body': str(self.description),
-                **kwargs
+                'data': {
+                    'event_id': self.event,
+                    'title': str(self.title),
+                    'body': str(self.description),
+                    **kwargs
+                }
             },
             'icon': 'ic_launcher',
         })
