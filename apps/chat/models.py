@@ -42,7 +42,7 @@ class ChatMessageQuerySet(models.QuerySet):
     def annotate_read_status(self, user):
         return self.annotate(read=models.Case(
             models.When(
-                models.Q(chatreadmessage__user=user) & models.Q(sender=user),
+                models.Q(chatreadmessage__user=user) | models.Q(sender=user),
                 then=True
             ),
             default=False,
