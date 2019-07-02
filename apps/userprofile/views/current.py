@@ -74,8 +74,8 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
         """Override get_queryset method"""
         return self.queryset.annotate_online_status()\
                             .annotate_friend_status(self.request.user)\
-                            .friendly(self.request.user)\
                             .valid()\
+                            .friendly(self.request.user)\
                             .order_by('first_name', 'last_name')\
                             .distinct()
 

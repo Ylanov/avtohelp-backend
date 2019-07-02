@@ -107,17 +107,19 @@ class ProfileQuerySet(models.QuerySet):
         Annotate friend status
         :return: annotated field
         """
-        return self.annotate(friend=models.Case(
-            models.When(
-                # Check if USER is an initiator of friend request (is OWNER)
-                models.Q(user__friendlist_user__owner=user) |
-                # Check if USER is an invited person
-                models.Q(user__friendlist_owner__friend=user),
-                then=True
-            ),
-            default=False,
-            output_field=models.BooleanField(default=False)
-        ))
+        return self.annotate(
+            friend=models.Case(
+                models.When(Q(user_id__in=models.Subquery(
+                    FriendList.objects.common(user).values('friend__id'))) |
+                            Q(user_id__in=models.Subquery(
+                                FriendList.objects.common(user).values(
+                                    'owner__id'))),
+                            then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
+
 
     def annotate_foe_status(self, user):
         """
