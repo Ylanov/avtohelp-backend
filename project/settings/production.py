@@ -19,9 +19,26 @@ DEBUG = False
 USE_CELERY = True
 USE_SMS = True  # Actual sms sending switcher
 
+# REDIS
+REDIS_URL = 'redis://localhost:6379/13'
+
+
+# CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
+
 
 # Celery settings
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/13'
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

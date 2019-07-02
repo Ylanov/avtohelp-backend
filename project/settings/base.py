@@ -308,18 +308,3 @@ SWAGGER_SETTINGS = {
 # Increase upload maximum file size
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
 FILE_UPLOAD_PERMISSIONS = 0o644
-
-
-# CACHE
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/13",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-        }
-    }
-}
-
-

@@ -1,8 +1,11 @@
 """Development settings."""
-from .base import *
 import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+
+from .base import *
+
+ALLOWED_HOSTS = ['roadhelper.spider.ru', 'roadhelper-prod.spider.ru', ]
 
 
 # Integration with Sentry
@@ -11,16 +14,29 @@ sentry_sdk.init(
     integrations=[DjangoIntegration(), CeleryIntegration()]
 )
 
+
 DEBUG = True
 USE_CELERY = True
 USE_SMS = False  # Actual sms sending switcher
+REDIS_URL = 'redis://base:6379/13'
 
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru', 'roadhelper-prod.spider.ru', ]
+# CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
 
 
 # Celery settings
-CELERY_RESULT_BACKEND = 'redis://base:6379/13'
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

@@ -1,17 +1,36 @@
 """Local settings."""
 from .base import *
 
+
+ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49',)
+
+
 DEBUG = True
 USE_CELERY = False
 USE_SMS = False
+REDIS_URL = 'redis://redis:6379/1'
+
+
+# CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        }
+    }
+}
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://redis:6379/1'
-CELERY_RESULT_BACKEND = 'redis://redis:6379/1'
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
+
 
 # Channels
 CHANNEL_LAYERS = {
@@ -23,25 +42,11 @@ CHANNEL_LAYERS = {
     },
 }
 
-# Cache
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/2",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "IGNORE_EXCEPTIONS": True,
-            "SOCKET_CONNECT_TIMEOUT": 60,  # in seconds
-            "SOCKET_TIMEOUT": 60,  # in seconds
-        },
-    }
-}
 
 # SMS
 SMS_SEND_DELAY = 10
 SMS_BLOCKING_PERIOD = 30
 
-ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49',)
 
 # Logging
 LOGGING = {
