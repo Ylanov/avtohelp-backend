@@ -109,34 +109,29 @@ class ProfileQuerySet(models.QuerySet):
         """
         return self.annotate(
             friend=models.Case(
-                models.When(Q(user_id__in=models.Subquery(
-                    FriendList.objects.common(user).values('friend__id'))) |
-                            Q(user_id__in=models.Subquery(
-                                FriendList.objects.common(user).values(
-                                    'owner__id'))),
+                models.When(Q(user_id__in=models.Subquery(FriendList.objects.common(user).values('friend__id'))) |
+                            Q(user_id__in=models.Subquery(FriendList.objects.common(user).values('owner__id'))),
                             then=True),
                 output_field=models.BooleanField(default=False),
                 default=False
             )
         )
 
-
     def annotate_foe_status(self, user):
         """
         Annotate foe status
         :return: annotated field
         """
-        return self.annotate(foe=models.Case(
-            models.When(
-                # Check that the user is in the black list
-                models.Q(user__blacked_user__owner=user) |
-                # Check that the user is blacklisted
-                models.Q(user__blacklist_owner__foe=user),
-                then=True
-            ),
-            default=False,
-            output_field=models.BooleanField(default=False)
-        ))
+
+        return self.annotate(
+            foe=models.Case(
+                models.When(Q(user_id__in=models.Subquery(BlackList.objects.common(user).values('foe__id'))) |
+                            Q(user_id__in=models.Subquery(BlackList.objects.common(user).values('owner__id'))),
+                            then=True),
+                output_field=models.BooleanField(default=False),
+                default=False
+            )
+        )
 
     def annotate_friend_request_status(self, user):
         """
