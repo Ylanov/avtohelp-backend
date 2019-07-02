@@ -76,7 +76,8 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
                             .annotate_friend_status(self.request.user)\
                             .friendly(self.request.user)\
                             .valid()\
-                            .order_by('first_name', 'last_name')
+                            .order_by('first_name', 'last_name')\
+                            .distinct()
 
 
 class MyProfileDetailView(ProfileMixin, generics.RetrieveUpdateAPIView):
@@ -153,7 +154,8 @@ class ProfileDetailView(ProfileMixin, generics.RetrieveAPIView):
         return self.queryset.annotate_online_status()\
                             .annotate_friend_status(self.request.user)\
                             .annotate_foe_status(self.request.user)\
-                            .annotate_friend_request_status(self.request.user)
+                            .annotate_friend_request_status(self.request.user)\
+                            .distinct()
 
 
 class ProfileLocationUpdateView(generics.UpdateAPIView):
