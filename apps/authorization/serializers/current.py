@@ -1,3 +1,6 @@
+# todo: delete after testing
+from os import environ
+
 from django.conf import settings
 from django.utils import timezone
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -47,7 +50,10 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         # make a new user
         user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
         # make a new sms
-        obj = models.SMSCode.objects.make(user=user, code=12345, **validated_data)
+        if environ.get('SETTINGS_CONFIGURATION') in ('local', 'development'):
+            obj = models.SMSCode.objects.make(user=user, code=12345, **validated_data)
+        else:
+            obj = models.SMSCode.objects.make(user=user, **validated_data)
         if settings.USE_CELERY:
             tasks.send_verification_sms.delay(sms_code_id=obj.id)
         else:
