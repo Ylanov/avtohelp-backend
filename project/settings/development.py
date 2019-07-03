@@ -21,6 +21,17 @@ USE_SMS = False  # Actual sms sending switcher
 REDIS_URL = 'redis://base:6379/13'
 
 
+# CHANNELS
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('base', 6379)],
+        },
+    },
+}
+
+
 # CACHE
 CACHES = {
     "default": {

@@ -11,6 +11,17 @@ USE_SMS = False
 REDIS_URL = 'redis://redis:6379/1'
 
 
+# CHANNELS
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('base', 6379)],
+        },
+    },
+}
+
+
 # CACHE
 CACHES = {
     "default": {

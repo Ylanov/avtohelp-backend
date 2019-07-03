@@ -18,9 +18,18 @@ sentry_sdk.init(
 DEBUG = False
 USE_CELERY = True
 USE_SMS = True  # Actual sms sending switcher
-
-# REDIS
 REDIS_URL = 'redis://localhost:6379/13'
+
+
+# CHANNELS
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('localhost', 6379)],
+        },
+    },
+}
 
 
 # CACHE
