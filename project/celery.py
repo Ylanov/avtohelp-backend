@@ -153,7 +153,7 @@ def notify_chat_participants(sender_id, room_id, participants):
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
         if devices.exists():
-            raw_result = devices.send_message(**notification.get_push_dict(sender_id=sender.id, room_id=room_id))
+            raw_result = devices.send_message(**notification.get_push_dict(sender_id=sender.profile.id, room_id=room_id))
             result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
             if result.get('success') > 0:
                 notification.status = True
