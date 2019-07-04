@@ -52,6 +52,7 @@ class AssistanceRequestCountView(views.APIView):
                 'count': models.AssistanceRequest.objects.available(user)\
                                                          .annotate_distance(point=user.profilelocation.location)\
                                                          .filter(distance__lte=push_config.radius)\
+                                                         .distinct('user')\
                                                          .count()
             })
         else:
