@@ -1,5 +1,6 @@
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
+from django.core.cache import caches
 
 from chat import models
 from project import celery as celery_tasks
@@ -62,6 +63,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """
         Called by receive_json when someone sent a join command.
         """
+        # Check if user isn't already in chat (check duplicates)
+        logged_users = caches['default'].get(f'room_{room_id}') or set()
+        if self.scope["user"].id in logged_users:
+            await self.close()
+
         # The logged-in user is in our scope thanks to the authentication
         # ASGI middleware
         room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
