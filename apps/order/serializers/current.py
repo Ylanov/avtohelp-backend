@@ -31,6 +31,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
     # RESPONSE
     profile = profile_serializers.ProfileViewSerializer(read_only=True, source='user.profile')
     distance = serializers.SerializerMethodField()
+    is_owner = serializers.BooleanField(read_only=True)
 
     # REQUEST
     geo_lat = serializers.FloatField(allow_null=True)
@@ -44,7 +45,8 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
         model = models.AssistanceRequest
         fields = ('id', 'created', 'issue', 'description',
                   'image', 'geo_lat', 'geo_lon', 'profile',
-                  'contact_phone', 'text_address', 'distance')
+                  'contact_phone', 'text_address', 'distance',
+                  'is_owner')
 
     def validate(self, attrs):
         """Override validate method"""

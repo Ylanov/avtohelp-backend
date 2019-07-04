@@ -55,7 +55,7 @@ class TestOrder(APITestCase):
         self.device_3 = profile_models.FCMDevice.objects.create(user=self.user_3, active=True)
 
         # Create assistance requests
-        models.AssistanceRequest.objects.create(user=self.user_1,
+        self.assistance_request_0 = models.AssistanceRequest.objects.create(user=self.user_1,
                                                 issue='Issue 1',
                                                 description='Description',
                                                 location=Point(45.061016, 38.944007, srid=4326))
@@ -238,7 +238,9 @@ class TestOrder(APITestCase):
             description='Issue description'
         )
         response = self.client.delete(reverse(api_path, kwargs={'pk': assistance_request.id}))
+        assistance_request.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(assistance_request.status, models.AssistanceRequest.CANCELED)
 
     def test_delete_assistance_request_1(self):
         """Test non existed delete assurance requests"""
@@ -251,3 +253,36 @@ class TestOrder(APITestCase):
         )
         response = self.client.delete(reverse(api_path, kwargs={'pk': 420}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_assistance_requests_is_owner_status(self):
+        """Test status is_owner in list of assistance requests"""
+
+        api_path = '%s:order:request-list' % self.VERSION
+
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for assistance_request in response.data:
+            if assistance_request.get('id') == self.assistance_request_0.id:
+                self.assertTrue(assistance_request.get('is_owner'))
+            else:
+                self.assertFalse(assistance_request.get('is_owner'))
+
+    def test_assistance_request_is_owner_status(self):
+        """Test status is_owner in detail of assistance request"""
+
+        api_path = '%s:order:request-detail' % self.VERSION
+
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.assistance_request_0.pk}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data.get('is_owner'))
+
+
+    def test_assistance_request_is_owner_status_2(self):
+        """Test status is_owner in detail of assistance request other user"""
+
+        api_path = '%s:order:request-detail' % self.VERSION
+
+        response = self.client.get(reverse(api_path, kwargs={'pk': self.assistance_request_1.pk}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data.get('is_owner'))
+

@@ -1,4 +1,4 @@
-from rest_framework import generics, views
+from rest_framework import generics, views, status
 from rest_framework.response import Response
 
 from base.models import PushNotificationConfiguration
@@ -60,7 +60,7 @@ class AssistanceRequestCountView(views.APIView):
             })
 
 
-class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView):
+class AssistanceRequestCreateView(AssistanceRequestBaseMixin, generics.CreateAPIView):
     """
     Create user assistance request
     REQUEST:
@@ -94,8 +94,7 @@ class AssistanceRequestCreateView(AssistanceRequestMixin, generics.CreateAPIView
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
     def get_queryset(self):
-        return self.queryset.available(self.request.user).annotate_distance(
-            raw_coordinates=self.request.query_params.get('coordinates'))
+        return super().get_queryset()
 
 
 class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveAPIView):
@@ -106,11 +105,11 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.all().annotate_distance(
-            raw_coordinates=self.request.query_params.get('coordinates'))
+        return super().get_queryset().annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))\
+                                     .annotate_owner_status(user=self.request.user)
 
 
-class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView):
+class AssistanceRequestUpdateView(AssistanceRequestBaseMixin, generics.UpdateAPIView):
     """
     Get detail information of assistance request
     """
@@ -118,7 +117,8 @@ class AssistanceRequestUpdateView(AssistanceRequestMixin, generics.UpdateAPIView
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.by_user(user=self.request.user).available(user=self.request.user)
+        return super().get_queryset().by_user(user=self.request.user)\
+                                     .available(user=self.request.user)
 
 
 class AssistanceRequestView(AssistanceRequestBaseMixin, generics.RetrieveDestroyAPIView):
@@ -129,8 +129,7 @@ class AssistanceRequestView(AssistanceRequestBaseMixin, generics.RetrieveDestroy
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.annotate_distance(
-            raw_coordinates=self.request.query_params.get('coordinates'))
+        return super().get_queryset().annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))
 
 
 class AssistanceRequestDestroyView(generics.DestroyAPIView):
@@ -141,3 +140,9 @@ class AssistanceRequestDestroyView(generics.DestroyAPIView):
     def get_queryset(self):
         """Override get_queryset method"""
         return models.AssistanceRequest.objects.by_user(user=self.request.user)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = models.AssistanceRequest.CANCELED
+        instance.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
