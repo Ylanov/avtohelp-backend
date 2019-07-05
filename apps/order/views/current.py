@@ -36,7 +36,8 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     filter_class = filters.AssistanceRequestFitlerSet
 
     def get_queryset(self):
-        return super().get_queryset().annotate_owner_status(user=self.request.user)
+        return super().get_queryset().annotate_owner_status(user=self.request.user)\
+                                     .order_by('distance')
 
 
 class AssistanceRequestCountView(views.APIView):
