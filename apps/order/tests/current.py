@@ -276,7 +276,6 @@ class TestOrder(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data.get('is_owner'))
 
-
     def test_assistance_request_is_owner_status_2(self):
         """Test status is_owner in detail of assistance request other user"""
 

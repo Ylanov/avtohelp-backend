@@ -394,3 +394,23 @@ class TestChat(APITestCase):
         self.assertEqual(len(response.data.get('results')), ChatRoom.objects.by_participant(self.user)\
                                                                             .public()\
                                                                             .count())
+
+    def test_ordering_chat_rooms_by_last_message(self):
+        """
+        Test retrieving chat rooms ordered by last message
+        """
+
+        # Create Chat Room
+        room_1 = ChatRoom.objects.make(participants=[self.user, self.user_1],
+                                       public=False)
+        room_2 = ChatRoom.objects.make(participants=[self.user, self.user_4],
+                                       public=False)
+
+        # Create chat message in room 1
+        ChatMessage.objects.create(sender=self.user_1, room=room_1, message='Message')
+
+        api_path = '%s:chat:room-list' % settings.AVAILABLE_VERSIONS.get(
+            'current')
+        response = self.client.get(reverse(api_path))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data.get('results')[0].get('id'), room_1.id)
