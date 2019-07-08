@@ -155,7 +155,7 @@ class ProfileDetailView(ProfileMixin, generics.RetrieveAPIView):
                             .annotate_friend_status(self.request.user)\
                             .annotate_foe_status(self.request.user)\
                             .annotate_friend_request_status(self.request.user)\
-                            .distinct()
+                            .distinct('id')
 
 
 class ProfileLocationUpdateView(generics.UpdateAPIView):
