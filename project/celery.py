@@ -152,10 +152,10 @@ def notify_chat_participants(sender_id, room_id, participants):
         participant = account_models.User.objects.get(id=user_id)
 
         # Get counter of unread messages
-        unread_messages = chat_models.ChatRoom.objects.by_room(room_id)\
-                                                      .by_participant(participant)\
-                                                      .annotate_unread_messages(participant)\
-                                                      .first().unread_messages
+        unread_messages = chat_models.ChatRoom.objects.by_room(room_id=room_id)\
+                                                      .annotate_unread_messages(user=participant)\
+                                                      .first()\
+                                                      .unread_messages
 
         # Check if user is online
         notification = base_models.PushNotification.objects.make_new_message_notification(
