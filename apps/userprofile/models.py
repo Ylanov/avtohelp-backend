@@ -322,6 +322,7 @@ class FriendRequest(BaseMixin):
         """Meta-class"""
         verbose_name = _('Friend request')
         verbose_name_plural = _('Friend request')
+        unique_together = ('owner', 'invited', )
 
     def approve(self, owner, invited):
         """Approve friend request"""
@@ -394,6 +395,7 @@ class FriendList(BaseMixin):
         """Meta-class"""
         verbose_name = _('Friend list')
         verbose_name_plural = _('Friend lists')
+        unique_together = ('owner', 'friend', )
 
 
 class BlackListQuerySet(models.QuerySet):
@@ -449,3 +451,4 @@ class BlackList(BaseMixin):
         """Meta-class"""
         verbose_name = _('Black list')
         verbose_name_plural = _('Black lists')
+        unique_together = ('owner', 'foe', )

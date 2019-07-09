@@ -1,5 +1,7 @@
 """Account app models."""
 
+import logging
+
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import UserManager as AbstractUserManager
 from django.contrib.gis.db.models.functions import Distance
@@ -11,6 +13,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 from base.models import PushNotificationConfiguration
 from userprofile.models import Profile, ProfileGallery, ProfileLocation
 from utils.mixins import BaseMixin
+
+# Logging error messages
+logger = logging.getLogger('ACCOUNT')
 
 
 class UserQuerySet(models.QuerySet):
@@ -71,9 +76,12 @@ class UserManager(AbstractUserManager):
         """Get user object or make new one"""
         qs = User.objects.filter(phone=phone)
         if qs.exists():
-            obj = qs.first(), False
+            obj = (qs.first(), False)
+            if not hasattr(obj, 'profile'):
+                logger.info(f'INFO: {obj.phone} has no Profile obj.'
+                            f'DATETIME: {timezone.now().isoformat()}.')
         else:
-            obj = self.make(phone=phone), True
+            obj = (self.make(phone=phone), True)
         return obj
 
 

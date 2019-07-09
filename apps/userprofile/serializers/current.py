@@ -1,5 +1,4 @@
 from django.contrib.gis.geos import Point
-from userprofile.models import FCMDevice
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers, exceptions
 
@@ -8,6 +7,7 @@ from car.serializers import current as car_serializers
 from catalog import models as catalog_models
 from catalog.serializers import current as catalog_serializers
 from userprofile import models
+from userprofile.models import FCMDevice
 from utils import api_exceptions
 from utils.serializers import GeoLocationSerializerMixin
 
@@ -358,7 +358,7 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
 
     # REQUEST
     # Profile of invited user
-    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.all(),
+    profile = serializers.PrimaryKeyRelatedField(queryset=models.Profile.objects.filter(user__is_active=True),
                                                  write_only=True)
 
     # RESPONSE
@@ -375,14 +375,22 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
         attrs['owner'] = self.context.get('request').user
         attrs['invited'] = attrs.pop('profile').user
 
+        # Check if requested user ID isn't equal
         if attrs['owner'].id == attrs['invited'].id:
             raise api_exceptions.EqualIDError()
 
+        # Check if friend list isn't existed
+        if models.FriendList.objects.by_users(attrs['owner'], attrs['invited']):
+            raise api_exceptions.AlreadyFriends(attrs['owner'], attrs['invited'])
+
+        # Check if friend request isn't exists
         if models.FriendRequest.objects.from_me_to_user(attrs['owner'], attrs['invited']).exists():
             raise api_exceptions.FriendRequestAlreadyExists(attrs['owner'], attrs['invited'])
 
+        # Check if invited user isn't blacklisted
         if models.BlackList.objects.are_foes(owner=attrs['owner'], user=attrs['invited']):
             raise api_exceptions.AreFoesError(attrs['owner'], attrs['invited'])
+
         return attrs
 
     def create(self, validated_data):

@@ -281,10 +281,6 @@ class TestChat(APITestCase):
         self.token, created = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        # Added to friendlist
-        f_request = FriendRequest.objects.create(owner=self.user, invited=self.user_1, approved=True)
-        FriendList.objects.create(owner=self.user, friend=self.user_1, request=f_request)
-
         # Create Chat Room
         chat_room = ChatRoom.objects.make(participants=[self.user, self.user_1], public=False)
 

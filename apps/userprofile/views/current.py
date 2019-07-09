@@ -350,8 +350,8 @@ class FriendListDestroyView(generics.DestroyAPIView):
 
     def get_object(self):
         """Override get_object method"""
-        return get_object_or_404(models.FriendList.objects.by_profiles(
-            self.request.user.profile, self.kwargs.get('profile_id')))
+        return get_object_or_404(models.FriendList.objects.by_profiles(self.request.user.profile,
+                                                                       self.kwargs.get('profile_id')))
 
 
 class FriendRequestApproveView(FriendRequestMixin, generics.UpdateAPIView):

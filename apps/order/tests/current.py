@@ -62,11 +62,11 @@ class TestOrder(APITestCase):
         self.assistance_request_1 = models.AssistanceRequest.objects.create(user=self.user_2,
                                                                             issue='Issue 2',
                                                                             description='Description',
-                                                                            location=Point(55.062003, 28.940738, srid=4326))
+                                                                            location=Point(45.071016, 38.942507, srid=4326))
         models.AssistanceRequest.objects.create(user=self.user_3,
                                                 issue='Issue 3',
                                                 description='Description',
-                                                location=Point(65.062003, 18.940738, srid=4326))
+                                                location=Point(45.031016, 38.814007, srid=4326))
 
         # Create user cars
         self.car_1 = car_models.Car.objects.create(mark=self.toyota,
@@ -111,8 +111,11 @@ class TestOrder(APITestCase):
         profile_models.BlackList.objects.create(owner=self.user_1, foe=self.user_2)
 
         api_path = '%s:order:request-list' % self.VERSION
+        query = {
+            'coordinates': '45.049340, 38.960508, 5500'
+        }
 
-        response = self.client.get(reverse(api_path))
+        response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_own_assistance_requests(self):
@@ -126,15 +129,18 @@ class TestOrder(APITestCase):
         Result: [AssistanceRequest(user_1), AssistanceRequest(user_2), AssistanceRequest(user_3),]
         """
         api_path = '%s:order:request-list' % self.VERSION
+        query = {
+            'coordinates': '45.049340, 38.960508, 5500'
+        }
 
-        response = self.client.get(reverse(api_path))
+        response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0].get('is_owner'), True)
 
     def test_service_list_query(self):
         """Test service list query - from center & position"""
         query = {
-            'position': ['45.061016, 38.944007']  # latitude, longitude
+            'coordinates': ['45.061016, 38.944007, 5500']  # latitude, longitude
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
@@ -143,33 +149,24 @@ class TestOrder(APITestCase):
     def test_service_list_query_1(self):
         """Test service list query - filter by distance"""
         query = {
-            'coordinates': ['55.062003, 28.940738'],  # latitude, longitude
+            'coordinates': ['45.061016, 38.944007, 5500'],  # latitude, longitude
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0].get('distance'), 0.0)  # output in meters
+        self.assertEqual(response.data[1].get('distance'), 880.77758879)  # output in meters
 
     def test_service_list_query_2(self):
         """Test service list query - filter by profile id"""
         query = {
-            'profile_id': self.assistance_request_1.user.profile.id
+            'profile_id': self.assistance_request_1.user.profile.id,
+            'coordinates': '45.061016, 38.944007, 5500'
         }
         api_path = '%s:order:request-list' % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0].get('profile_id'), self.assistance_request_1.user.profile.id)
-
-    def test_service_list_query_3(self):
-        """Test service list query - filter by distance"""
-        query = {
-            'coordinates': ['55.062003, 28.940738, 100000000'],  # latitude, longitude
-        }
-        api_path = '%s:order:request-list' % self.VERSION
-        response = self.client.get(reverse(api_path), data=query)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[1].get('distance'), 0.0)  # output in meters
-        self.assertEqual(response.data[2].get('distance'), 1504877.55296152)  # output in meters
 
     def test_count_created_assistance_requests(self):
         """
@@ -258,8 +255,11 @@ class TestOrder(APITestCase):
         """Test status is_owner in list of assistance requests"""
 
         api_path = '%s:order:request-list' % self.VERSION
+        query = {
+            'coordinates': '45.049340, 38.960508, 5500'
+        }
 
-        response = self.client.get(reverse(api_path))
+        response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         for assistance_request in response.data:
             if assistance_request.get('id') == self.assistance_request_0.id:
