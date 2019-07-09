@@ -140,12 +140,23 @@ def notify_friend_request(invited_id):
 def notify_chat_participants(sender_id, room_id, participants):
     """Notify user about new friend request"""
     from account import models as account_models
+    from chat import models as chat_models
     from base import models as base_models
     from userprofile.models import FCMDevice
 
     for user_id in participants:
         # Get sender user object
         sender = account_models.User.objects.get(id=sender_id)
+
+        # Get participant obj
+        participant = account_models.User.objects.get(id=user_id)
+
+        # Get counter of unread messages
+        unread_messages = chat_models.ChatRoom.objects.by_room(room_id)\
+                                                      .by_participant(participant)\
+                                                      .annotate_unread_messages(participant)\
+                                                      .first().unread_messages
+
         # Check if user is online
         notification = base_models.PushNotification.objects.make_new_message_notification(
             user=user_id,
@@ -153,7 +164,11 @@ def notify_chat_participants(sender_id, room_id, participants):
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
         if devices.exists():
-            raw_result = devices.send_message(**notification.get_push_dict(sender_id=sender.profile.id, room_id=room_id))
+            # Send PUSH-notification
+            raw_result = devices.send_message(
+                badge=unread_messages,
+                **notification.get_push_dict(sender_id=sender.profile.id, room_id=room_id))
+
             result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
             if result.get('success') > 0:
                 notification.status = True

@@ -113,6 +113,10 @@ class ChatRoomManager(models.Manager):
 class ChatRoomQuerySet(models.QuerySet):
     """QuerySet for model ChatRoom"""
 
+    def by_room(self, room_id):
+        """Filter by room_id"""
+        return self.filter(id=room_id)
+
     def friendly(self, participant):
         """Only friendly rooms"""
         return self.exclude(participants__blacked_user__owner=participant)\
