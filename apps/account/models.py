@@ -77,8 +77,8 @@ class UserManager(AbstractUserManager):
         qs = User.objects.filter(phone=phone)
         if qs.exists():
             obj = (qs.first(), False)
-            if not hasattr(obj, 'profile'):
-                logger.info(f'INFO: {obj[0].phone} has no Profile obj.'
+            if not hasattr(obj[0], 'profile'):
+                logger.info(f'INFO: {obj[0].phone} has no Profile obj.\n'
                             f'DATETIME: {timezone.now().isoformat()}.')
         else:
             obj = (self.make(phone=phone), True)
