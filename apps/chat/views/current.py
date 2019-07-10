@@ -1,6 +1,7 @@
 from django.db.models import Q
 from django.shortcuts import render
 from rest_framework import generics, views
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
@@ -23,6 +24,17 @@ class ChatMessageListView(generics.ListAPIView):
         return models.ChatMessage.objects.filter(room=self.kwargs.get('pk'))\
                                          .annotate_read_status(user=self.request.user)\
                                          .distinct()
+
+
+class ChatReadMessageView(generics.CreateAPIView):
+    """Create read message objects"""
+
+    serializer_class = serializers.ChatReadMessageSerializer
+    permission_classes = (permissions.ChatMessagePermission,)
+
+    def create(self, request, *args, **kwargs):
+        super(ChatReadMessageView, self).create(request, *args, **kwargs)
+        return Response(status=status.HTTP_200_OK)
 
 
 class ChatTotalUnreadMessageCountView(views.APIView):

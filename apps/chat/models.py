@@ -239,3 +239,4 @@ class ChatReadMessage(BaseMixin):
     class Meta:
         """Meta class"""
         ordering = ('created',)
+        unique_together = ('user', 'message')

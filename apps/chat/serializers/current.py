@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, response
 
 from account.models import User
 from chat import models
@@ -31,6 +31,45 @@ class ChatMessageListSerializer(serializers.ModelSerializer):
         model = models.ChatMessage
         fields = ('id', 'created', 'modified',
                   'sender', 'room_id', 'message', 'read')
+
+
+class ChatReadMessageSerializer(serializers.ModelSerializer):
+    """Serializer for model ChatReadMessage"""
+
+    # REQUEST
+    messages = serializers.PrimaryKeyRelatedField(
+        queryset=models.ChatMessage.objects.all(),
+        many=True,
+        write_only=True,
+        allow_null=False,
+        allow_empty=False
+    )
+
+    class Meta:
+        """Meta class"""
+        model = models.ChatReadMessage
+        fields = ('messages',)
+
+    def validate(self, attrs):
+        """Validate method"""
+        user = self.context.get('request').user
+        messages = attrs.get('messages')
+
+        # Check existence of requested messages
+        qs = models.ChatMessage.objects.exclude(sender=user)\
+                                       .exclude(chatreadmessage__user_id=user)\
+                                       .filter(id__in=[message.id for message in messages])
+        attrs['messages'] = list(qs)
+        return attrs
+
+    def create(self, validated_data):
+        for message in validated_data.get('messages'):
+            if message is not None:
+                self.Meta.model.objects.bulk_create([
+                    self.Meta.model(user=self.context.get('request').user,
+                                    message=message)
+                ])
+        return response.Response()
 
 
 class ChatRoomDetailSerializer(serializers.ModelSerializer):
