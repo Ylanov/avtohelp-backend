@@ -14,7 +14,8 @@ class Newsletter(BaseMixin, ImageMixin):
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
     text = models.TextField(verbose_name=_('Text'))
-    short_description = models.CharField(default=None, null=True, max_length=255,
+    short_description = models.CharField(max_length=255,
+                                         blank=True, default=None, null=True,
                                          verbose_name=_('Short description'))
     publish = models.BooleanField(default=False, verbose_name=_('Publish'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
