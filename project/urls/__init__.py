@@ -27,7 +27,7 @@ api_schema_view = get_swagger_view(title='Road Helper API')
 current_version = settings.AVAILABLE_VERSIONS.get('current')
 future_version = settings.AVAILABLE_VERSIONS.get('future')
 urlpatterns = [
-    path('', base_views.IndexView.as_view()),
+    path('app', base_views.IndexView.as_view()),
 
     path('admin/', admin.site.urls),
     path(f'api/v{current_version}/', include(current, namespace=f'{current_version}')),
