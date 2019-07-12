@@ -1,4 +1,5 @@
 from django.urls import re_path
+
 from versioning import views
 
 app_name = 'versioning'

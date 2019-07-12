@@ -18,13 +18,16 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_swagger.views import get_swagger_view
-from userprofile.views import current as views
+
+from base.views import common as base_views
 from project.urls import current, future
+from userprofile.views import current as views
 
 api_schema_view = get_swagger_view(title='Road Helper API')
 current_version = settings.AVAILABLE_VERSIONS.get('current')
 future_version = settings.AVAILABLE_VERSIONS.get('future')
 urlpatterns = [
+    path('', base_views.IndexView.as_view()),
 
     path('admin/', admin.site.urls),
     path(f'api/v{current_version}/', include(current, namespace=f'{current_version}')),
