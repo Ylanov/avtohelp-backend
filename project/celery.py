@@ -35,25 +35,25 @@ def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(minute=settings.REQUEST_RELEVANCE),
                              check_request_relevance.s(),
                              name='Check assistance request relevance')
-    # sender.add_periodic_task(crontab(minute=settings.SMS_BLOCKING_PERIOD),
-    #                          check_verification_sms_relevance.s(),
-    #                          name='Check verification SMS relevance')
+    sender.add_periodic_task(crontab(minute=settings.SMS_BLOCKING_PERIOD),
+                             check_verification_sms_relevance.s(),
+                             name='Check verification SMS relevance')
     # Unused
     # sender.add_periodic_task(crontab(minute=settings.MESSAGES_UPDATE_PERIOD),
     #                          notify_unread_messages.s(),
     #                          name='Notify users about unread messages')
 
 
-# @app.task
-# def check_verification_sms_relevance():
-#     """Check verification SMS relevance"""
-#     from authorization import models as auth_models
-#     for sms_code in auth_models.SMSCode.objects.filter(status=auth_models.SMSCode.SENT):
-#         delta = (sms_code.created +
-#                  timezone.timedelta(minutes=settings.SMS_BLOCKING_PERIOD))
-#         if delta >= timezone.now():
-#             sms_code.status = auth_models.SMSCode.DECLINED
-#             sms_code.save()
+@app.task
+def check_verification_sms_relevance():
+    """Check verification SMS relevance"""
+    from authorization import models as auth_models
+    for sms_code in auth_models.SMSCode.objects.filter(status=auth_models.SMSCode.SENT):
+        delta = (sms_code.created +
+                 timezone.timedelta(minutes=settings.SMS_BLOCKING_PERIOD))
+        if timezone.now() >= delta:
+            sms_code.status = auth_models.SMSCode.DECLINED
+            sms_code.save()
 
 
 @app.task

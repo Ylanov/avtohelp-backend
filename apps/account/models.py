@@ -143,7 +143,8 @@ class User(AbstractUser, BaseMixin):
     @property
     def get_location_update_datetime(self):
         """Return user location update datetime"""
-        return self.profilelocation.modified if hasattr(self, 'profilelocation') else None
+        if self.profilelocation.location:
+            return self.profilelocation.modified
 
     @property
     def location_is_valid(self):
@@ -151,7 +152,7 @@ class User(AbstractUser, BaseMixin):
         geo_pos_settings = PushNotificationConfiguration.get_solo()
         hours, minutes = geo_pos_settings.geo_position_lifetime.hour, geo_pos_settings.geo_position_lifetime.minute
         delta = timezone.now() - timezone.timedelta(hours=hours, minutes=minutes)
-        if self.get_location_update_datetime >= delta:
+        if self.get_location_update_datetime and self.get_location_update_datetime >= delta:
             return True
         else:
             return False
