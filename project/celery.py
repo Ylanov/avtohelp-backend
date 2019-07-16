@@ -35,7 +35,8 @@ def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(crontab(minute=settings.REQUEST_RELEVANCE),
                              check_request_relevance.s(),
                              name='Check assistance request relevance')
-    sender.add_periodic_task(crontab(minute=settings.SMS_BLOCKING_PERIOD),
+    # Calls check_verification_sms_relevance() every 6 hours
+    sender.add_periodic_task(crontab(hour=6),
                              check_verification_sms_relevance.s(),
                              name='Check verification SMS relevance')
     # Unused
@@ -50,8 +51,8 @@ def check_verification_sms_relevance():
     from authorization import models as auth_models
     for sms_code in auth_models.SMSCode.objects.filter(status=auth_models.SMSCode.SENT):
         delta = (sms_code.created +
-                 timezone.timedelta(minutes=settings.SMS_BLOCKING_PERIOD))
-        if timezone.now() >= delta:
+                 timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD))
+        if timezone.now() <= delta:
             sms_code.status = auth_models.SMSCode.DECLINED
             sms_code.save()
 
