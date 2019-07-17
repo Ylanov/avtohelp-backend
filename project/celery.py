@@ -32,11 +32,11 @@ def debug_task(self):
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     # Calls check_request_relevance() every 30 minutes.
-    sender.add_periodic_task(crontab(minute=settings.REQUEST_RELEVANCE),
+    sender.add_periodic_task(crontab(minute=f'*/{settings.REQUEST_RELEVANCE}'),
                              check_request_relevance.s(),
                              name='Check assistance request relevance')
     # Calls check_verification_sms_relevance() every 6 hours
-    sender.add_periodic_task(crontab(hour=6),
+    sender.add_periodic_task(crontab(hour='*/6'),
                              check_verification_sms_relevance.s(),
                              name='Check verification SMS relevance')
     # Unused
