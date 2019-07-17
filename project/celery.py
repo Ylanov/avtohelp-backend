@@ -2,7 +2,6 @@ import logging
 import os
 
 from celery import Celery
-from celery.schedules import crontab
 from django.conf import settings
 from django.utils import timezone
 
@@ -31,13 +30,13 @@ def debug_task(self):
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    # Calls check_request_relevance() every 30 minutes.
-    sender.add_periodic_task(crontab(minute=f'*/{settings.REQUEST_RELEVANCE}'),
-                             check_request_relevance.s(),
+    # Calls check_request_relevance() every 30 minutes (1800 sec.).
+    sender.add_periodic_task(schedule=1800,
+                             sig=check_request_relevance.s(),
                              name='Check assistance request relevance')
-    # Calls check_verification_sms_relevance() every 6 hours
-    sender.add_periodic_task(crontab(hour='*/6'),
-                             check_verification_sms_relevance.s(),
+    # Calls check_verification_sms_relevance() every 6 hours (21600 sec.)
+    sender.add_periodic_task(schedule=21600,
+                             sig=check_verification_sms_relevance.s(),
                              name='Check verification SMS relevance')
     # Unused
     # sender.add_periodic_task(crontab(minute=settings.MESSAGES_UPDATE_PERIOD),
