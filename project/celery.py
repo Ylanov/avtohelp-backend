@@ -52,7 +52,7 @@ def check_verification_sms_relevance():
         delta = (sms_code.created +
                  timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD))
         if timezone.now() <= delta:
-            sms_code.status = auth_models.SMSCode.DECLINED
+            sms_code.status = auth_models.SMSCode.EXPIRED
             sms_code.save()
 
 
