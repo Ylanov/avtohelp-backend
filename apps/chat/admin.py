@@ -21,7 +21,7 @@ class ChatRoomInlineModel(admin.StackedInline):
 
 class ChatRoomAdminModel(admin.ModelAdmin):
     """Admin model for ChatRoom"""
-    inlines = (ChatMessagesInlineModel,)
+    # inlines = (ChatMessagesInlineModel,)
     readonly_fields = ('id', 'created', 'modified')
     list_display = readonly_fields + ('is_public',)
     filter_horizontal = ('participants',)
@@ -116,5 +116,5 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
 
 
 admin.site.register(models.ChatRoom, ChatRoomAdminModel)
-admin.site.register(models.ChatMessage, ChatMessageAdminModel)
-admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
+# admin.site.register(models.ChatMessage, ChatMessageAdminModel)
+# admin.site.register(models.ChatReadMessage, ChatReadMessageAdminModel)
