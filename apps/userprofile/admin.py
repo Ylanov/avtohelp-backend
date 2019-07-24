@@ -22,6 +22,7 @@ class ProfileModelAdmin(admin.ModelAdmin):
     """Custom admin page for Profile"""
     readonly_fields = ('id', 'created', 'modified')
     inlines = (ProfileGalleryInline, )
+    search_fields = ('user__phone', )
     list_display = ('id', 'user', 'first_name', 'last_name', 'created', 'modified')
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'first_name',
