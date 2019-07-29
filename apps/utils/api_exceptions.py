@@ -60,9 +60,8 @@ class ClientError(Exception):
 class TooOftenTriedError(exceptions.APIException):
     """Too often tried to enter the code."""
     status_code = HTTP_420_ENHACE_YOUR_CALM
-    default_detail = _('Too often tried to request the code, try to request the code after %s seconds.'
-                       % settings.SMS_SEND_DELAY)
-
+    default_detail = (_('Too often tried to request the code, try to request the code after %s seconds.') %
+                      settings.SMS_SEND_DELAY)
 
 class TemporaryLockError(exceptions.APIException):
     """Temporary Lock Error."""
