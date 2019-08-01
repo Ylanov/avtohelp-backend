@@ -156,3 +156,8 @@ class User(AbstractUser, BaseMixin):
             return True
         else:
             return False
+
+    @property
+    def has_token(self):
+        """Return boolean value if user has an auth token"""
+        return True if hasattr(self, 'auth_token') else False

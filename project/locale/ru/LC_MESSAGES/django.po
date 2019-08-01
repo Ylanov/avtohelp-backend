@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-29 11:18+0000\n"
+"POT-Creation-Date: 2019-08-01 08:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,20 +20,34 @@ msgstr ""
 "%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
 "%100>=11 && n%100<=14)? 2 : 3);\n"
 
-#: apps/account/admin.py:14 apps/authorization/admin.py:13
+#: apps/account/admin.py:17 apps/authorization/admin.py:13
 #: apps/order/admin.py:14 apps/userprofile/admin.py:28
 msgid "User's data"
 msgstr "Информация о пользователе"
 
-#: apps/account/admin.py:15 apps/authorization/admin.py:15
+#: apps/account/admin.py:18 apps/authorization/admin.py:15
 #: apps/base/admin.py:14 apps/chat/admin.py:29 apps/chat/admin.py:66
 #: apps/chat/admin.py:96 apps/order/admin.py:17 apps/userprofile/admin.py:31
 msgid "Info"
 msgstr "Информация"
 
-#: apps/account/admin.py:16
+#: apps/account/admin.py:19
 msgid "Flags"
+msgstr "Флаги"
+
+#: apps/account/admin.py:37
+#, python-format
+msgid ""
+"User's %s was successfully disabled.\n"
+"                                       User's %s was already disabled.\n"
+"                                    "
 msgstr ""
+"Пользовате(ль/ли) %s были успешно заблокирован(ы). Пользовате(ль/ли) %s уже "
+"заблокирован(ы)."
+
+#: apps/account/admin.py:42
+msgid "Mark selected users as disabled"
+msgstr "Заблокировать выделенных пользователей."
 
 #: apps/account/apps.py:7
 msgid "Account"
@@ -113,15 +127,15 @@ msgstr ""
 "Код: %s\n"
 "Взаимопомощь на дороге"
 
-#: apps/authorization/models.py:214
+#: apps/authorization/models.py:217
 msgid "Last datetime authorization attempt"
 msgstr "Последняя дата попытки авторизации"
 
-#: apps/authorization/models.py:220
+#: apps/authorization/models.py:223
 msgid "User lock"
 msgstr "Блокировка пользователя"
 
-#: apps/authorization/models.py:221
+#: apps/authorization/models.py:224
 msgid "User locks"
 msgstr "Блокировки пользователей"
 
@@ -643,80 +657,84 @@ msgstr ""
 "Были зафиксированы слишком частые попытки запросить код, попробуйте "
 "запросить код после %s секунд."
 
-#: apps/utils/api_exceptions.py:69
+#: apps/utils/api_exceptions.py:70
 msgid "Temporary Lock"
 msgstr "Временная блокировка"
 
-#: apps/utils/api_exceptions.py:81
+#: apps/utils/api_exceptions.py:82
 msgid "User not found"
 msgstr "Пользователь не найден"
 
-#: apps/utils/api_exceptions.py:93
+#: apps/utils/api_exceptions.py:94
+msgid "User is not active."
+msgstr ""
+
+#: apps/utils/api_exceptions.py:106
 msgid "Message not found"
 msgstr "Сообщение не найдено"
 
-#: apps/utils/api_exceptions.py:101
+#: apps/utils/api_exceptions.py:114
 #, python-format
 msgid "City with ID %s, not found"
 msgstr "Город с идентификатором %s не найден в БД"
 
-#: apps/utils/api_exceptions.py:112
+#: apps/utils/api_exceptions.py:125
 msgid "Invalid value was sended"
 msgstr "Было передано неверное значение "
 
-#: apps/utils/api_exceptions.py:123
+#: apps/utils/api_exceptions.py:136
 msgid "Car brand is not found in DB"
 msgstr "Бренд машины не найден в БД"
 
-#: apps/utils/api_exceptions.py:134
+#: apps/utils/api_exceptions.py:147
 msgid "Model of car brand is not found in DB"
 msgstr "Модель машины не найдена в БД"
 
-#: apps/utils/api_exceptions.py:145
+#: apps/utils/api_exceptions.py:158
 msgid "Car color is not found in DB"
 msgstr "Цвет машины не найден в БД"
 
-#: apps/utils/api_exceptions.py:156
+#: apps/utils/api_exceptions.py:169
 #, python-format
 msgid "User ID %s and User ID %s are already friends"
 msgstr "Пользователь %s уже является другом %s"
 
-#: apps/utils/api_exceptions.py:167
+#: apps/utils/api_exceptions.py:180
 #, python-format
 msgid "User %s is already in User %s blacklist"
 msgstr "Пользователь %s уже находится в черном списке пользователя %s "
 
-#: apps/utils/api_exceptions.py:178
+#: apps/utils/api_exceptions.py:191
 #, python-format
 msgid "Friend request from User %s to User %s, already exists"
 msgstr ""
 "Запрос на добавление в друзья от пользователя %s, пользователю %s, уже "
 "существует"
 
-#: apps/utils/api_exceptions.py:189
+#: apps/utils/api_exceptions.py:202
 msgid "Sent IDs are the same"
 msgstr "Переданные идентификаторы идентичны"
 
-#: apps/utils/api_exceptions.py:200
+#: apps/utils/api_exceptions.py:213
 #, python-format
 msgid "User %s and User %s aren't friends"
 msgstr "Пользователь %s и пользователь %s не являюстя друзьями"
 
-#: apps/utils/api_exceptions.py:211
+#: apps/utils/api_exceptions.py:224
 #, python-format
 msgid "Chat room for User %s to User %s, already exists"
 msgstr "Чат для пользователей (%s и %s) уже существует"
 
-#: apps/utils/api_exceptions.py:222
+#: apps/utils/api_exceptions.py:235
 #, python-format
 msgid "User %s and User %s are foes"
 msgstr "Пользователь %s и пользователь %s являются врагами"
 
-#: apps/utils/api_exceptions.py:233
+#: apps/utils/api_exceptions.py:246
 msgid "Car is not found in DB"
 msgstr "Автомобиль не найден в БД"
 
-#: apps/utils/api_exceptions.py:244
+#: apps/utils/api_exceptions.py:257
 msgid "Query parameters passed incorrectly."
 msgstr "Были переданы неправильные параметры запроса"
 

@@ -197,7 +197,10 @@ class SMSCode(BaseMixin):
 
 class UserLockQuerySet(models.QuerySet):
     """QuerySet for model UserLock"""
-    pass
+
+    def by_phone(self, phone):
+        """Filter user lock by phone number"""
+        return self.filter(user__phone=phone)
 
 
 class UserLockManager(models.Manager):

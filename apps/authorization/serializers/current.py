@@ -28,6 +28,10 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         """Validate method."""
         phone = attrs.get('phone')
+        user_qs = User.objects.filter(phone=phone)
+        # check if user phone is active or not
+        if user_qs.exists() and not user_qs.first().is_active:
+            raise api_exceptions.UserIsBlocked()
         # get sms-codes by user phone
         qs = models.SMSCode.objects.by_phone(phone).ready_to_go()
         if qs.exists():

@@ -63,6 +63,7 @@ class TooOftenTriedError(exceptions.APIException):
     default_detail = (_('Too often tried to request the code, try to request the code after %s seconds.') %
                       settings.SMS_SEND_DELAY)
 
+
 class TemporaryLockError(exceptions.APIException):
     """Temporary Lock Error."""
     status_code = status.HTTP_423_LOCKED
@@ -80,6 +81,18 @@ class UserNotFound(exceptions.APIException):
     status_code = status.HTTP_404_NOT_FOUND
     default_detail = _('User not found')
     extended_status_code = '%s.1' % status.HTTP_404_NOT_FOUND
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()
+
+
+class UserIsBlocked(exceptions.APIException):
+    """User blocked."""
+    status_code = status.HTTP_403_FORBIDDEN
+    default_detail = _('User is not active.')
+    extended_status_code = '%s.1' % status.HTTP_403_FORBIDDEN
 
     def __init__(self):
         self.default_detail = dict(detail=self.default_detail,
