@@ -1,64 +1,18 @@
 from __future__ import unicode_literals
 
-import re
 from base64 import b64encode
 from collections import namedtuple
+from urllib import parse as urlparse
 
 from django.db.models import F
-from django.utils.encoding import force_str
-from django.utils.six.moves.urllib import parse as urlparse
 from rest_framework.pagination import CursorPagination
-from rest_framework.pagination import _reverse_ordering, _positive_int
+from rest_framework.pagination import _reverse_ordering
 
 Cursor = namedtuple('Cursor', ['offset', 'reverse', 'position'])
 
 
-class CustomCursorPagination(CursorPagination):
-    """Custom cursor pagination"""
-
-    def get_page_size(self, request):
-        if self.page_size_query_param:
-            try:
-                return _positive_int(
-                    request.query_params[self.page_size_query_param],
-                    strict=True,
-                    cutoff=self.max_page_size
-                )
-            except (KeyError, ValueError):
-                pass
-
-        return self.page_size
-
-    def inject_cursor_value(self, query: str, scheme: str = None, netloc: str = None,
-                            path: str = None, fragment: str = None) -> str:
-        """
-        # Eject cursor value without url and filters
-        Example of response:
-        ```
-            {
-                "next": "cD0yMDE5LTA2LTA2KzA4JTNBMjYlM0EyNi4zOTMxMjElMkIwMCUzQTAw"
-                ...
-            }
-        ```
-        """
-        pattern = r'cursor[=]{1}[\w]*[%\w]+'
-        match = re.search(pattern, query)
-        if match:
-            return match.group().split('=')[1]
-        else:
-            # Default mechanism to return cursor value (with url and filter params)
-            return urlparse.urlunsplit((scheme, netloc, path, query, fragment))
-
-    def replace_query_param(self, url, key, val):
-        """
-        Given a URL and a key/val pair, set or replace an item in the query
-        parameters of the URL, and return the new URL.
-        """
-        (scheme, netloc, path, query, fragment) = urlparse.urlsplit(force_str(url))
-        query_dict = urlparse.parse_qs(query, keep_blank_values=True)
-        query_dict[force_str(key)] = [force_str(val)]
-        query = urlparse.urlencode(sorted(list(query_dict.items())), doseq=True)
-        return self.inject_cursor_value(query, scheme, netloc, path, fragment)
+class ProjectCursorPagination(CursorPagination):
+    """Customized cursor pagination class."""
 
     def encode_cursor(self, cursor):
         """
@@ -74,16 +28,16 @@ class CustomCursorPagination(CursorPagination):
 
         querystring = urlparse.urlencode(tokens, doseq=True)
         encoded = b64encode(querystring.encode('ascii')).decode('ascii')
-        return self.replace_query_param(self.base_url, self.cursor_query_param, encoded)
+        return encoded
 
 
-class NewsCursorPagination(CustomCursorPagination):
+class NewsCursorPagination(ProjectCursorPagination):
     """Custom cursor pagination"""
 
     ordering = '-publish_date'
 
 
-class ChatCursorPagination(CustomCursorPagination):
+class ChatCursorPagination(ProjectCursorPagination):
 
     ordering = 'last_message_datetime'
 

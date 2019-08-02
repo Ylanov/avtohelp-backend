@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from userprofile import models, filters
 from userprofile.models import FCMDevice
 from userprofile.serializers import current as serializers
-from utils.paginations import CustomCursorPagination
+from utils.paginations import ProjectCursorPagination
 
 
 class FCMDeviceViewSet(generics.GenericAPIView):
@@ -68,7 +68,7 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
 
     serializer_class = serializers.ProfileListSerializer
     filter_class = filters.ProfileListFilterSet
-    pagination_class = CustomCursorPagination
+    pagination_class = ProjectCursorPagination
 
     def get_queryset(self):
         """Override get_queryset method"""
