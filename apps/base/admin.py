@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from solo.admin import SingletonModelAdmin
@@ -5,16 +7,22 @@ from solo.admin import SingletonModelAdmin
 from .models import Newsletter, PushNotification, PushNotificationConfiguration, \
     PushNotificationSchedule
 
-
 class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
     readonly_fields = ('id', 'created', 'modified')
-    list_display = ('id', 'title', 'publish', 'publish_date')
+    list_display = ('id', 'title', 'publish', 'push', 'publish_date')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
-        (_('Options'), {'fields': ('title', 'text', 'publish',
+        (_('Options'), {'fields': ('title', 'text', 'publish', 'push',
                                    'publish_date', 'image')}),
     )
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        
+        if obj.push:
+            obj.send_push_notification()
+
 
 
 class PushNotificationModelAdmin(admin.ModelAdmin):
