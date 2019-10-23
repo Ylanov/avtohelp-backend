@@ -93,6 +93,11 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/code/debug.log',
         }
     },
     'loggers': {
@@ -121,6 +126,16 @@ LOGGING = {
             'handlers': ['console', ],
             'level': 'DEBUG',
             'propagate': False,
+        },
+        'app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'CELERY': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     }
 }
