@@ -265,6 +265,28 @@ def read_message(message_list, reader_id):
         for message in qs:
             chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
 
+
+@app.task
+def notify_new_newsletter(newsletter_id):
+    """Notify user about new newsletter"""
+    from base import models as base_models
+    from userprofile.models import FCMDevice
+
+    devices = FCMDevice.objects.filter(active=True)
+
+    #  Sent PUSH-notifications for filtered users
+    for device in devices:
+        notification = base_models.PushNotification.objects.make_new_newsletter_notification(user=device.user, newsletter=newsletter_id)
+        raw_result = device.send_message(**notification.get_push_dict(newsletter_id=newsletter_id))
+        result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
+        if result.get('success'):
+            notification.status = True
+            notification.sent_count = result.get('success')
+            notification.save()
+            logger.info(f'User notified: {result.get("success")}')
+        else:
+            logger.info(f'Error was occurred when sending PUSH-notifications')
+
 # Unused
 # @app.task
 # def notify_unread_messages():
