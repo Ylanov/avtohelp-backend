@@ -1,14 +1,18 @@
 import datetime
+import logging
 
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
 from account import models as account_models
 from utils.mixins import BaseMixin, ImageMixin
+from project import celery as tasks
 
+# # Logging error messages
+logger = logging.getLogger('app')
 
-# Create your models here.
 class Newsletter(BaseMixin, ImageMixin):
     """Model to new representation."""
 
@@ -18,6 +22,7 @@ class Newsletter(BaseMixin, ImageMixin):
                                          blank=True, default=None, null=True,
                                          verbose_name=_('Short description'))
     publish = models.BooleanField(default=False, verbose_name=_('Publish'))
+    push = models.BooleanField(default=False, verbose_name=_('Push notification'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
                                         verbose_name=_('Publish date'))
 
@@ -26,6 +31,15 @@ class Newsletter(BaseMixin, ImageMixin):
 
         verbose_name = _('News')
         verbose_name_plural = _('Newsletter')
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to all active users"""
+
+        logger.info(f'INFO: Send push notification for all active users. News id: {self.id}')
+        if settings.USE_CELERY:
+            tasks.notify_new_newsletter.delay(self.id)
+        else:
+            tasks.notify_new_newsletter(self.id)
 
 
 class PushNotificationManager(models.Manager):
@@ -82,6 +96,27 @@ class PushNotificationManager(models.Manager):
         obj.save()
         return obj
 
+    def make_new_newsletter_notification(self, user: (str, int, object), newsletter: (str, int, object)) -> object:
+        """Make common notification for new newsletter"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+
+        if not isinstance(newsletter, Newsletter):
+            newsletter_qs = Newsletter.objects.filter(id=newsletter)
+            if newsletter_qs.exists():
+                newsletter = newsletter_qs.first()
+            else:
+                return None
+
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('News'),
+                description=newsletter.title,
+                event=self.model.NEW_NEWSLETTER
+            )
+            obj.save()
+            return obj
+
 
 class PushNotificationQuerySet(models.QuerySet):
     """PushNotification querysets"""
@@ -95,12 +130,14 @@ class PushNotification(BaseMixin):
     CREATE_REQUEST = 1
     NEW_MESSAGE = 2
     FRIEND_REQUEST = 3
+    NEW_NEWSLETTER = 4
 
     EVENT_CHOICES = (
         (INITIALIZE, _('Initialization')),
         (CREATE_REQUEST, _('Create assistance request')),
         (NEW_MESSAGE, _('New message')),
-        (FRIEND_REQUEST, _('Friend request'))
+        (FRIEND_REQUEST, _('Friend request')),
+        (NEW_NEWSLETTER, _('Newsletter'))
     )
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))

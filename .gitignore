@@ -23,3 +23,6 @@ logs/
 
 #geo
 /tilescache/
+/.DS_Store
+
+/debug.log
