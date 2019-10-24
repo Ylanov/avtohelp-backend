@@ -71,7 +71,8 @@ class ChatRoomListView(generics.ListAPIView):
         return models.ChatRoom.objects.by_participant(participant=user)\
                                       .annotate_last_message_datetime()\
                                       .annotate_unread_messages(user)\
-                                      .annotate_message_count()
+                                      .annotate_message_count()\
+                                      .filter(message_count__gte=1)
 
 
 class ChatView(generics.GenericAPIView):
