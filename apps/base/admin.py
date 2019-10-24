@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 import logging
 
->>>>>>> origin/master
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from solo.admin import SingletonModelAdmin
