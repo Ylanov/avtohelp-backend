@@ -133,7 +133,7 @@ class User(AbstractUser, BaseMixin):
     @property
     def get_car_license_plate(self):
         """Return user profile car license plate"""
-        return f'{self.profilecar_set.first().license_plate}' if self.profilecar_set.first() else ''
+        return f'{self.profilecar_set.first().license_plate}' if self.profilecar_set.first() and  self.profilecar_set.first().license_plate else ''
 
     @property
     def get_avatar(self):
