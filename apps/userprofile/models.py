@@ -191,7 +191,7 @@ class ProfileCar(BaseMixin):
     color = models.ForeignKey('car.CarColor', on_delete=models.CASCADE)
     license_plate = models.CharField(max_length=255,
                                      verbose_name=_('License plate'),
-                                     blank=True, null=True, default=None)
+                                     blank=True, null=True, default='')
 
     class Meta:
         """Meta class"""
