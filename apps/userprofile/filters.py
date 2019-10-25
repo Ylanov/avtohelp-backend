@@ -29,11 +29,17 @@ class ProfileListFilterSet(django_filters.FilterSet):
             qs = queryset.annotate_full_text_search().filter(search=SearchQuery(value, config='simple'))
             # If qs is empty find by one of query parameter
             if not qs.exists():
-                qs = queryset.annotate_full_text_fuzz_search().filter(
-                    search=SearchQuery(query_params[0]) |
-                           SearchQuery(query_params[1] if len(query_params) == 2 else '') |
-                           SearchQuery(query_params[2] if len(query_params) == 3 else '')
-                )
+                count = len(query_params)
+                if count==2:
+                    qs = queryset.annotate_full_text_search()\
+                                .filter(search__icontains=query_params[0])\
+                                .filter(search__icontains=query_params[1])
+                elif count==3:
+                    qs = queryset.annotate_full_text_search()\
+                                .filter(search__icontains=query_params[0])\
+                                .filter(search__icontains=query_params[1])\
+                                .filter(search__icontains=query_params[2])
+
                 # If qs is empty find something
                 if not qs.exists():
                     qs = queryset.annotate_full_text_search().filter(search__icontains=value)
