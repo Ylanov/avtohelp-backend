@@ -153,7 +153,8 @@ class ProfileQuerySet(models.QuerySet):
         return self.annotate(search=SearchVector(
             'first_name',
             'last_name',
-            'user__profilecar__license_plate'
+            'user__profilecar__license_plate',
+            config='simple'
         ))
 
 
