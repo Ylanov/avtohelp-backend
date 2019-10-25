@@ -26,7 +26,7 @@ class ProfileListFilterSet(django_filters.FilterSet):
             # Parse search parameters in value
             query_params = [item.strip() for item in value.split(' ')]
             # Full-text search
-            qs = queryset.annotate_full_text_search().filter(search=value)
+            qs = queryset.annotate_full_text_search().filter(search=SearchQuery(value))
             # If qs is empty find by one of query parameter
             if not qs.exists():
                 qs = queryset.annotate_full_text_search().filter(
