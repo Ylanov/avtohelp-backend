@@ -157,6 +157,14 @@ class ProfileQuerySet(models.QuerySet):
             config='simple'
         ))
 
+    def annotate_full_text_fuzz_search(self):
+        """Full-text fuzz search"""
+        return self.annotate(search=SearchVector(
+            'first_name',
+            'last_name',
+            'user__profilecar__license_plate'
+        ))
+
 
 class Profile(BaseMixin, ImageMixin):
     """Profile model"""
