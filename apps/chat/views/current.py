@@ -63,7 +63,7 @@ class ChatRoomListView(generics.ListAPIView):
     """Chat room list view"""
     serializer_class = serializers.ChatRoomListSerializer
     filter_class = filters.ChatRoomListFilterSet
-    pagination_class = ProjectCursorPagination
+    pagination_class = ChatCursorPagination
 
     def get_queryset(self):
         """Override get queryset method"""
