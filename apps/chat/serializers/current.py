@@ -140,14 +140,14 @@ class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
         if are_foes:
             raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
 
-        # Check if chat room is already exists
-        room = models.ChatRoom.objects.private(attrs['initiator'], attrs['participant'])
-        if room.exists():
-            raise api_exceptions.ChatRoomAlreadyExistsError(attrs['initiator'], attrs['participant'])
-
         return attrs
 
     def create(self, validated_data):
         """Override create method"""
+        room = models.ChatRoom.objects.private(validated_data['initiator'], validated_data['participant'])
+        if room.exists():
+            obj = models.ChatRoom.objects.get(id=room[0].id)
+            return obj
+
         obj = models.ChatRoom.objects.make(participants=validated_data.values(), public=False)
         return obj
