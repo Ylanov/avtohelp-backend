@@ -179,6 +179,7 @@ class PushNotification(BaseMixin):
                     **kwargs
                 }
             },
+            'sound': 'default',
             'icon': 'ic_launcher',
         })
         return result
