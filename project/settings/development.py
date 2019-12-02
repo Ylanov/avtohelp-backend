@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .base import *
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru', 'roadhelper-prod.spider.ru', ]
+ALLOWED_HOSTS = ['localhost', ]
 
 
 # Integration with Sentry
@@ -18,7 +18,7 @@ sentry_sdk.init(
 DEBUG = True
 USE_CELERY = True
 USE_SMS = False  # Actual sms sending switcher
-REDIS_URL = 'redis://base:6379/13'
+REDIS_URL = 'redis://redis:6379/13'
 
 
 # CHANNELS
@@ -26,7 +26,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('base', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
