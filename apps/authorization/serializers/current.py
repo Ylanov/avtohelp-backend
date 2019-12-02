@@ -57,7 +57,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         # todo: remove from prod, this was added temporarily
         if environ.get('SETTINGS_CONFIGURATION') in ('local', 'development') or\
            validated_data.get('phone') == '+79180055555':
-            obj = models.SMSCode.objects.make(user=user, code=12345, **validated_data)
+            obj = models.SMSCode.objects.make(user=user, code=12345, status=1, **validated_data)
         else:
             obj = models.SMSCode.objects.make(user=user, **validated_data)
         if settings.USE_CELERY:
