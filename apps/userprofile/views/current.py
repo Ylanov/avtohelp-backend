@@ -322,7 +322,7 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.common(user=self.request.user)
+        return models.FriendList.objects.common(user=self.request.user).exclude(friend__profile__first_name__isnull=True)
 
 
 class FriendRequestCreateView(FriendRequestMixin, generics.CreateAPIView):
