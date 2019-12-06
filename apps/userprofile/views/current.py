@@ -23,6 +23,8 @@ class FCMDeviceViewSet(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         """Override post method."""
+        FCMDevice.objects.filter(user_id=self.request.user.id).delete()
+
         instance = self.get_object_or_none()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
