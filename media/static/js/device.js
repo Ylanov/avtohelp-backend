@@ -36,8 +36,10 @@ function getMobileOperatingSystem() {
     $(function() {
         var os = getMobileOperatingSystem();
         console.log(os);
-        if(os == 'iOS' || os == 'Android')
+        if(os == 'iOS' || os == 'Android') {
+            ym(56556214, 'reachGoal', 'DETECTED_OS_FOR_REDIRECT', os);
             window.location.href = store[os];
+        }
     });
 
 })(jQuery);
