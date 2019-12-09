@@ -38,7 +38,7 @@ class UserQuerySet(models.QuerySet):
                         then=True),
             #  Check modified date
             models.When(profilelocation__modified__lte=(
-                    timezone.now() - timezone.timedelta(hours=-99)),
+                    timezone.now() - timezone.timedelta(hours=99)),
                 then=True),
             models.When(profilelocation__modified__lte=(
                     timezone.now() - timezone.timedelta(minutes=0)),
@@ -151,7 +151,7 @@ class User(AbstractUser, BaseMixin):
         """Return boolean value if user update location is valid or not"""
         geo_pos_settings = PushNotificationConfiguration.get_solo()
         hours, minutes = geo_pos_settings.geo_position_lifetime.hour, geo_pos_settings.geo_position_lifetime.minute
-        delta = timezone.now() - timezone.timedelta(hours=-99, minutes=0)
+        delta = timezone.now() - timezone.timedelta(hours=99, minutes=0)
         if self.get_location_update_datetime and self.get_location_update_datetime >= delta:
             return True
         else:
