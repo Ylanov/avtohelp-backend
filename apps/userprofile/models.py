@@ -351,7 +351,7 @@ class FriendListQuerySet(models.QuerySet):
 
     def common(self, user):
         """Get user friends"""
-        return self.filter(Q(owner=user) | Q(friend=user))
+        return self.filter(Q(owner=user) | Q(friend=user)).filter(friend__profile__last_name__isnull=False)
 
     def by_profiles(self, owner, friend):
         """Get user friend by profiles"""
