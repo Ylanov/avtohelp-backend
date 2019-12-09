@@ -29,7 +29,7 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
 
         return self.annotate(geo_position_is_valid=models.Case(
             models.When(
-                user__profilelocation__modified__gte=timezone.now() - timezone.timedelta(hours=-99, minutes=0),
+                user__profilelocation__modified__gte=timezone.now() - timezone.timedelta(hours=99, minutes=0),
                 then=True),
             output_field=models.BooleanField(default=False), default=False
         ))
