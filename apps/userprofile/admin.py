@@ -94,7 +94,8 @@ class DeviceAdmin(admin.ModelAdmin):
                 else:
                     response = queryset.send_message(
                         title="Test notification",
-                        body="Test bulk notification"
+                        body="Test bulk notification",
+                        sound="default"
                     )
             else:
                 if data:
@@ -102,7 +103,8 @@ class DeviceAdmin(admin.ModelAdmin):
                 else:
                     response = device.send_message(
                         title="Test notification",
-                        body="Test single notification"
+                        body="Test single notification",
+                        sound="default"
                     )
             if response:
                 ret.append(response)

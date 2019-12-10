@@ -74,14 +74,25 @@ def check_request_relevance():
 def send_verification_sms(sms_code_id):
     """Send verification sms task."""
     from authorization import models as auth_models
+    from base.models import UserVerificationConfiguration
     # Get sms code object
     sms = auth_models.SMSCode.objects.get(id=sms_code_id)
 
     if settings.USE_SMS is True:
         # send actual sms if its allowed by server configuration
         try:
-            sms.send_sms()
-            logger.info('SMS: sending try, ID=%d' % sms.id)
+            # get config
+            phone_verify_settings = UserVerificationConfiguration.get_solo()
+
+            # check verification mode
+            if phone_verify_settings.mode == 'Phone call':
+                # call
+                sms.phone_call()
+                logger.info('SMS: phone call try, ID=%d' % sms.id)
+            else:
+                # send sms
+                sms.send_sms()
+                logger.info('SMS: sending try, ID=%d' % sms.id)
         except:
             logger.error('SMS: sending failed, ID=%d' % sms.id)
     else:

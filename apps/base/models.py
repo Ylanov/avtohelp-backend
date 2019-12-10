@@ -179,6 +179,7 @@ class PushNotification(BaseMixin):
                     **kwargs
                 }
             },
+            'sound': 'default',
             'icon': 'ic_launcher',
         })
         return result
@@ -214,3 +215,17 @@ class PushNotificationConfiguration(SingletonModel):
 
     class Meta:
         verbose_name = _("Push notification configuration")
+
+
+class UserVerificationConfiguration(SingletonModel):
+    """Configuration for User phone verification mode"""
+
+    MODE_CHOICES = (
+        ("0" , 'SMS'),
+        ("1" , 'Phone call'),
+    )
+    mode = models.CharField(max_length=2, choices=MODE_CHOICES)
+    
+
+    class Meta:
+        verbose_name = _("User phone verification configuration")

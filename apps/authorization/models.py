@@ -1,6 +1,9 @@
 from datetime import timedelta
+from datetime import datetime
+import hashlib
 
 import requests
+import json
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -157,6 +160,44 @@ class SMSCode(BaseMixin):
             'mes': message,
         }
         requests.post(url=self.URL, params=params)
+        self.status = self.SENT
+        self.save()
+
+    def phone_call(self):
+        """Phone call method."""
+        endpoint = 'call/start-password-call'
+        url = settings.OTP_SERVICE + '/' + endpoint
+        server_key = settings.OTP_SERVER_KEY
+        server_signature_key = settings.OTP_SIGNATURE_KEY
+
+        data = {
+            'async': 1,
+            'dstNumber': self.phone.as_e164.replace('+', ''),
+            'pin': self.code,
+            'timeout': 20,
+        }
+        data = json.dumps(data)
+
+        timestamp = datetime.now()
+        signature_text = "%s\n%s\n%s\n%s\n%s" % (
+            endpoint,
+            timestamp,
+            server_key,
+            data,
+            server_signature_key
+        )
+
+        sha_signature = hashlib.sha256(signature_text).hexdigest()
+        access_token = server_key + timestamp + sha_signature
+
+        headers = {
+            'Content-type': 'application/json',  # Определение типа данных
+            'Accept': 'text/plain',
+            'Content-Encoding': 'utf-8',
+            'Authorization': 'Bearer ' + access_token
+        }
+
+        requests.post(url=url, headers=headers, data=data)
         self.status = self.SENT
         self.save()
 
