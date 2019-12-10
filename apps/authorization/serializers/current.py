@@ -32,6 +32,11 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         # check if user phone is active or not
         if user_qs.exists() and not user_qs.first().is_active:
             raise api_exceptions.UserIsBlocked()
+
+        # no check is debug
+        if settings.DEBUG:
+            return attrs
+
         # get sms-codes by user phone
         qs = models.SMSCode.objects.by_phone(phone).ready_to_go()
         if qs.exists():
