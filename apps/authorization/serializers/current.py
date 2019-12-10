@@ -58,13 +58,14 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         """Create method."""
         # make a new user
         user = User.objects.get_or_make(phone=validated_data.get('phone'))[0]
+        
         # make a new sms
         # todo: remove from prod, this was added temporarily
-        if environ.get('SETTINGS_CONFIGURATION') in ('local', 'development') or\
-           validated_data.get('phone') == '+79180055555':
+        if settings.TEST_SMS_CODE:
             obj = models.SMSCode.objects.make(user=user, code=12345, status=1, **validated_data)
         else:
             obj = models.SMSCode.objects.make(user=user, **validated_data)
+
         if settings.USE_CELERY:
             tasks.send_verification_sms.delay(sms_code_id=obj.id)
         else:

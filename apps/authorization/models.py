@@ -1,9 +1,11 @@
 from datetime import timedelta
 from datetime import datetime
+import calendar, time
 import hashlib
 
 import requests
 import json
+import logging
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -14,6 +16,8 @@ from account.models import User
 from utils.methods import generate_sms_code
 from utils.mixins import BaseMixin
 
+# Logging error messages
+logger = logging.getLogger('CELERY')
 
 # Create your models here.
 class SMSCodeManager(models.Manager):
@@ -166,6 +170,7 @@ class SMSCode(BaseMixin):
     def phone_call(self):
         """Phone call method."""
         endpoint = 'call/start-password-call'
+        logger.info('endpoint: ' + endpoint)
         url = settings.OTP_SERVICE + '/' + endpoint
         server_key = settings.OTP_SERVER_KEY
         server_signature_key = settings.OTP_SIGNATURE_KEY
@@ -177,8 +182,11 @@ class SMSCode(BaseMixin):
             'timeout': 20,
         }
         data = json.dumps(data)
+        logger.info('data: ' + data)
 
-        timestamp = datetime.now()
+        timestamp = str(calendar.timegm(time.gmtime()))
+        logger.info('timestamp: ' + timestamp)
+
         signature_text = "%s\n%s\n%s\n%s\n%s" % (
             endpoint,
             timestamp,
@@ -187,17 +195,19 @@ class SMSCode(BaseMixin):
             server_signature_key
         )
 
-        sha_signature = hashlib.sha256(signature_text).hexdigest()
+        sha_signature = hashlib.sha256(signature_text.encode()).hexdigest()
+        logger.info('sha_signature: ' + sha_signature)
         access_token = server_key + timestamp + sha_signature
+        logger.info('access_token: ' + access_token)
 
         headers = {
             'Content-type': 'application/json',  # Определение типа данных
-            'Accept': 'text/plain',
-            'Content-Encoding': 'utf-8',
             'Authorization': 'Bearer ' + access_token
         }
 
-        requests.post(url=url, headers=headers, data=data)
+        response = requests.post(url=url, headers=headers, data=data)
+        logger.info('response: ' + response.text)
+
         self.status = self.SENT
         self.save()
 

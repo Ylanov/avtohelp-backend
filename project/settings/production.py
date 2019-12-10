@@ -18,6 +18,7 @@ sentry_sdk.init(
 DEBUG = False
 USE_CELERY = True
 USE_SMS = True  # Actual sms sending switcher
+TEST_SMS_CODE = False
 REDIS_URL = 'redis://localhost:6379/13'
 
 

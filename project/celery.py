@@ -84,8 +84,10 @@ def send_verification_sms(sms_code_id):
             # get config
             phone_verify_settings = UserVerificationConfiguration.get_solo()
 
-            # check verification mode
-            if phone_verify_settings.mode == 'Phone call':
+            logger.info('DEBUG: phone_verify_settings.mode=%s' % phone_verify_settings.mode)
+
+            # check verification mode is CALL PHONE
+            if phone_verify_settings.mode == '1':
                 # call
                 sms.phone_call()
                 logger.info('SMS: phone call try, ID=%d' % sms.id)
