@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .base import *
 
-ALLOWED_HOSTS = ['localhost', ]
+ALLOWED_HOSTS = ['localhost', 'ec2-3-121-42-136.eu-central-1.compute.amazonaws.com', ]
 
 
 # Integration with Sentry

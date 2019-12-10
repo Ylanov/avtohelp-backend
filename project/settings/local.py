@@ -2,7 +2,7 @@
 from .base import *
 
 
-ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49',)
+ALLOWED_HOSTS = ('localhost', '0.0.0.0', '127.0.0.1', '10.0.0.49', 'ec2-3-121-42-136.eu-central-1.compute.amazonaws.com', )
 
 
 DEBUG = True
