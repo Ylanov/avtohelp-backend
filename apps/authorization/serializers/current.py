@@ -18,12 +18,13 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     """Verification phone serializer"""
 
     phone = PhoneNumberField(write_only=True)
+    mode = serializers.CharField(write_only=True)
 
     class Meta:
         """Override create method"""
 
         model = models.SMSCode
-        fields = ('phone',)
+        fields = ('phone','mode',)
 
     def validate(self, attrs):
         """Validate method."""
