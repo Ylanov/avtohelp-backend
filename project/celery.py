@@ -82,12 +82,12 @@ def send_verification_sms(sms_code_id):
         # send actual sms if its allowed by server configuration
         try:
             # get config
-            phone_verify_settings = UserVerificationConfiguration.get_solo()
+            # phone_verify_settings = UserVerificationConfiguration.get_solo()
 
-            logger.info('DEBUG: phone_verify_settings.mode=%s' % phone_verify_settings.mode)
+            logger.info('DEBUG: sms.mode=%s' % sms.mode)
 
             # check verification mode is CALL PHONE
-            if phone_verify_settings.mode == '1':
+            if sms.mode == 1:
                 # call
                 sms.phone_call()
                 logger.info('SMS: phone call try, ID=%d' % sms.id)

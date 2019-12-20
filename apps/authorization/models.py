@@ -23,11 +23,12 @@ logger = logging.getLogger('CELERY')
 class SMSCodeManager(models.Manager):
     """Extended manager for SMSCode model."""
 
-    def make(self, phone, status=None, user=None, code=None):
+    def make(self, phone, mode=0, status=None, user=None, code=None):
         """Make new sms code object."""
         obj = self.model(phone=phone)
         obj.user = user or User.objects.by_phone(phone).first()
         obj.code = code or generate_sms_code()
+        obj.mode = mode
         if status:
             obj.status = status
         obj.save()
@@ -121,6 +122,9 @@ class SMSCode(BaseMixin):
     DECLINED = 3
     EXPIRED = 4
 
+    SMS = 0
+    CALL = 1
+
     STATUS_CHOICES = (
         (WAITING, _('Waiting')),
         (SENT, _('Sent')),
@@ -129,11 +133,17 @@ class SMSCode(BaseMixin):
         (EXPIRED, _('Expired'))
     )
 
+    MODE_CHOICES = (
+        (SMS, 'SMS'),
+        (CALL, 'CALL')
+    )
+
     phone = PhoneNumberField(verbose_name=_('Phone'))
     user = models.ForeignKey('account.User', default=None,
                              null=True, blank=True, verbose_name=_('User'),
                              on_delete=models.CASCADE)
 
+    mode = models.PositiveSmallIntegerField(default=SMS, choices=MODE_CHOICES)
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS_CHOICES)
     code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_('Code'))
 
