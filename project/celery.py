@@ -290,7 +290,7 @@ def notify_new_newsletter(newsletter_id):
     #  Sent PUSH-notifications for filtered users
     for device in devices:
         notification = base_models.PushNotification.objects.make_new_newsletter_notification(user=device.user, newsletter=newsletter_id)
-        raw_result = device.send_message(**notification.get_push_dict(newsletter_id=newsletter_id))
+        raw_result = device.send_message(**notification.get_push_dict(model_id=newsletter_id))
         result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
         if result.get('success'):
             notification.status = True
