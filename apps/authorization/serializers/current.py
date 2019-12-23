@@ -18,7 +18,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
     """Verification phone serializer"""
 
     phone = PhoneNumberField(write_only=True)
-    mode = serializers.CharField(write_only=True)
+    mode = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         """Override create method"""
