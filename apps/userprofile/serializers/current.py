@@ -95,6 +95,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     foe = serializers.BooleanField()
     friend_request = serializers.BooleanField()
     online = serializers.BooleanField()
+    is_verified = serializers.BooleanField()
 
     # REQUEST
     avatar = serializers.ImageField(source='image')
@@ -107,7 +108,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
                   'phone', 'city', 'city_detail', 'profile_car', 'friend',
-                  'foe', 'online', 'friend_request')
+                  'foe', 'online', 'friend_request', 'is_verified')
 
 
 class MyProfileSerializer(serializers.ModelSerializer):
@@ -128,7 +129,7 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name', 'avatar',
-                  'phone', 'city', 'city_detail', 'profile_car')
+                  'phone', 'city', 'city_detail', 'profile_car', 'is_verified')
 
 
 class ProfileChangeAvatar(serializers.ModelSerializer):
@@ -291,7 +292,7 @@ class FullProfileSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'online', 'license_plate', 'avatar')
+                  'online', 'license_plate', 'avatar', 'is_verified')
 
 
 class ProfileListSerializer(FullProfileSerializer):
@@ -304,7 +305,7 @@ class ProfileListSerializer(FullProfileSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'online', 'friend', 'license_plate', 'avatar')
+                  'online', 'friend', 'license_plate', 'avatar', 'is_verified')
 
 
 class ProfileBaseSerializer(serializers.ModelSerializer):
@@ -317,7 +318,7 @@ class ProfileBaseSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.Profile
         fields = ('id', 'created', 'first_name', 'last_name',
-                  'license_plate', 'avatar')
+                  'license_plate', 'avatar', 'is_verified')
 
     def get_license_plate(self, obj):
         """Get car id"""

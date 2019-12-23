@@ -169,6 +169,8 @@ class Profile(BaseMixin, ImageMixin):
     city = models.ForeignKey('catalog.City',
                              on_delete=models.CASCADE,
                              blank=True, null=True, default=None)
+    is_verified = models.BooleanField(default=False, null=True, blank=True, 
+                            verbose_name=_('Verified user'))
 
     objects = ProfileQuerySet.as_manager()
 
