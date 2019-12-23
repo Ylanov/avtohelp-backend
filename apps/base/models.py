@@ -23,6 +23,7 @@ class Newsletter(BaseMixin, ImageMixin):
                                          verbose_name=_('Short description'))
     publish = models.BooleanField(default=False, verbose_name=_('Publish'))
     push = models.BooleanField(default=False, verbose_name=_('Push notification'))
+    recommendation = models.BooleanField(default=False, verbose_name=_('Recommendation'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
                                         verbose_name=_('Publish date'))
 

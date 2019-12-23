@@ -15,7 +15,7 @@ class NewsListSerializer(serializers.ModelSerializer):
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
-    image = serializers.ImageField(source='get_image')
+    image = serializers.ImageField(source='get_image', required=False)
 
     class Meta:
         """Meta class"""
@@ -24,6 +24,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
                   'publish_date', 'image')
+        read_only_fields = ('id', 'image', 'publish')
 
 
 class PushNotificationScheduleSerializer(serializers.ModelSerializer):
