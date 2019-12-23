@@ -23,7 +23,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'image')
+                  'publish_date', 'recommendation', 'image')
         read_only_fields = ('id', 'image', 'publish')
 
 
