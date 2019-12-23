@@ -26,7 +26,7 @@ class ProfileModelAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'first_name', 'last_name', 'created', 'modified')
     fieldsets = (
         (_('User\'s data'), {'fields': ('user', 'first_name',
-                                        'last_name', 'image')}),
+                                        'last_name', 'image', 'is_verified')}),
         (_('Location'), {'fields': ('city',)}),
         (_('Info'), {'fields': ('created', 'modified')}),
     )
