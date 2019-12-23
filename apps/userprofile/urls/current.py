@@ -94,4 +94,8 @@ urlpatterns = [
 
     path('profile/blacklist/<int:profile_id>/delete', views.BlackListDestroyView.as_view(),
          name='blacklistrequest-delete'),
+
+    # User counter
+    path('profiles/count', views.ProfileCountView.as_view(),
+         name='profile-count'),
 ]

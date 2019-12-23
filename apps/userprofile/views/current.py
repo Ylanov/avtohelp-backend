@@ -54,6 +54,16 @@ class ProfileMixin:
     queryset = models.Profile.objects.select_related('user')
 
 
+class ProfileCountView(ProfileMixin, generics.ListAPIView):
+    """
+    View for counter of user profiles
+    """
+    def get(self, request, format=None):
+        user_count = self.queryset.count()
+        content = {'user_count': user_count}
+        return Response(content)
+
+
 class ProfileListView(ProfileMixin, generics.ListAPIView):
     """
     View for list of user profiles
