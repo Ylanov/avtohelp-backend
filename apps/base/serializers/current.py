@@ -27,6 +27,19 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'image', 'publish')
 
 
+class RecommendationsListSerializer(serializers.ModelSerializer):
+    """Serializer for NewsListView"""
+
+    class Meta:
+        """Meta class"""
+
+        model = models.Newsletter
+        fields = ('id', 'created', 'title', 'short_description', 
+                    'publish_date', 'publish')
+        read_only_fields = ('id', 'created', 'title', 'short_description', 
+                    'publish_date', 'publish')
+
+
 class PushNotificationScheduleSerializer(serializers.ModelSerializer):
     """Serializer for PushNotificationSchedule model"""
 
