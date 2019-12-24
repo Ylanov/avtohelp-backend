@@ -66,6 +66,14 @@ class RecommendationsListView(generics.ListAPIView):
         return self.queryset.filter(author_id=self.request.user.id)
 
 
+class RecommendationCreateView(generics.CreateAPIView):
+    """
+    Recommendation create view
+    """
+    serializer_class = serializers.RecommendationCreateSerializer
+
+
+
 # class NewsListView(generics.ListAPIView):
 #     """
 #     News list view
