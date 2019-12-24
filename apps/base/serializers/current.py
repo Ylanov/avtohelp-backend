@@ -31,14 +31,23 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
 
+    status = serializers.SerializerMethodField()
+
     class Meta:
         """Meta class"""
 
         model = models.Newsletter
         fields = ('id', 'created', 'title', 'short_description', 
-                    'publish_date', 'publish')
+                    'text', 'publish_date', 'status')
         read_only_fields = ('id', 'created', 'title', 'short_description', 
-                    'publish_date', 'publish')
+                    'text', 'publish_date', 'status')
+
+    def get_status(self, obj):
+        if obj.publish == False:
+            return 'pending'
+        if obj.publish == True:
+            return 'published'
+        return 'refused'
 
 
 class RecommendationCreateSerializer(serializers.ModelSerializer):
@@ -50,7 +59,7 @@ class RecommendationCreateSerializer(serializers.ModelSerializer):
         """Meta class"""
         model = models.Newsletter
         fields = ('id', 'created', 'title', 'short_description', 
-                    'publish_date', 'recommendation', 'image')
+                    'text', 'publish_date', 'recommendation', 'image')
 
     def create(self, validated_data):
         """Override create method"""
