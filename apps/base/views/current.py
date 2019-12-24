@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from base import models
 from base.serializers import current as serializers
 from utils import views as view_mixins
-from utils.paginations import NewsCursorPagination
+from utils.paginations import ProjectCursorPagination, NewsCursorPagination
 
 """
 VIEWSETS
@@ -50,6 +50,28 @@ class PushNotificationConfigurationView(generics.GenericAPIView):
         """Override get method"""
         obj = models.PushNotificationConfiguration.get_solo()
         return Response(data=self.get_serializer(obj.notification_schedule, many=True).data)
+
+
+class RecommendationsListView(generics.ListAPIView):
+    """
+    Recommendations list view
+    """
+    # permission_classes = (AllowAny,)
+    serializer_class = serializers.RecommendationsListSerializer
+    queryset = models.Newsletter.objects.all()
+    pagination_class = ProjectCursorPagination
+
+    def get_queryset(self):
+        """Override get_queryset method"""
+        return self.queryset.filter(author_id=self.request.user.id)
+
+
+class RecommendationCreateView(generics.CreateAPIView):
+    """
+    Recommendation create view
+    """
+    serializer_class = serializers.RecommendationCreateSerializer
+
 
 
 # class NewsListView(generics.ListAPIView):
