@@ -1,3 +1,4 @@
+import datetime
 from rest_framework import serializers
 from base import models
 
@@ -43,33 +44,21 @@ class RecommendationsListSerializer(serializers.ModelSerializer):
 class RecommendationCreateSerializer(serializers.ModelSerializer):
     """Serializer for create Newsletter"""
 
+    publish_date = serializers.DateTimeField(required=False)
+
     class Meta:
         """Meta class"""
         model = models.Newsletter
         fields = ('id', 'created', 'title', 'short_description', 
                     'publish_date', 'recommendation', 'image')
 
-    # def validate(self, attrs):
-    #     """Override validate method"""
-    #     attrs['initiator'] = self.context.get('request').user
-    #     attrs['participant'] = attrs.get('participant').user
-
-    #     # Check if participant is not an initiator
-    #     if attrs['initiator'] == attrs['participant']:
-    #         raise api_exceptions.EqualIDError()
-
-    #     # Check if participant not in black list
-    #     are_foes = profile_models.BlackList.objects.are_foes(attrs['initiator'], attrs['participant'])
-    #     if are_foes:
-    #         raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
-
-    #     return attrs
-
     def create(self, validated_data):
         """Override create method"""
         user = self.context['request'].user
         if not user.is_anonymous:
             validated_data['author'] = user
+        validated_data['recommendation'] = True
+        validated_data['publish_date'] = datetime.datetime.now()
         news = models.Newsletter.objects.create(**validated_data)
         return news
 
