@@ -26,7 +26,7 @@ class Newsletter(BaseMixin, ImageMixin):
     recommendation = models.BooleanField(default=False, verbose_name=_('Recommendation'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
                                         verbose_name=_('Publish date'))
-    author = models.OneToOneField('account.User',  blank=True, default=None, null=True,
+    author = models.ForeignKey('account.User',  blank=True, default=None, null=True,
                                         on_delete=models.PROTECT,
                                         verbose_name=_('Author'))
 
