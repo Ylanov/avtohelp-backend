@@ -43,6 +43,8 @@ class RecommendationsListSerializer(serializers.ModelSerializer):
                     'text', 'publish_date', 'status')
 
     def get_status(self, obj):
+        if obj.refused == True:
+            return 'refused'
         if obj.publish == False:
             return 'pending'
         if obj.publish == True:
