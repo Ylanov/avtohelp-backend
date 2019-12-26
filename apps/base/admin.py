@@ -1,4 +1,4 @@
-import logging
+import logging, datetime
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
@@ -20,6 +20,9 @@ class NewsletterModelAdmin(admin.ModelAdmin):
     )
 
     def save_model(self, request, obj, form, change):
+
+        if obj.publish == True:
+            obj.publish_date = datetime.datetime.now()
         super().save_model(request, obj, form, change)
         
         if obj.push:
