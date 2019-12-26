@@ -11,12 +11,12 @@ from .models import Newsletter, PushNotification, PushNotificationConfiguration,
 class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
     readonly_fields = ('id', 'created', 'modified', 'recommendation', 'author')
-    list_display = ('id', 'title', 'publish', 'push', 'recommendation', 'publish_date')
+    list_display = ('id', 'title', 'publish', 'push', 'recommendation', 'publish_date', 'refused')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
         (_('Options'), {'fields': ('title', 'text', 'publish', 'push',
                                     'publish_date', 'image')}),
-        (_('Recommendation'), {'fields': ('recommendation', 'author')}),
+        (_('Recommendation'), {'fields': ('recommendation', 'refused', 'author')}),
     )
 
     def save_model(self, request, obj, form, change):

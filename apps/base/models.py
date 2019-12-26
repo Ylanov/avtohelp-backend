@@ -29,6 +29,7 @@ class Newsletter(BaseMixin, ImageMixin):
     author = models.ForeignKey('account.User',  blank=True, default=None, null=True,
                                         on_delete=models.PROTECT,
                                         verbose_name=_('Author'))
+    refused = models.BooleanField(default=False, verbose_name=_('Refused'))
 
     class Meta:
         """Meta class."""
