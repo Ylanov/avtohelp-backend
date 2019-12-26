@@ -24,8 +24,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'image')
-        read_only_fields = ('id', 'image', 'publish')
+                  'publish_date', 'recommendation', 'image', 'refused')
+        read_only_fields = ('id', 'image', 'publish', 'refused')
 
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
@@ -43,6 +43,8 @@ class RecommendationsListSerializer(serializers.ModelSerializer):
                     'text', 'publish_date', 'status')
 
     def get_status(self, obj):
+        if obj.refused == True:
+            return 'refused'
         if obj.publish == False:
             return 'pending'
         if obj.publish == True:
