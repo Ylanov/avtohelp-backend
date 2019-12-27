@@ -23,8 +23,13 @@ class Newsletter(BaseMixin, ImageMixin):
                                          verbose_name=_('Short description'))
     publish = models.BooleanField(default=False, verbose_name=_('Publish'))
     push = models.BooleanField(default=False, verbose_name=_('Push notification'))
+    recommendation = models.BooleanField(default=False, verbose_name=_('Recommendation'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
                                         verbose_name=_('Publish date'))
+    author = models.ForeignKey('account.User',  blank=True, default=None, null=True,
+                                        on_delete=models.PROTECT,
+                                        verbose_name=_('Author'))
+    refused = models.BooleanField(default=False, verbose_name=_('Refused'))
 
     class Meta:
         """Meta class."""
@@ -215,3 +220,17 @@ class PushNotificationConfiguration(SingletonModel):
 
     class Meta:
         verbose_name = _("Push notification configuration")
+
+
+class UserVerificationConfiguration(SingletonModel):
+    """Configuration for User phone verification mode"""
+
+    MODE_CHOICES = (
+        ("0" , 'SMS'),
+        ("1" , 'Phone call'),
+    )
+    mode = models.CharField(max_length=2, choices=MODE_CHOICES)
+    
+
+    class Meta:
+        verbose_name = _("User phone verification configuration")

@@ -13,11 +13,12 @@ class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='get_first_name')
     last_name = serializers.CharField(source='get_last_name')
     avatar = serializers.ImageField(source='profile.image')
+    is_verified = serializers.BooleanField(source='profile.is_verified')
 
     class Meta:
         """Meta class"""
         model = User
-        fields = ('id', 'first_name', 'last_name', 'avatar')
+        fields = ('id', 'first_name', 'last_name', 'avatar', 'is_verified')
 
 
 class ChatMessageListSerializer(serializers.ModelSerializer):

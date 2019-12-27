@@ -26,3 +26,5 @@ logs/
 /.DS_Store
 
 /debug.log
+
+/roadhelper.ini

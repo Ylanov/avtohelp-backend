@@ -31,9 +31,7 @@ class ImageMixin(models.Model):
     """Image field model mixin."""
 
     THUMBNAIL_KEY = 'news_small'
-    image = ThumbnailerImageField(upload_to=image_path,
-                                  blank=True, null=True, default=None,
-                                  verbose_name=_('Image'))
+    image = ThumbnailerImageField(upload_to=image_path, null=True, blank=True, default=None, verbose_name=_('Image'))
 
     class Meta:
         """Meta class."""

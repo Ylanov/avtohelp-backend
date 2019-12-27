@@ -1,6 +1,11 @@
 from datetime import timedelta
+from datetime import datetime
+import calendar, time
+import hashlib
 
 import requests
+import json
+import logging
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -11,16 +16,19 @@ from account.models import User
 from utils.methods import generate_sms_code
 from utils.mixins import BaseMixin
 
+# Logging error messages
+logger = logging.getLogger('CELERY')
 
 # Create your models here.
 class SMSCodeManager(models.Manager):
     """Extended manager for SMSCode model."""
 
-    def make(self, phone, status=None, user=None, code=None):
+    def make(self, phone, mode=0, status=None, user=None, code=None):
         """Make new sms code object."""
         obj = self.model(phone=phone)
         obj.user = user or User.objects.by_phone(phone).first()
         obj.code = code or generate_sms_code()
+        obj.mode = mode
         if status:
             obj.status = status
         obj.save()
@@ -114,6 +122,9 @@ class SMSCode(BaseMixin):
     DECLINED = 3
     EXPIRED = 4
 
+    SMS = 0
+    CALL = 1
+
     STATUS_CHOICES = (
         (WAITING, _('Waiting')),
         (SENT, _('Sent')),
@@ -122,11 +133,17 @@ class SMSCode(BaseMixin):
         (EXPIRED, _('Expired'))
     )
 
+    MODE_CHOICES = (
+        (SMS, 'SMS'),
+        (CALL, 'CALL')
+    )
+
     phone = PhoneNumberField(verbose_name=_('Phone'))
     user = models.ForeignKey('account.User', default=None,
                              null=True, blank=True, verbose_name=_('User'),
                              on_delete=models.CASCADE)
 
+    mode = models.PositiveSmallIntegerField(default=SMS, choices=MODE_CHOICES)
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS_CHOICES)
     code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_('Code'))
 
@@ -157,6 +174,50 @@ class SMSCode(BaseMixin):
             'mes': message,
         }
         requests.post(url=self.URL, params=params)
+        self.status = self.SENT
+        self.save()
+
+    def phone_call(self):
+        """Phone call method."""
+        endpoint = 'call/start-password-call'
+        logger.info('endpoint: ' + endpoint)
+        url = settings.OTP_SERVICE + '/' + endpoint
+        server_key = settings.OTP_SERVER_KEY
+        server_signature_key = settings.OTP_SIGNATURE_KEY
+
+        data = {
+            'async': 1,
+            'dstNumber': self.phone.as_e164.replace('+', ''),
+            'pin': self.code,
+            'timeout': 20,
+        }
+        data = json.dumps(data)
+        logger.info('data: ' + data)
+
+        timestamp = str(calendar.timegm(time.gmtime()))
+        logger.info('timestamp: ' + timestamp)
+
+        signature_text = "%s\n%s\n%s\n%s\n%s" % (
+            endpoint,
+            timestamp,
+            server_key,
+            data,
+            server_signature_key
+        )
+
+        sha_signature = hashlib.sha256(signature_text.encode()).hexdigest()
+        logger.info('sha_signature: ' + sha_signature)
+        access_token = server_key + timestamp + sha_signature
+        logger.info('access_token: ' + access_token)
+
+        headers = {
+            'Content-type': 'application/json',  # Определение типа данных
+            'Authorization': 'Bearer ' + access_token
+        }
+
+        response = requests.post(url=url, headers=headers, data=data)
+        logger.info('response: ' + response.text)
+
         self.status = self.SENT
         self.save()
 

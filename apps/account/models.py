@@ -13,6 +13,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 from base.models import PushNotificationConfiguration
 from userprofile.models import Profile, ProfileGallery, ProfileLocation
 from utils.mixins import BaseMixin
+from userprofile.models import FCMDevice
 
 # Logging error messages
 logger = logging.getLogger('ACCOUNT')
@@ -114,6 +115,7 @@ class User(AbstractUser, BaseMixin):
     def logout(self):
         """Regenerate auth token method"""
         self.auth_token.delete()
+        devices = FCMDevice.objects.filter(user_id=self.id).delete()
 
     @property
     def get_first_name(self):

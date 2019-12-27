@@ -5,7 +5,7 @@ from sentry_sdk.integrations.django import DjangoIntegration
 
 from .base import *
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru', 'roadhelper-prod.spider.ru', ]
+ALLOWED_HOSTS = ['localhost', 'ec2-3-121-42-136.eu-central-1.compute.amazonaws.com', ]
 
 
 # Integration with Sentry
@@ -16,9 +16,10 @@ sentry_sdk.init(
 
 
 DEBUG = True
-USE_CELERY = True
-USE_SMS = False  # Actual sms sending switcher
-REDIS_URL = 'redis://base:6379/13'
+USE_CELERY = False
+USE_SMS = True  # Actual sms sending switcher
+TEST_SMS_CODE = True
+REDIS_URL = 'redis://redis:6379/13'
 
 
 # CHANNELS
@@ -26,7 +27,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('base', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
@@ -88,6 +89,11 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/code/debug.log',
         }
     },
     'loggers': {
@@ -116,6 +122,11 @@ LOGGING = {
             'handlers': ['console', ],
             'level': 'DEBUG',
             'propagate': False,
+        },
+        'CELERY': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     }
 }

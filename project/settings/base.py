@@ -273,6 +273,15 @@ SMS_LOGIN = 'ilyaarzumanyan92'
 SMS_PASSWORD = '93Damybee281'
 SMS_SENDER = 'RoadHelper'
 
+# STORE URL FOR MOBILE APPLICATION 
+# set urls in file: media/static/js/device.js
+# comment this lines
+#STORE_APPLE = 'https://apps.apple.com/ru/app/id1419101818'
+#STORE_GOOGLE = 'https://play.google.com/store/apps/details?id=ru.autohelp'
+
+OTP_SERVICE='https://api.new-tel.net'
+OTP_SERVER_KEY='f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714'
+OTP_SIGNATURE_KEY='ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2'
 
 # Message PUSH-notifications
 LIMIT_UNREAD_MESSAGES = 3

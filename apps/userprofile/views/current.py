@@ -23,6 +23,8 @@ class FCMDeviceViewSet(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         """Override post method."""
+        FCMDevice.objects.filter(user_id=self.request.user.id).delete()
+
         instance = self.get_object_or_none()
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -50,6 +52,16 @@ class ProfileMixin:
     """Profile mixin"""
 
     queryset = models.Profile.objects.select_related('user')
+
+
+class ProfileCountView(ProfileMixin, generics.ListAPIView):
+    """
+    View for counter of user profiles
+    """
+    def get(self, request, format=None):
+        user_count = self.queryset.count()
+        content = {'user_count': user_count}
+        return Response(content)
 
 
 class ProfileListView(ProfileMixin, generics.ListAPIView):
@@ -320,7 +332,7 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.common(user=self.request.user)
+        return models.FriendList.objects.common(user=self.request.user).exclude(friend__profile__first_name__isnull=True)
 
 
 class FriendRequestCreateView(FriendRequestMixin, generics.CreateAPIView):

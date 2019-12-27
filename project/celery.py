@@ -74,14 +74,27 @@ def check_request_relevance():
 def send_verification_sms(sms_code_id):
     """Send verification sms task."""
     from authorization import models as auth_models
+    from base.models import UserVerificationConfiguration
     # Get sms code object
     sms = auth_models.SMSCode.objects.get(id=sms_code_id)
 
     if settings.USE_SMS is True:
         # send actual sms if its allowed by server configuration
         try:
-            sms.send_sms()
-            logger.info('SMS: sending try, ID=%d' % sms.id)
+            # get config
+            # phone_verify_settings = UserVerificationConfiguration.get_solo()
+
+            logger.info('DEBUG: sms.mode=%s' % sms.mode)
+
+            # check verification mode is CALL PHONE
+            if sms.mode == 1:
+                # call
+                sms.phone_call()
+                logger.info('SMS: phone call try, ID=%d' % sms.id)
+            else:
+                # send sms
+                sms.send_sms()
+                logger.info('SMS: sending try, ID=%d' % sms.id)
         except:
             logger.error('SMS: sending failed, ID=%d' % sms.id)
     else:
@@ -277,7 +290,7 @@ def notify_new_newsletter(newsletter_id):
     #  Sent PUSH-notifications for filtered users
     for device in devices:
         notification = base_models.PushNotification.objects.make_new_newsletter_notification(user=device.user, newsletter=newsletter_id)
-        raw_result = device.send_message(**notification.get_push_dict(newsletter_id=newsletter_id))
+        raw_result = device.send_message(**notification.get_push_dict(model_id=newsletter_id))
         result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
         if result.get('success'):
             notification.status = True

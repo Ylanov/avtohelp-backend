@@ -1,24 +1,28 @@
-import logging
+import logging, datetime
 
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 from solo.admin import SingletonModelAdmin
 
 from .models import Newsletter, PushNotification, PushNotificationConfiguration, \
-    PushNotificationSchedule
+    PushNotificationSchedule, UserVerificationConfiguration
 
 
 class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
-    readonly_fields = ('id', 'created', 'modified')
-    list_display = ('id', 'title', 'publish', 'push', 'publish_date')
+    readonly_fields = ('id', 'created', 'modified', 'recommendation', 'author')
+    list_display = ('id', 'title', 'publish', 'push', 'recommendation', 'publish_date', 'refused')
     fieldsets = (
         (_('Info'), {'fields': ('id', 'created', 'modified')}),
         (_('Options'), {'fields': ('title', 'text', 'publish', 'push',
-                                   'publish_date', 'image')}),
+                                    'publish_date', 'image')}),
+        (_('Recommendation'), {'fields': ('recommendation', 'refused', 'author')}),
     )
 
     def save_model(self, request, obj, form, change):
+
+        if obj.publish == True:
+            obj.publish_date = datetime.datetime.now()
         super().save_model(request, obj, form, change)
         
         if obj.push:
@@ -39,3 +43,4 @@ admin.site.register(Newsletter, NewsletterModelAdmin)
 admin.site.register(PushNotification, PushNotificationModelAdmin)
 admin.site.register(PushNotificationConfiguration, SingletonModelAdmin)
 admin.site.register(PushNotificationSchedule)
+admin.site.register(UserVerificationConfiguration, SingletonModelAdmin)
