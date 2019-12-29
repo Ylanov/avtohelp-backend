@@ -18,8 +18,9 @@ sentry_sdk.init(
 DEBUG = True
 USE_CELERY = False
 USE_SMS = True  # Actual sms sending switcher
-TEST_SMS_CODE = True
+TEST_SMS_CODE = False
 REDIS_URL = 'redis://redis:6379/13'
+APPROVE_ACCOUNT = '+79280446633'
 
 
 # CHANNELS
