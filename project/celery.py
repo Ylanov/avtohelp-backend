@@ -78,7 +78,7 @@ def send_verification_sms(sms_code_id):
     # Get sms code object
     sms = auth_models.SMSCode.objects.get(id=sms_code_id)
 
-    if settings.USE_SMS is True:
+    if settings.USE_SMS is True and sms.user.phone != '+79189383399':
         # send actual sms if its allowed by server configuration
         try:
             # get config
