@@ -35,7 +35,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
             raise api_exceptions.UserIsBlocked()
 
         # no check is debug
-        if settings.DEBUG:
+        if settings.DEBUG or phone == settings.APPROVE_ACCOUNT:
             return attrs
 
         # get sms-codes by user phone
