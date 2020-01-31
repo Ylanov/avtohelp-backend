@@ -17,6 +17,7 @@ logger = logging.getLogger('app')
 class Newsletter(BaseMixin):
     """Model to new representation."""
 
+    THUMBNAIL_KEY = 'news_small'
     title = models.CharField(max_length=255, verbose_name=_('Title'))
     text = models.TextField(verbose_name=_('Text'))
     short_description = models.CharField(max_length=255,
@@ -49,6 +50,14 @@ class Newsletter(BaseMixin):
             tasks.notify_new_newsletter.delay(self.id)
         else:
             tasks.notify_new_newsletter(self.id)
+
+    def get_image(self, key=None):
+        """Get thumbnailed image file."""
+        return self.image[key or self.THUMBNAIL_KEY] if self.image else None
+
+    def get_image_url(self, key=None):
+        """Get image thumbnail url."""
+        return self.get_image(key).url if self.image else None
 
 
 class PushNotificationManager(models.Manager):

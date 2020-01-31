@@ -31,6 +31,9 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     def get_image(self, news):
         request = self.context.get('request')
 
+        if not news.image:
+            return None
+
         if not news.cropping:
             return request.build_absolute_uri(news.image.url)
 
