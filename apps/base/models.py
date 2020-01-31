@@ -7,13 +7,14 @@ from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
 
 from account import models as account_models
-from utils.mixins import BaseMixin, ImageMixin
+from utils.mixins import BaseMixin, ImageMixin, image_path
 from project import celery as tasks
+from image_cropping import ImageCropField, ImageRatioField
 
 # # Logging error messages
 logger = logging.getLogger('app')
 
-class Newsletter(BaseMixin, ImageMixin):
+class Newsletter(BaseMixin):
     """Model to new representation."""
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
@@ -30,6 +31,9 @@ class Newsletter(BaseMixin, ImageMixin):
                                         on_delete=models.PROTECT,
                                         verbose_name=_('Author'))
     refused = models.BooleanField(default=False, verbose_name=_('Refused'))
+
+    image = ImageCropField(upload_to=image_path, null=True, blank=True, default=None, verbose_name=_('Image'))
+    cropping = ImageRatioField('image', '600x600', free_crop=True, size_warning=True)
 
     class Meta:
         """Meta class."""

@@ -1,7 +1,7 @@
 import datetime
 from rest_framework import serializers
 from base import models
-
+from image_cropping.utils import get_backend
 
 class NewsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
@@ -16,7 +16,8 @@ class NewsListSerializer(serializers.ModelSerializer):
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
-    image = serializers.ImageField(source='get_image', required=False)
+    # image = serializers.ImageField(required=False)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
@@ -27,6 +28,39 @@ class NewsDetailSerializer(serializers.ModelSerializer):
                   'publish_date', 'recommendation', 'image', 'refused')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
+    def get_image(self, news):
+        request = self.context.get('request')
+
+        if not news.cropping:
+            return request.build_absolute_uri(news.image.url)
+
+        demention = NewsDetailSerializer.get_dementions(news)
+        thumbnail_url = get_backend().get_thumbnail_url(
+            news.image,
+            {
+                'size': (demention[0], demention[1]),
+                'box': news.cropping,
+                'crop': True,
+                'detail': True,
+            }
+        )
+        return request.build_absolute_uri(thumbnail_url)
+
+
+    def get_dementions(news):
+        if not news.cropping:
+            return [news.image.width, news.image.height]
+
+        demention = [int(x) for x in news.cropping.split(',') if x]
+        x = demention[0] - demention[1]
+        y = demention[3] - demention[2]
+
+        if x<0:
+            x = x*(-1)
+        if y<0:
+            y = y*(-1)
+
+        return [x,y]
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""

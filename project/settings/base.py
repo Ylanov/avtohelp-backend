@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import sys
+from easy_thumbnails.conf import Settings as thumbnail_settings
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -71,6 +72,7 @@ EXTERNAL_APPS = [
     'django_filters',
     'phonenumber_field',
     'easy_thumbnails',
+    'image_cropping',
     'fcm_django',
     'easy_select2',
     'inline_actions',
@@ -311,3 +313,12 @@ SWAGGER_SETTINGS = {
 # Increase upload maximum file size
 DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
 FILE_UPLOAD_PERMISSIONS = 0o644
+
+THUMBNAIL_PROCESSORS = (
+    'image_cropping.thumbnail_processors.crop_corners',
+) + thumbnail_settings.THUMBNAIL_PROCESSORS
+
+IMAGE_CROPPING_BACKEND = 'image_cropping.backends.easy_thumbs.EasyThumbnailsBackend'
+IMAGE_CROPPING_BACKEND_PARAMS = {}
+# IMAGE_CROPPING_THUMB_SIZE = (600, 600)
+
