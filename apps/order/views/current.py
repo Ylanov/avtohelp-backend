@@ -49,16 +49,27 @@ class AssistanceRequestCountView(views.APIView):
         user = request.user
         push_config = PushNotificationConfiguration.get_solo()
         if user.location_is_valid:
+
+            countRequest = models.AssistanceRequest.objects.available(user)\
+                                .annotate_distance(point=user.profilelocation.location)\
+                                .filter(distance__lte=push_config.radius)\
+                                .distinct('user')\
+                                .count()
+
+            readRequest = models.AssistanceRequest.objects.available(user)\
+                                .annotate_distance(point=user.profilelocation.location)\
+                                .filter(distance__lte=push_config.radius)\
+                                .filter(assistance_request_user_read__user=user)\
+                                .count()
+
             return Response({
-                'count': models.AssistanceRequest.objects.available(user)\
-                                                         .annotate_distance(point=user.profilelocation.location)\
-                                                         .filter(distance__lte=push_config.radius)\
-                                                         .distinct('user')\
-                                                         .count()
+                'count': countRequest,
+                'unread': countRequest - readRequest
             })
         else:
             return Response({
-                'count': 0
+                'count': 0,
+                'unread': 0
             })
 
 
@@ -107,6 +118,19 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
 
     def get_queryset(self):
         """Override get_queryset method"""
+        try:
+            request = models.AssistanceRequest.objects.get(pk=self.kwargs['pk'])
+            # listing = RealEstateListing.objects.get(slug_url=slug)
+        except models.AssistanceRequest.DoesNotExist:
+            request = None
+
+        if request:
+            views = models.AssistanceRequestUserRead.objects.filter(request=request, user=self.request.user).count()
+            
+            # check views count of assistance request
+            if views == 0:
+                read = models.AssistanceRequestUserRead.objects.make(request=request, user=self.request.user)
+        
         return super().get_queryset().annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))\
                                      .annotate_owner_status(user=self.request.user)
 

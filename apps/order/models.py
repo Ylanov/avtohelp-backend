@@ -129,3 +129,25 @@ class AssistanceRequest(BaseMixin, ImageMixin):
             transaction.on_commit(lambda: tasks.notify_assistance_request.delay(self.id))
         else:
             transaction.on_commit(lambda: tasks.notify_assistance_request(self.id))
+
+
+class AssistanceRequestUserReadManager(models.Manager):
+    """Manager for AssistanceRequest model"""
+
+    def make(self, **kwargs):
+        """Make new assistance request"""
+        obj = self.model(**kwargs)
+        obj.save()
+        return obj
+
+class AssistanceRequestUserRead(BaseMixin):
+    """Assistance request User read model"""
+
+    request = models.ForeignKey('order.AssistanceRequest',
+                              verbose_name=_('Order'),
+                              related_name='assistance_request_user_read', on_delete=models.CASCADE)
+    user = models.ForeignKey('account.User',
+                             verbose_name=_('User'),
+                             on_delete=models.CASCADE)
+    objects = AssistanceRequestUserReadManager()
+
