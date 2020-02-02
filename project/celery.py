@@ -240,16 +240,16 @@ def notify_assistance_request(request_id):
         .filter(distance__lte=singleton.radius) \
         .exclude(user=request.user)
 
-    #  Sent PUSH-notifications for filtered users
-    for device in devices:
-        notification = base_models.PushNotification.objects.make_assistance_request_notification(user=device.user)
-        raw_result = device.send_message(**notification.get_push_dict(request_id=request_id))
+    # send bulk push message for filtered users
+    if devices.exists():
+        notification = base_models.PushNotification.objects.make_assistance_request_notification(user=devices.first().user)
+        raw_result = devices.send_message(**notification.get_push_dict(request_id=request_id))
         result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
         if result.get('success'):
             notification.status = True
             notification.sent_count = result.get('success')
             notification.save()
-            logger.info(f'User notified: {result.get("success")}')
+            logger.info(f'Users notified: {result.get("success")}')
         else:
             logger.info(f'Error was occurred when sending PUSH-notifications')
 
