@@ -19,7 +19,7 @@ class Newsletter(BaseMixin):
 
     THUMBNAIL_KEY = 'news_small'
     title = models.CharField(max_length=255, verbose_name=_('Title'))
-    text = models.TextField(verbose_name=_('Text'))
+    text = models.TextField(blank=True, default='', verbose_name=_('Text'))
     short_description = models.CharField(max_length=255,
                                          blank=True, default=None, null=True,
                                          verbose_name=_('Short description'))
