@@ -72,7 +72,7 @@ class NewsletterLike(BaseMixin):
 
 class NewsletterComment(BaseMixin):
     """Comments for Newsletter"""
-    newsletter = models.ForeignKey('Newsletter', on_delete=models.CASCADE)
+    newsletter = models.ForeignKey('Newsletter', related_name='comments', on_delete=models.CASCADE)
     author = models.ForeignKey('account.User', on_delete=models.PROTECT)
     text = models.CharField(max_length=1024,
                                      verbose_name=_('Text comment'),

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from base import models
 from image_cropping.utils import get_backend
 from utils import api_exceptions
+from userprofile.serializers import current as profile_serializers
 
 class NewsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
@@ -13,13 +14,25 @@ class NewsListSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'title', 'short_description', 'publish_date')
 
+class NewsletterCommentListSerializer(serializers.ModelSerializer):
+    """Serializer for NewsletterComment"""
+
+    author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
+
+    class Meta:
+        """Meta class"""
+
+        model = models.NewsletterComment
+        fields = ('id', 'created', 'modified', 'author', 'text')
 
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
-    # image = serializers.ImageField(required=False)
     image = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
+    # comments = serializers.SerializerMethodField()
+    # comments = serializers.RelatedField(many=True, read_only=True)
+    comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
     class Meta:
         """Meta class"""
@@ -27,7 +40,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'image', 'refused','likes')
+                  'publish_date', 'recommendation', 'image', 'refused','likes',
+                  'comments')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_image(self, news):
