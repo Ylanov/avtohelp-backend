@@ -35,6 +35,10 @@ class NewsletterLikeModelAdmin(admin.ModelAdmin):
     """Custom page for NewsletterLike"""
     pass
 
+class NewsletterCommentModelAdmin(admin.ModelAdmin):
+    """Custom page for NewsletterLike"""
+    pass
+
 class PushNotificationModelAdmin(admin.ModelAdmin):
     """Custom page for PushNotification"""
     common_fields = ('id', 'user', 'status', 'event')
@@ -46,6 +50,7 @@ class PushNotificationModelAdmin(admin.ModelAdmin):
 # Register your models here.
 admin.site.register(Newsletter, NewsletterModelAdmin)
 admin.site.register(NewsletterLike, NewsletterLikeModelAdmin)
+admin.site.register(NewsletterComment, NewsletterCommentModelAdmin)
 admin.site.register(PushNotification, PushNotificationModelAdmin)
 admin.site.register(PushNotificationConfiguration, SingletonModelAdmin)
 admin.site.register(PushNotificationSchedule)
