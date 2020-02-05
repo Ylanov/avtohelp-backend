@@ -2,6 +2,7 @@ import datetime
 from rest_framework import serializers
 from base import models
 from image_cropping.utils import get_backend
+from utils import api_exceptions
 
 class NewsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
@@ -90,9 +91,73 @@ class NewsToggleLikeSerializer(serializers.ModelSerializer):
             like.delete()
             return False
 
-class NewsletterCommentSerializer(serializers.ModelSerializer):
-    """Serializer for Newsletter"""
-    pass
+class NewsletterCommentCreateSerializer(serializers.ModelSerializer):
+    """Serializer for NewsletterComment"""
+
+    class Meta:
+        """Meta class"""
+
+        model = models.NewsletterComment
+        fields = ('id', 'created', 'modified', 'newsletter_id', 'author_id', 'text')
+
+    def validate(self, attrs):
+        """Override validate method"""
+
+        newsletter_id = self.context.get('newsletter_id')
+        newsletter = models.Newsletter.objects.filter(id=newsletter_id).first()
+
+        if newsletter == None:
+            raise api_exceptions.NewsletterNotFound()
+
+        attrs['newsletter_id'] = newsletter_id
+        return attrs
+
+    def create(self, validated_data):
+        """Override create method"""
+
+        user = self.context['request'].user
+        if not user.is_anonymous:
+            validated_data['author'] = user
+
+        comment = models.NewsletterComment.objects.create(**validated_data)
+        return comment
+
+class NewsletterCommentUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for NewsletterComment"""
+
+    class Meta:
+        """Meta class"""
+
+        model = models.NewsletterComment
+        fields = ('id', 'created', 'modified', 'newsletter_id', 'author_id', 'text')
+
+    def update(self, instance, validated_data):
+        """Override update method"""
+        user = self.context['request'].user
+        instance.text = validated_data['text']
+
+        if instance.author != user:
+            raise api_exceptions.YouAreNotOwner()
+
+        instance.save()
+        return instance
+
+
+class NewsletterCommentDeleteSerializer(serializers.ModelSerializer):
+    """Serializer for NewsletterComment"""
+
+    class Meta:
+        """Meta class"""
+
+        model = models.NewsletterComment
+    
+    def destroy(request, *args, **kwargs):
+        user = request.user
+        instance = kwargs['instance']
+
+        if instance.author != user:
+            raise api_exceptions.YouAreNotOwner()
+        return super().destroy()
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""

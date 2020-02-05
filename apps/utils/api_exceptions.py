@@ -261,3 +261,25 @@ class QueryParamError(ValidationErrorMixin):
         self.default_detail = dict(detail=self.default_detail,
                                    status_code=self.extended_status_code)
         super().__init__()
+
+class NewsletterNotFound(exceptions.APIException):
+    """User blocked."""
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _('Newsletter object not found.')
+    extended_status_code = '%s.14' % status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()
+
+class YouAreNotOwner(exceptions.APIException):
+    """User blocked."""
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = _('You are not the owner of this comment.')
+    extended_status_code = '%s.15' % status.HTTP_400_BAD_REQUEST
+
+    def __init__(self):
+        self.default_detail = dict(detail=self.default_detail,
+                                   status_code=self.extended_status_code)
+        super().__init__()

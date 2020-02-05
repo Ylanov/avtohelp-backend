@@ -84,7 +84,21 @@ class NewsCommentCreateView(generics.CreateAPIView):
     News comment create view
     """
     queryset = models.NewsletterComment.objects.all()
-    serializer_class = serializers.NewsletterCommentSerializer
+    serializer_class = serializers.NewsletterCommentCreateSerializer
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # add things in context.
+        context['newsletter_id'] = self.kwargs['newsletter_id']
+        return context
+
+class NewsCommentUpdateView(generics.UpdateAPIView):
+    queryset = models.NewsletterComment.objects.all()
+    serializer_class = serializers.NewsletterCommentUpdateSerializer
+
+class NewsCommentDeleteView(generics.DestroyAPIView):
+    queryset = models.NewsletterComment.objects.all()
+    serializer_class = serializers.NewsletterCommentDeleteSerializer
 
 # class NewsListView(generics.ListAPIView):
 #     """
