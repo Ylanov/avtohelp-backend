@@ -70,6 +70,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         return models.NewsletterLike.objects.filter(newsletter=news).count()
 
 class NewsToggleLikeSerializer(serializers.ModelSerializer):
+    """Serializer for NewsToggleLike"""
     like = serializers.SerializerMethodField()
 
     class Meta:
@@ -89,6 +90,9 @@ class NewsToggleLikeSerializer(serializers.ModelSerializer):
             like.delete()
             return False
 
+class NewsletterCommentSerializer(serializers.ModelSerializer):
+    """Serializer for Newsletter"""
+    pass
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
