@@ -7,7 +7,8 @@ from image_cropping.admin import ImageCroppingMixin
 from easy_thumbnails.fields import ThumbnailerImageField
 
 from .models import Newsletter, PushNotification, PushNotificationConfiguration, \
-    PushNotificationSchedule, UserVerificationConfiguration
+    PushNotificationSchedule, UserVerificationConfiguration, \
+    NewsletterLike, NewsletterComment, NewsletterCommentLike
 
 class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
 # class NewsletterModelAdmin(admin.ModelAdmin):
@@ -30,6 +31,9 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
         if obj.push:
             obj.send_push_notification()
 
+class NewsletterLikeModelAdmin(admin.ModelAdmin):
+    """Custom page for NewsletterLike"""
+    pass
 
 class PushNotificationModelAdmin(admin.ModelAdmin):
     """Custom page for PushNotification"""
@@ -39,9 +43,9 @@ class PushNotificationModelAdmin(admin.ModelAdmin):
     list_filter = ('status', 'event')
     search_fields = ('user__phone',)
 
-
 # Register your models here.
 admin.site.register(Newsletter, NewsletterModelAdmin)
+admin.site.register(NewsletterLike, NewsletterLikeModelAdmin)
 admin.site.register(PushNotification, PushNotificationModelAdmin)
 admin.site.register(PushNotificationConfiguration, SingletonModelAdmin)
 admin.site.register(PushNotificationSchedule)
