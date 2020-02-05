@@ -59,6 +59,40 @@ class Newsletter(BaseMixin):
         """Get image thumbnail url."""
         return self.get_image(key).url if self.image else None
 
+class NewsletterLike(BaseMixin):
+    """Comments for Newsletter"""
+    newsletter = models.ForeignKey('Newsletter', on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Newsletter like')
+        verbose_name_plural = _('Newsletter likes')
+
+class NewsletterComment(BaseMixin):
+    """Comments for Newsletter"""
+    newsletter = models.ForeignKey('Newsletter', on_delete=models.CASCADE)
+    author = models.ForeignKey('account.User', on_delete=models.PROTECT)
+    text = models.CharField(max_length=1024,
+                                     verbose_name=_('Text comment'),
+                                     blank=False, null=False, default='')
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Newsletter comment')
+        verbose_name_plural = _('Newsletter comments')
+
+class NewsletterCommentLike(BaseMixin):
+    """Comments for Newsletter"""
+    comment = models.ForeignKey('NewsletterComment', on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Comment like')
+        verbose_name_plural = _('Comment likes')
 
 class PushNotificationManager(models.Manager):
     """PushNotification manager"""
