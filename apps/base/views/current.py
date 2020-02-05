@@ -72,7 +72,9 @@ class RecommendationCreateView(generics.CreateAPIView):
     """
     serializer_class = serializers.RecommendationCreateSerializer
 
-
+class NewsToggleLike(generics.UpdateAPIView):
+    queryset = models.Newsletter.objects.all()
+    serializer_class = serializers.NewsToggleLikeSerializer
 
 # class NewsListView(generics.ListAPIView):
 #     """

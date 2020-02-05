@@ -67,7 +67,28 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         return [x,y]
 
     def get_likes(self, news):
-        return models.NewsletterLike.objects.filter(newsletter__id=news.id).count()
+        return models.NewsletterLike.objects.filter(newsletter=news).count()
+
+class NewsToggleLikeSerializer(serializers.ModelSerializer):
+    like = serializers.SerializerMethodField()
+
+    class Meta:
+        """Meta class"""
+
+        model = models.Newsletter
+        fields = ('like',)
+
+    def get_like(self, news):
+        user = self.context['request'].user
+        like = models.NewsletterLike.objects.filter(newsletter=news).filter(owner=user).first()
+
+        if like == None:
+            like = models.NewsletterLike.objects.create(newsletter=news, owner=user)
+            return True
+        else:
+            like.delete()
+            return False
+
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""

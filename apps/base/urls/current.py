@@ -17,6 +17,8 @@ urlpatterns = [
          name='recommendations-list'),
     path('recommendation', views.RecommendationCreateView.as_view(),
          name='recommendation-create'),
+    path('news/<int:pk>/toggle-like', views.NewsToggleLike.as_view(),
+         name='news-like-toggle'),
     # path('news', views.NewsListView.as_view(), name='news-list'),
     # path('news/<int:pk>', views.NewsDetailView, name='news-detail'),
     # path('notifications', views.NotificationListView.as_view(), name='notifications-list'),
