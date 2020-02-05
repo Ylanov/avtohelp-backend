@@ -18,6 +18,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     # image = serializers.ImageField(required=False)
     image = serializers.SerializerMethodField()
+    likes = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
@@ -25,7 +26,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'image', 'refused')
+                  'publish_date', 'recommendation', 'image', 'refused','likes')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_image(self, news):
@@ -64,6 +65,9 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             y = y*(-1)
 
         return [x,y]
+
+    def get_likes(self, news):
+        return models.NewsletterLike.objects.filter(newsletter__id=news.id).count()
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
