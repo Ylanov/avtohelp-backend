@@ -30,6 +30,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
+    i_like = serializers.SerializerMethodField()
     author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
     comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
@@ -40,7 +41,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
                   'publish_date', 'recommendation', 'author', 'image', 'refused','likes',
-                  'comments')
+                  'i_like', 'comments')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_image(self, news):
@@ -82,6 +83,10 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     def get_likes(self, news):
         return models.NewsletterLike.objects.filter(newsletter=news).count()
+
+    def get_i_like(self, news):
+        user = self.context['request'].user
+        return models.NewsletterLike.objects.filter(newsletter=news, owner=user).first() != None
 
 class NewsToggleLikeSerializer(serializers.ModelSerializer):
     """Serializer for NewsToggleLike"""
