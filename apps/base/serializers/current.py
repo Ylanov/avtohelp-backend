@@ -30,8 +30,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     image = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
-    # comments = serializers.SerializerMethodField()
-    # comments = serializers.RelatedField(many=True, read_only=True)
+    author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
     comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
     class Meta:
@@ -40,7 +39,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'image', 'refused','likes',
+                  'publish_date', 'recommendation', 'author', 'image', 'refused','likes',
                   'comments')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
