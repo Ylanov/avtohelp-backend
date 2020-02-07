@@ -311,8 +311,8 @@ def notify_new_newsletter_like(newsletter_like_id):
     initiator = like.owner
     user = like.newsletter.author
 
-    # if user == initiator:
-    #     return None
+    if user == initiator:
+        return None
 
     if user != None and initiator != None:
         notification = base_models.PushNotification.objects.make_newsletter_like_notification(user=user, initiator=initiator)
@@ -339,8 +339,8 @@ def notify_new_newsletter_comment(newsletter_comment_id):
     initiator = comment.author
     user = comment.newsletter.author
 
-    # if user == initiator:
-    #     return None
+    if user == initiator:
+        return None
 
     if user != None and initiator != None:
         notification = base_models.PushNotification.objects.make_newsletter_comment_notification(user=user, initiator=initiator)
