@@ -96,6 +96,19 @@ class NewsletterComment(BaseMixin):
         verbose_name = _('Newsletter comment')
         verbose_name_plural = _('Newsletter comments')
 
+    def save(self, *args, **kwargs):
+        super(NewsletterComment, self).save(*args, **kwargs)
+        self.send_push_notification()
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to all active users"""
+
+        logger.info(f'INFO: Send push notification for author newsletter for comment. NewsletterComment id: {self.id}')
+        if settings.USE_CELERY:
+            tasks.notify_new_newsletter_comment.delay(self.id)
+        else:
+            tasks.notify_new_newsletter_comment(self.id)
+
 class NewsletterCommentLike(BaseMixin):
     """Comments for Newsletter"""
     comment = models.ForeignKey('NewsletterComment', on_delete=models.CASCADE)
@@ -203,6 +216,27 @@ class PushNotificationManager(models.Manager):
             obj.save()
             return obj
 
+    def make_newsletter_comment_notification(self, user: (str, int, object), initiator: (str, int, object)) -> object:
+        """Make common notification for newsletter comment"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+
+        if not isinstance(initiator, account_models.User):
+            initiator_qs = account_models.User.objects.filter(id=initiator)
+            if initiator_qs.exists():
+                initiator = initiator_qs.first()
+            else:
+                return None
+
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('New comment'),
+                description=_('User %s comment your newsletter') % initiator.get_full_name,
+                event=self.model.NEW_NEWSLETTER_COMMENT
+            )
+            obj.save()
+            return obj
+
 
 
 class PushNotificationQuerySet(models.QuerySet):
@@ -219,6 +253,7 @@ class PushNotification(BaseMixin):
     FRIEND_REQUEST = 3
     NEW_NEWSLETTER = 4
     NEW_NEWSLETTER_LIKE = 5
+    NEW_NEWSLETTER_COMMENT = 6
 
     EVENT_CHOICES = (
         (INITIALIZE, _('Initialization')),
@@ -226,7 +261,8 @@ class PushNotification(BaseMixin):
         (NEW_MESSAGE, _('New message')),
         (FRIEND_REQUEST, _('Friend request')),
         (NEW_NEWSLETTER, _('Newsletter')),
-        (NEW_NEWSLETTER_LIKE, _('Newsletter like'))
+        (NEW_NEWSLETTER_LIKE, _('Newsletter like')),
+        (NEW_NEWSLETTER_COMMENT, _('New newsletter comment'))
     )
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))

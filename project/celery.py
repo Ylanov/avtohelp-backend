@@ -311,14 +311,14 @@ def notify_new_newsletter_like(newsletter_like_id):
     initiator = like.owner
     user = like.newsletter.author
 
-    if user == initiator:
-        return None
+    # if user == initiator:
+    #     return None
 
     if user != None and initiator != None:
         notification = base_models.PushNotification.objects.make_newsletter_like_notification(user=user, initiator=initiator)
         devices = FCMDevice.objects.filter(user_id=user.id)
         if devices.exists():
-            raw_result = devices.send_message(**notification.get_push_dict())
+            raw_result = devices.send_message(**notification.get_push_dict(model_id=like.newsletter.id))
             result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
             if result.get('success'):
                 notification.status = True
@@ -329,7 +329,32 @@ def notify_new_newsletter_like(newsletter_like_id):
                 logger.info(f'Error was occurred when sending PUSH-notifications')
 
 
+@app.task
+def notify_new_newsletter_comment(newsletter_comment_id):
+    """Notify user about new newsletter comment"""
+    from base import models as base_models
+    from userprofile.models import FCMDevice
 
+    comment = base_models.NewsletterComment.objects.filter(id=newsletter_comment_id).first()
+    initiator = comment.author
+    user = comment.newsletter.author
+
+    # if user == initiator:
+    #     return None
+
+    if user != None and initiator != None:
+        notification = base_models.PushNotification.objects.make_newsletter_comment_notification(user=user, initiator=initiator)
+        devices = FCMDevice.objects.filter(user_id=user.id)
+        if devices.exists():
+            raw_result = devices.send_message(**notification.get_push_dict(model_id=comment.newsletter.id))
+            result = raw_result if hasattr(raw_result, 'get') else {k: v for k, v in raw_result[0].items()}
+            if result.get('success'):
+                notification.status = True
+                notification.sent_count = result.get('success')
+                notification.save()
+                logger.info(f'User notified: {result.get("success")}')
+            else:
+                logger.info(f'Error was occurred when sending PUSH-notifications')
 
 # Unused
 # @app.task
