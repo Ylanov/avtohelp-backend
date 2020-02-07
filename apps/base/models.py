@@ -70,6 +70,19 @@ class NewsletterLike(BaseMixin):
         verbose_name = _('Newsletter like')
         verbose_name_plural = _('Newsletter likes')
 
+    def save(self, *args, **kwargs):
+        super(NewsletterLike, self).save(*args, **kwargs)
+        self.send_push_notification()
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to all active users"""
+
+        logger.info(f'INFO: Send push notification for author newsletter. NewsletterLike id: {self.id}')
+        if settings.USE_CELERY:
+            tasks.notify_new_newsletter_like.delay(self.id)
+        else:
+            tasks.notify_new_newsletter_like(self.id)
+
 class NewsletterComment(BaseMixin):
     """Comments for Newsletter"""
     newsletter = models.ForeignKey('Newsletter', related_name='comments', on_delete=models.CASCADE)
@@ -169,6 +182,28 @@ class PushNotificationManager(models.Manager):
             obj.save()
             return obj
 
+    def make_newsletter_like_notification(self, user: (str, int, object), initiator: (str, int, object)) -> object:
+        """Make common notification for newsletter like"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+
+        if not isinstance(initiator, account_models.User):
+            initiator_qs = account_models.User.objects.filter(id=initiator)
+            if initiator_qs.exists():
+                initiator = initiator_qs.first()
+            else:
+                return None
+
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('Like'),
+                description=_('User %s liked your newsletter') % initiator.get_full_name,
+                event=self.model.NEW_NEWSLETTER_LIKE
+            )
+            obj.save()
+            return obj
+
+
 
 class PushNotificationQuerySet(models.QuerySet):
     """PushNotification querysets"""
@@ -183,13 +218,15 @@ class PushNotification(BaseMixin):
     NEW_MESSAGE = 2
     FRIEND_REQUEST = 3
     NEW_NEWSLETTER = 4
+    NEW_NEWSLETTER_LIKE = 5
 
     EVENT_CHOICES = (
         (INITIALIZE, _('Initialization')),
         (CREATE_REQUEST, _('Create assistance request')),
         (NEW_MESSAGE, _('New message')),
         (FRIEND_REQUEST, _('Friend request')),
-        (NEW_NEWSLETTER, _('Newsletter'))
+        (NEW_NEWSLETTER, _('Newsletter')),
+        (NEW_NEWSLETTER_LIKE, _('Newsletter like'))
     )
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
