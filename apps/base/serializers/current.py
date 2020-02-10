@@ -29,6 +29,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
     image = serializers.SerializerMethodField()
+    image_resolution = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     i_like = serializers.SerializerMethodField()
     author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
@@ -40,7 +41,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'author', 'image', 'refused','likes',
+                  'publish_date', 'recommendation', 'author', 'image', 'image_resolution', 'refused','likes',
                   'i_like', 'comments')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
@@ -80,6 +81,17 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             y = y*(-1)
 
         return [x,y]
+
+    def get_image_resolution(self, news):
+        if not news.image:
+            return None
+            
+        dementions = NewsDetailSerializer.get_dementions(news)
+        return {
+            'width': dementions[0],
+            'height': dementions[1]
+        }
+
 
     def get_likes(self, news):
         return models.NewsletterLike.objects.filter(newsletter=news).count()
@@ -176,6 +188,7 @@ class NewsletterCommentDeleteSerializer(serializers.ModelSerializer):
         if instance.author != user:
             raise api_exceptions.YouAreNotOwner()
         return super().destroy()
+
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
