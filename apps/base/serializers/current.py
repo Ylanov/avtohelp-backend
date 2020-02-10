@@ -16,8 +16,8 @@ class NewsListSerializer(serializers.ModelSerializer):
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
-    # image = serializers.ImageField(required=False)
     image = serializers.SerializerMethodField()
+    image_resolution = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
@@ -25,7 +25,7 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         model = models.Newsletter
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'image', 'refused')
+                  'publish_date', 'recommendation', 'image','image_resolution', 'refused')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_image(self, news):
@@ -64,6 +64,17 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             y = y*(-1)
 
         return [x,y]
+
+    def get_image_resolution(self, news):
+        if not news.image:
+            return None
+            
+        dementions = NewsDetailSerializer.get_dementions(news)
+        return {
+            'width': dementions[0],
+            'height': dementions[1]
+        }
+
 
 class RecommendationsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
