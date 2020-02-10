@@ -58,10 +58,13 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         x = demention[0] - demention[1]
         y = demention[3] - demention[2]
 
-        if x<0:
-            x = x*(-1)
-        if y<0:
-            y = y*(-1)
+        if x==0:
+            return [demention[2], demention[3]]
+        else:
+            if x<0:
+                x = x*(-1)
+            if y<0:
+                y = y*(-1)
 
         return [x,y]
 
