@@ -59,6 +59,66 @@ class Newsletter(BaseMixin):
         """Get image thumbnail url."""
         return self.get_image(key).url if self.image else None
 
+class NewsletterLike(BaseMixin):
+    """Comments for Newsletter"""
+    newsletter = models.ForeignKey('Newsletter', on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Newsletter like')
+        verbose_name_plural = _('Newsletter likes')
+
+    def save(self, *args, **kwargs):
+        super(NewsletterLike, self).save(*args, **kwargs)
+        self.send_push_notification()
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to all active users"""
+
+        logger.info(f'INFO: Send push notification for author newsletter. NewsletterLike id: {self.id}')
+        if settings.USE_CELERY:
+            tasks.notify_new_newsletter_like.delay(self.id)
+        else:
+            tasks.notify_new_newsletter_like(self.id)
+
+class NewsletterComment(BaseMixin):
+    """Comments for Newsletter"""
+    newsletter = models.ForeignKey('Newsletter', related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey('account.User', on_delete=models.PROTECT)
+    text = models.CharField(max_length=1024,
+                                     verbose_name=_('Text comment'),
+                                     blank=False, null=False, default='')
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Newsletter comment')
+        verbose_name_plural = _('Newsletter comments')
+
+    def save(self, *args, **kwargs):
+        super(NewsletterComment, self).save(*args, **kwargs)
+        self.send_push_notification()
+
+    def send_push_notification(self):
+        """Sent PUSH-notification to all active users"""
+
+        logger.info(f'INFO: Send push notification for author newsletter for comment. NewsletterComment id: {self.id}')
+        if settings.USE_CELERY:
+            tasks.notify_new_newsletter_comment.delay(self.id)
+        else:
+            tasks.notify_new_newsletter_comment(self.id)
+
+class NewsletterCommentLike(BaseMixin):
+    """Comments for Newsletter"""
+    comment = models.ForeignKey('NewsletterComment', on_delete=models.CASCADE)
+    owner = models.ForeignKey('account.User', on_delete=models.PROTECT)
+
+    class Meta:
+        """Meta class"""
+
+        verbose_name = _('Comment like')
+        verbose_name_plural = _('Comment likes')
 
 class PushNotificationManager(models.Manager):
     """PushNotification manager"""
@@ -135,6 +195,49 @@ class PushNotificationManager(models.Manager):
             obj.save()
             return obj
 
+    def make_newsletter_like_notification(self, user: (str, int, object), initiator: (str, int, object)) -> object:
+        """Make common notification for newsletter like"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+
+        if not isinstance(initiator, account_models.User):
+            initiator_qs = account_models.User.objects.filter(id=initiator)
+            if initiator_qs.exists():
+                initiator = initiator_qs.first()
+            else:
+                return None
+
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('Like'),
+                description=_('User %s liked your newsletter') % initiator.get_full_name,
+                event=self.model.NEW_NEWSLETTER_LIKE
+            )
+            obj.save()
+            return obj
+
+    def make_newsletter_comment_notification(self, user: (str, int, object), initiator: (str, int, object)) -> object:
+        """Make common notification for newsletter comment"""
+        user_id = user.id if isinstance(user, account_models.User) else user
+
+        if not isinstance(initiator, account_models.User):
+            initiator_qs = account_models.User.objects.filter(id=initiator)
+            if initiator_qs.exists():
+                initiator = initiator_qs.first()
+            else:
+                return None
+
+        if account_models.User.objects.filter(id=user_id).exists():
+            obj = self.model(
+                user_id=user_id,
+                title=_('New comment'),
+                description=_('User %s comment your newsletter') % initiator.get_full_name,
+                event=self.model.NEW_NEWSLETTER_COMMENT
+            )
+            obj.save()
+            return obj
+
+
 
 class PushNotificationQuerySet(models.QuerySet):
     """PushNotification querysets"""
@@ -149,13 +252,17 @@ class PushNotification(BaseMixin):
     NEW_MESSAGE = 2
     FRIEND_REQUEST = 3
     NEW_NEWSLETTER = 4
+    NEW_NEWSLETTER_LIKE = 5
+    NEW_NEWSLETTER_COMMENT = 6
 
     EVENT_CHOICES = (
         (INITIALIZE, _('Initialization')),
         (CREATE_REQUEST, _('Create assistance request')),
         (NEW_MESSAGE, _('New message')),
         (FRIEND_REQUEST, _('Friend request')),
-        (NEW_NEWSLETTER, _('Newsletter'))
+        (NEW_NEWSLETTER, _('Newsletter')),
+        (NEW_NEWSLETTER_LIKE, _('Newsletter like')),
+        (NEW_NEWSLETTER_COMMENT, _('New newsletter comment'))
     )
 
     title = models.CharField(max_length=255, verbose_name=_('Title'))
