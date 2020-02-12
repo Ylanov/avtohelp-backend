@@ -29,20 +29,23 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
 
     image = serializers.SerializerMethodField()
-    image_resolution = serializers.SerializerMethodField()
-    likes = serializers.SerializerMethodField()
-    i_like = serializers.SerializerMethodField()
-    author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
-    comments = NewsletterCommentListSerializer(many=True, read_only=True)
+    # image_resolution = serializers.SerializerMethodField()
+    # likes = serializers.SerializerMethodField()
+    # i_like = serializers.SerializerMethodField()
+    # author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
+    # comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
     class Meta:
         """Meta class"""
 
         model = models.Newsletter
+        # fields = ('id', 'created', 'modified', 'title',
+        #           'short_description', 'text', 'publish',
+        #           'publish_date', 'recommendation', 'author', 'image', 'image_resolution', 'refused','likes',
+        #           'i_like', 'comments')
         fields = ('id', 'created', 'modified', 'title',
                   'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'author', 'image', 'image_resolution', 'refused','likes',
-                  'i_like', 'comments')
+                  'publish_date', 'recommendation', 'image')
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_image(self, news):
