@@ -50,17 +50,15 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'image', 'publish', 'refused')
 
     def get_author(self, news):
-        profile = None;
+        profile = None
+        profile_id = 6
 
-        if news.author == None:
-            user_id = 6
-            if settings.NEWSLETTER_USER_ID:
-                user_id = settings.NEWSLETTER_USER_ID
+        if settings.NEWSLETTER_USERPROFILE_ID:
+            profile_id = settings.NEWSLETTER_USERPROFILE_ID
 
-            user = account_models.User.objects.filter(id=user_id).get()
-            if user!=None:
-                profile = user.profile
-        else:
+        profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
+
+        if profile==None:
             profile = news.author.profile
 
         return profile_serializers.ProfileBaseSerializer(profile, context={'request': self.context.get('request')}).data
