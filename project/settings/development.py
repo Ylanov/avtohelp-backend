@@ -21,6 +21,8 @@ USE_SMS = True  # Actual sms sending switcher
 TEST_SMS_CODE = True
 REDIS_URL = 'redis://redis:6379/13'
 
+NEWSLETTER_USER_ID=3
+
 
 # CHANNELS
 CHANNEL_LAYERS = {

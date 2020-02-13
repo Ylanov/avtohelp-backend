@@ -1,4 +1,5 @@
 import datetime
+from django.conf import settings
 from rest_framework import serializers
 from base import models
 from userprofile import models as userprofile_models
@@ -51,8 +52,11 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         profile = None;
 
         if news.author == None:
-            # profile = userprofile_models.Profile.objects.filter(id=6)
-            user = account_models.User.objects.filter(id=6).get()
+            user_id = 6
+            if settings.NEWSLETTER_USER_ID:
+                user_id = settings.NEWSLETTER_USER_ID
+
+            user = account_models.User.objects.filter(id=user_id).get()
             if user!=None:
                 profile = user.profile
         else:
