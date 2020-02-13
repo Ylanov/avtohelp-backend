@@ -1,6 +1,9 @@
 import datetime
+from django.conf import settings
 from rest_framework import serializers
 from base import models
+from userprofile import models as userprofile_models
+from account import models as account_models
 from image_cropping.utils import get_backend
 from utils import api_exceptions
 from userprofile.serializers import current as profile_serializers
@@ -32,7 +35,8 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     image_resolution = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     i_like = serializers.SerializerMethodField()
-    author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
+    # author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
+    author = serializers.SerializerMethodField()
     comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
     class Meta:
@@ -44,6 +48,20 @@ class NewsDetailSerializer(serializers.ModelSerializer):
                   'publish_date', 'recommendation', 'author', 'image', 'image_resolution', 'refused','likes',
                   'i_like', 'comments')
         read_only_fields = ('id', 'image', 'publish', 'refused')
+
+    def get_author(self, news):
+        profile = None
+        profile_id = 6
+
+        if settings.NEWSLETTER_USERPROFILE_ID:
+            profile_id = settings.NEWSLETTER_USERPROFILE_ID
+
+        profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
+
+        if profile==None:
+            profile = news.author.profile
+
+        return profile_serializers.ProfileBaseSerializer(profile, context={'request': self.context.get('request')}).data
 
     def get_image(self, news):
         request = self.context.get('request')
