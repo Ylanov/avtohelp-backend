@@ -2,11 +2,13 @@ from django.urls import path
 
 from base.views import current as views
 from rest_framework import routers
-
+from base import models as base_models
 
 app_name = 'base'
 
-router = routers.SimpleRouter()
+# router = routers.SimpleRouter()
+router = base_models.BaseSimpleRouter()
+
 router.register(r'news', views.NewsViewSet)
 router.register(r'notifications', views.NotificationViewSet)
 
