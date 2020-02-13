@@ -5,6 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from solo.models import SingletonModel
+from rest_framework.routers import SimpleRouter
 
 from account import models as account_models
 from utils.mixins import BaseMixin, ImageMixin, image_path
@@ -354,3 +355,10 @@ class UserVerificationConfiguration(SingletonModel):
 
     class Meta:
         verbose_name = _("User phone verification configuration")
+
+
+class BaseSimpleRouter(SimpleRouter):
+    def __init__(self):
+        self.trailing_slash = '/?'
+        super(SimpleRouter, self).__init__()
+
