@@ -19,13 +19,14 @@ class Newsletter(BaseMixin):
     """Model to new representation."""
 
     THUMBNAIL_KEY = 'news_small'
-    title = models.CharField(max_length=255, verbose_name=_('Title'))
+    title = models.CharField(max_length=255, blank=True, default=None, null=True, verbose_name=_('Title'))
     text = models.TextField(blank=True, default='', verbose_name=_('Text'))
     short_description = models.CharField(max_length=255,
                                          blank=True, default=None, null=True,
                                          verbose_name=_('Short description'))
     publish = models.BooleanField(default=False, verbose_name=_('Publish'))
     push = models.BooleanField(default=False, verbose_name=_('Push notification'))
+    as_admin = models.BooleanField(default=False, verbose_name=_('Publish as administrator'))
     recommendation = models.BooleanField(default=False, verbose_name=_('Recommendation'))
     publish_date = models.DateTimeField(help_text=_('Uses instead created if set'),
                                         verbose_name=_('Publish date'))
@@ -73,7 +74,7 @@ class NewsletterLike(BaseMixin):
 
     def save(self, *args, **kwargs):
         super(NewsletterLike, self).save(*args, **kwargs)
-        self.send_push_notification()
+        # self.send_push_notification()
 
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""
@@ -99,7 +100,7 @@ class NewsletterComment(BaseMixin):
 
     def save(self, *args, **kwargs):
         super(NewsletterComment, self).save(*args, **kwargs)
-        self.send_push_notification()
+        # self.send_push_notification()
 
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""

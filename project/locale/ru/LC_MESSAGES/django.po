@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-07 19:16+0000\n"
+"POT-Creation-Date: 2020-02-22 21:45+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,7 +70,7 @@ msgid "email address"
 msgstr "Адрес электронной почты"
 
 #: apps/account/models.py:108 apps/authorization/models.py:143
-#: apps/base/models.py:274 apps/chat/models.py:201 apps/order/models.py:102
+#: apps/base/models.py:276 apps/chat/models.py:201 apps/order/models.py:102
 #: apps/order/models.py:150
 msgid "User"
 msgstr "Пользователь"
@@ -144,226 +144,226 @@ msgstr "Блокировки пользователей"
 msgid "Base"
 msgstr "База"
 
-#: apps/base/models.py:21 apps/base/models.py:268
+#: apps/base/models.py:22 apps/base/models.py:270
 msgid "Title"
 msgstr "Заголовок"
 
-#: apps/base/models.py:22
+#: apps/base/models.py:23
 msgid "Text"
 msgstr "Текст"
 
-#: apps/base/models.py:25
+#: apps/base/models.py:26
 msgid "Short description"
 msgstr "Краткое описание"
 
-#: apps/base/models.py:26
+#: apps/base/models.py:27
 msgid "Publish"
 msgstr "Опубликовать"
 
-#: apps/base/models.py:27 apps/base/models.py:290
+#: apps/base/models.py:28 apps/base/models.py:292
 msgid "Push notification"
 msgstr "Push-уведомление"
 
-#: apps/base/models.py:28
-#, fuzzy
-#| msgid "Documentation"
-msgid "Recommendation"
-msgstr "Рекоммендация"
-
 #: apps/base/models.py:29
+msgid "Publish as administrator"
+msgstr "Опубликовать от имени администратора"
+
+#: apps/base/models.py:30
+msgid "Recommendation"
+msgstr "Рекомендация"
+
+#: apps/base/models.py:31
 msgid "Uses instead created if set"
 msgstr "Используется вместо даты создания объекта"
 
-#: apps/base/models.py:30
+#: apps/base/models.py:32
 msgid "Publish date"
 msgstr "Дата публикации"
 
-#: apps/base/models.py:33
-#, fuzzy
-#| msgid "Authorization"
+#: apps/base/models.py:35
 msgid "Author"
-msgstr "Авторизация"
+msgstr "Автор"
 
-#: apps/base/models.py:34
+#: apps/base/models.py:36
 msgid "Refused"
 msgstr "Отклонить"
 
-#: apps/base/models.py:36 apps/utils/mixins.py:34 apps/utils/mixins.py:65
+#: apps/base/models.py:38 apps/utils/mixins.py:34 apps/utils/mixins.py:65
 msgid "Image"
 msgstr "Изображение"
 
-#: apps/base/models.py:42 apps/base/models.py:191
+#: apps/base/models.py:44 apps/base/models.py:193
 msgid "News"
 msgstr "Новости"
 
-#: apps/base/models.py:43 apps/base/models.py:263
+#: apps/base/models.py:45 apps/base/models.py:265
 msgid "Newsletter"
 msgstr "Новости"
 
-#: apps/base/models.py:70 apps/base/models.py:264
+#: apps/base/models.py:72 apps/base/models.py:266
 #, fuzzy
 #| msgid "Newsletter"
 msgid "Newsletter like"
 msgstr "Лайк новости"
 
-#: apps/base/models.py:71
+#: apps/base/models.py:73
 #, fuzzy
 #| msgid "Newsletter"
 msgid "Newsletter likes"
 msgstr "Лайки новости"
 
-#: apps/base/models.py:91
+#: apps/base/models.py:93
 #, fuzzy
 #| msgid "Documentation"
 msgid "Text comment"
 msgstr "Рекоммендация"
 
-#: apps/base/models.py:96
+#: apps/base/models.py:98
 #, fuzzy
 #| msgid "Newsletter"
 msgid "Newsletter comment"
 msgstr "Комментарий новости"
 
-#: apps/base/models.py:97
+#: apps/base/models.py:99
 #, fuzzy
 #| msgid "Newsletter"
 msgid "Newsletter comments"
 msgstr "Комментарии новости"
 
-#: apps/base/models.py:120
+#: apps/base/models.py:122
 msgid "Comment like"
 msgstr "Лайк комментария"
 
-#: apps/base/models.py:121
+#: apps/base/models.py:123
 msgid "Comment likes"
 msgstr "Лайки комментария"
 
-#: apps/base/models.py:132
+#: apps/base/models.py:134
 msgid "New friend request"
 msgstr "Новый запрос на добавление в друзья"
 
-#: apps/base/models.py:133
+#: apps/base/models.py:135
 msgid "A new friend request has been received"
 msgstr "Был получен новый запрос на добавление в друзья"
 
-#: apps/base/models.py:145
+#: apps/base/models.py:147
 msgid "New assistance request"
 msgstr "Новый запрос помощи"
 
-#: apps/base/models.py:146
+#: apps/base/models.py:148
 msgid "New assistance request was published"
 msgstr "Новый запрос помощи был опубликован"
 
-#: apps/base/models.py:170
+#: apps/base/models.py:172
 msgid "New message from chat"
 msgstr "Новое сообщение"
 
-#: apps/base/models.py:171
+#: apps/base/models.py:173
 #, python-format
 msgid "User %s wrote a message"
 msgstr "Пользователь %s написал сообщение"
 
-#: apps/base/models.py:212
+#: apps/base/models.py:214
 msgid "Like"
 msgstr "Лайк"
 
-#: apps/base/models.py:213
+#: apps/base/models.py:215
 #, python-format
 msgid "User %s liked your newsletter"
 msgstr "Пользователю %s понравилась ваша новость"
 
-#: apps/base/models.py:233
+#: apps/base/models.py:235
 #, fuzzy
 #| msgid "Documentation"
 msgid "New comment"
 msgstr "Рекоммендация"
 
-#: apps/base/models.py:234
+#: apps/base/models.py:236
 #, python-format
 msgid "User %s comment your newsletter"
 msgstr "Пользователь %s оставил комментарий"
 
-#: apps/base/models.py:259
+#: apps/base/models.py:261
 msgid "Initialization"
 msgstr "Инициализация"
 
-#: apps/base/models.py:260
+#: apps/base/models.py:262
 msgid "Create assistance request"
 msgstr "Создать запрос о помощи"
 
-#: apps/base/models.py:261
+#: apps/base/models.py:263
 msgid "New message"
 msgstr "Новое сообщение"
 
-#: apps/base/models.py:262 apps/userprofile/models.py:326
+#: apps/base/models.py:264 apps/userprofile/models.py:326
 #: apps/userprofile/models.py:327
 msgid "Friend request"
 msgstr "Запрос в друзья"
 
-#: apps/base/models.py:265
+#: apps/base/models.py:267
 #, fuzzy
 #| msgid "Newsletter"
 msgid "New newsletter comment"
 msgstr "Новости"
 
-#: apps/base/models.py:269 apps/car/models.py:91 apps/order/models.py:107
+#: apps/base/models.py:271 apps/car/models.py:91 apps/order/models.py:107
 msgid "Description"
 msgstr "Описание"
 
-#: apps/base/models.py:272
+#: apps/base/models.py:274
 msgid "Event"
 msgstr "Событие"
 
-#: apps/base/models.py:278 apps/order/models.py:110
+#: apps/base/models.py:280 apps/order/models.py:110
 #: apps/userprofile/models.py:320
 msgid "Status"
 msgstr "Статус"
 
-#: apps/base/models.py:280
+#: apps/base/models.py:282
 msgid "Sent notifications count"
 msgstr "Количество отправленных Push-уведомлений"
 
-#: apps/base/models.py:291
+#: apps/base/models.py:293
 msgid "Push notifications"
 msgstr "Push-уведомления"
 
-#: apps/base/models.py:316
+#: apps/base/models.py:318
 msgid "time"
 msgstr "Время"
 
-#: apps/base/models.py:319
+#: apps/base/models.py:321
 msgid "Push-notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:320
+#: apps/base/models.py:322
 msgid "Push-notification schedules"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:332
+#: apps/base/models.py:334
 msgid "Radius"
 msgstr "Радиус"
 
-#: apps/base/models.py:333
+#: apps/base/models.py:335
 msgid "Radius in meters"
 msgstr "Радиус в метрах"
 
-#: apps/base/models.py:336
+#: apps/base/models.py:338
 msgid "Geo position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:337
+#: apps/base/models.py:339
 msgid "Profile geo-position lifetime"
 msgstr "Время жизни геопозиции профиля пользователя"
 
-#: apps/base/models.py:339
+#: apps/base/models.py:341
 msgid "Notification schedule"
 msgstr "Расписание отправки Push-уведомлений"
 
-#: apps/base/models.py:342
+#: apps/base/models.py:344
 msgid "Push notification configuration"
 msgstr "Конфигурация отправки Push-уведомлений"
 
-#: apps/base/models.py:356
+#: apps/base/models.py:358
 #, fuzzy
 #| msgid "Push notification configuration"
 msgid "User phone verification configuration"

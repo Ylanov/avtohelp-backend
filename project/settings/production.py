@@ -78,6 +78,11 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/code/debug.log',
         }
     },
     'loggers': {
@@ -98,6 +103,16 @@ LOGGING = {
         'CELERY': {
             'handlers': ['console'],
             'level': 'DEBUG',
-        }
+        },
+        'app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'ACCOUNT': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }
