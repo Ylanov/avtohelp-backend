@@ -10,6 +10,7 @@ from easy_thumbnails.fields import ThumbnailerImageField
 from .models import Newsletter, PushNotification, PushNotificationConfiguration, \
     PushNotificationSchedule, UserVerificationConfiguration, \
     NewsletterLike, NewsletterComment, NewsletterCommentLike
+from userprofile.models import Profile
 
 class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
 # class NewsletterModelAdmin(admin.ModelAdmin):
@@ -31,10 +32,13 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
             obj.publish_date = datetime.datetime.now()
 
         if obj.as_admin == True:
-            profile_id = 1
+            author_id = 1
             if settings.NEWSLETTER_USERPROFILE_ID:
                 profile_id = settings.NEWSLETTER_USERPROFILE_ID
-            author = obj.author_id = profile_id
+                profile = Profile.objects.filter(id=profile_id).get()
+                if profile:
+                    author_id = profile.user.id
+            author = obj.author_id = author_id
         super().save_model(request, obj, form, change)
         
         if obj.push:
