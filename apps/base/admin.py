@@ -13,8 +13,10 @@ from .models import Newsletter, PushNotification, PushNotificationConfiguration,
 class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
 # class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
-    # readonly_fields = ('id', 'created', 'modified', 'recommendation', 'author')
-    # list_display = ('id', 'title', 'publish', 'push', 'recommendation', 'publish_date', 'refused')
+
+    readonly_fields = ('id',  'created', 'modified', 'recommendation', 'author')
+    list_display = ('id', 'text', 'publish', 'push', 'recommendation', 'publish_date', 'refused')
+    exclude = ('title', 'short_description')
     # fieldsets = (
     #     (_('Info'), {'fields': ('id', 'created', 'modified')}),
     #     (_('Options'), {'fields': ('title', 'text', 'publish', 'push',
@@ -23,7 +25,6 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
     # )
 
     def save_model(self, request, obj, form, change):
-
         if obj.publish == True:
             obj.publish_date = datetime.datetime.now()
         super().save_model(request, obj, form, change)
