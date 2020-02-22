@@ -114,8 +114,9 @@ class User(AbstractUser, BaseMixin):
 
     def logout(self):
         """Regenerate auth token method"""
-        self.auth_token.delete()
         devices = FCMDevice.objects.filter(user_id=self.id).delete()
+        self.auth_token.delete()
+        logger.info(f'INFO: User ID:{self.id} has logout success.\n')
 
     @property
     def get_first_name(self):
