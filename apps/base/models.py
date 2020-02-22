@@ -73,7 +73,7 @@ class NewsletterLike(BaseMixin):
 
     def save(self, *args, **kwargs):
         super(NewsletterLike, self).save(*args, **kwargs)
-        self.send_push_notification()
+        # self.send_push_notification()
 
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""
