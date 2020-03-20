@@ -296,9 +296,9 @@ def notify_new_newsletter(newsletter_id):
             notification.status = True
             notification.sent_count = result.get('success')
             notification.save()
-            logger.info(f'User notified: {result.get("success")}')
+            logger.info(f'User notified for New Newsletter: {result.get("success")}')
         else:
-            logger.info(f'Error was occurred when sending PUSH-notifications')
+            logger.info(f'Error was occurred when sending PUSH-notifications for New Newsletter.')
 
 
 @app.task
