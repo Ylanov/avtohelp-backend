@@ -180,7 +180,7 @@ class PushNotificationManager(models.Manager):
         """Make common notification for new newsletter"""
         user_id = user.id if isinstance(user, account_models.User) else user
 
-        if not isinstance(newsletter, Newsletter):
+        if newsletter:
             newsletter_qs = Newsletter.objects.filter(id=newsletter)
             if newsletter_qs.exists():
                 newsletter = newsletter_qs.first()
@@ -191,7 +191,7 @@ class PushNotificationManager(models.Manager):
             obj = self.model(
                 user_id=user_id,
                 title=_('News'),
-                description=newsletter.title,
+                description=newsletter.text,
                 event=self.model.NEW_NEWSLETTER
             )
             obj.save()
