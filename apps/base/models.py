@@ -191,7 +191,7 @@ class PushNotificationManager(models.Manager):
             obj = self.model(
                 user_id=user_id,
                 title=_('News'),
-                description=newsletter.text,
+                description=newsletter.text[:240] + "...",
                 event=self.model.NEW_NEWSLETTER
             )
             obj.save()
