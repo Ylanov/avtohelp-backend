@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0003_chatroom_image'),
+        ("chat", "0003_chatroom_image"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='chatmessage',
-            options={'ordering': ('-created',)},
+            name="chatmessage",
+            options={"ordering": ("-created",)},
         ),
     ]

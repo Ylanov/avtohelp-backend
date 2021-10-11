@@ -8,13 +8,19 @@ import utils.mixins
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat', '0002_chatreadmessage'),
+        ("chat", "0002_chatreadmessage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='chatroom',
-            name='image',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, default=None, null=True, upload_to=utils.mixins.image_path, verbose_name='Image'),
+            model_name="chatroom",
+            name="image",
+            field=easy_thumbnails.fields.ThumbnailerImageField(
+                blank=True,
+                default=None,
+                null=True,
+                upload_to=utils.mixins.image_path,
+                verbose_name="Image",
+            ),
         ),
     ]

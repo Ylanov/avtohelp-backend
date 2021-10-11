@@ -7,13 +7,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('car', '0002_carservicecategory_image'),
+        ("car", "0002_carservicecategory_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='carcolor',
-            name='hex_color',
+            model_name="carcolor",
+            name="hex_color",
             field=colorful.fields.RGBColorField(blank=True, default=None, null=True),
         ),
     ]

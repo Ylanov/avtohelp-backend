@@ -3,76 +3,109 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from fcm_django.models import FCMDevice as BaseFCMDevice
 
-from .models import (Profile, FriendRequest,
-                     FriendList, BlackList,
-                     ProfileLocation, ProfileCar,
-                     ProfileGallery, FCMDevice)
+from .models import (
+    Profile,
+    FriendRequest,
+    FriendList,
+    BlackList,
+    ProfileLocation,
+    ProfileCar,
+    ProfileGallery,
+    FCMDevice,
+)
 
-common_fields = ('id', 'user', 'created', 'modified')
+common_fields = ("id", "user", "created", "modified")
 
 
 class ProfileGalleryInline(admin.TabularInline):
     """Inline for model Profile"""
+
     model = ProfileGallery
-    classes = ['collapse']
+    classes = ["collapse"]
     extra = 1
 
 
 class ProfileModelAdmin(admin.ModelAdmin):
     """Custom admin page for Profile"""
-    readonly_fields = ('id', 'created', 'modified')
-    inlines = (ProfileGalleryInline, )
-    search_fields = ('user__phone', 'user__profile__first_name', 'user__profile__last_name', 'user__profilecar__license_plate',)
-    list_display = ('id', 'user', 'first_name', 'last_name', 'created', 'modified')
+
+    readonly_fields = ("id", "created", "modified")
+    inlines = (ProfileGalleryInline,)
+    search_fields = (
+        "user__phone",
+        "user__profile__first_name",
+        "user__profile__last_name",
+        "user__profilecar__license_plate",
+    )
+    list_display = ("id", "user", "first_name", "last_name", "created", "modified")
     fieldsets = (
-        (_('User\'s data'), {'fields': ('user', 'first_name',
-                                        'last_name', 'image', 'is_verified')}),
-        (_('Location'), {'fields': ('city',)}),
-        (_('Info'), {'fields': ('created', 'modified')}),
+        (
+            _("User's data"),
+            {"fields": ("user", "first_name", "last_name", "image", "is_verified")},
+        ),
+        (_("Location"), {"fields": ("city",)}),
+        (_("Info"), {"fields": ("created", "modified")}),
     )
 
 
 class FriendRequestModelAdmin(admin.ModelAdmin):
     """Custom admin page for FriendRequest"""
-    list_display = ('id', 'owner', 'invited') + common_fields[-2:]
+
+    list_display = ("id", "owner", "invited") + common_fields[-2:]
 
 
 class ProfileLocationModelAdmin(admin.ModelAdmin):
     """Custom admin page for FriendRequest"""
-    list_display = ('id', 'user', 'location') + common_fields[-2:]
+
+    list_display = ("id", "user", "location") + common_fields[-2:]
 
 
 class FriendListModelAdmin(admin.ModelAdmin):
     """Custom admin page for FriendList"""
-    list_display = ('id', 'owner', 'friend', 'created', 'modified')
+
+    list_display = ("id", "owner", "friend", "created", "modified")
 
 
 class BlackListModelAdmin(admin.ModelAdmin):
     """Custom admin page for BlackList"""
-    list_display = ('id', 'owner', 'foe', 'created', 'modified')
+
+    list_display = ("id", "owner", "foe", "created", "modified")
 
 
 class ProfileCarModelAdmin(admin.ModelAdmin):
     """Custom admin page for ProfileCar"""
-    list_display = ('id', 'owner', 'car', 'license_plate')
+
+    list_display = ("id", "owner", "car", "license_plate")
 
 
 class ProfileGalleryModelAdmin(admin.ModelAdmin):
     """Custom admin page for ProfileGallery"""
-    list_display = ('id', 'profile', 'image')
+
+    list_display = ("id", "profile", "image")
 
 
 class DeviceAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "device_id", "name", "type", "user", "active",
-                    "date_created")
+    list_display = (
+        "__str__",
+        "device_id",
+        "name",
+        "type",
+        "user",
+        "active",
+        "date_created",
+    )
     list_filter = ("active",)
-    actions = ("send_message", "send_bulk_message", "send_data_message",
-               "send_bulk_data_message", "enable", "disable")
+    actions = (
+        "send_message",
+        "send_bulk_message",
+        "send_data_message",
+        "send_bulk_data_message",
+        "enable",
+        "disable",
+    )
     raw_id_fields = ("user",)
 
     if hasattr(User, "USERNAME_FIELD"):
-        search_fields = (
-            "name", "device_id", "user__%s" % (User.USERNAME_FIELD))
+        search_fields = ("name", "device_id", "user__%s" % (User.USERNAME_FIELD))
     else:
         search_fields = ("name", "device_id")
 
@@ -88,14 +121,12 @@ class DeviceAdmin(admin.ModelAdmin):
         for device in queryset:
             if bulk:
                 if data:
-                    response = queryset.send_message(
-                        data={"Nick": "Mario"}
-                    )
+                    response = queryset.send_message(data={"Nick": "Mario"})
                 else:
                     response = queryset.send_message(
                         title="Test notification",
                         body="Test bulk notification",
-                        sound="default"
+                        sound="default",
                     )
             else:
                 if data:
@@ -104,12 +135,12 @@ class DeviceAdmin(admin.ModelAdmin):
                     response = device.send_message(
                         title="Test notification",
                         body="Test single notification",
-                        sound="default"
+                        sound="default",
                     )
             if response:
                 ret.append(response)
 
-            failure = int(response['failure'])
+            failure = int(response["failure"])
             total_failure += failure
             errors.append(str(response))
 
@@ -126,9 +157,11 @@ class DeviceAdmin(admin.ModelAdmin):
         if total_failure > 0:
             self.message_user(
                 request,
-                _("Some messages failed to send. %d devices were marked as "
-                  "inactive." % total_failure),
-                level=messages.WARNING
+                _(
+                    "Some messages failed to send. %d devices were marked as "
+                    "inactive." % total_failure
+                ),
+                level=messages.WARNING,
             )
 
     def send_message(self, request, queryset):
@@ -149,8 +182,7 @@ class DeviceAdmin(admin.ModelAdmin):
     def send_bulk_data_message(self, request, queryset):
         self.send_messages(request, queryset, True, True)
 
-    send_bulk_data_message.short_description = _(
-        "Send test data message in bulk")
+    send_bulk_data_message.short_description = _("Send test data message in bulk")
 
     def enable(self, request, queryset):
         queryset.update(active=True)
@@ -174,4 +206,3 @@ admin.site.register(ProfileLocation, ProfileLocationModelAdmin)
 admin.site.register(FCMDevice, DeviceAdmin)
 #  Unregister base fcm device model
 admin.site.unregister(BaseFCMDevice)
-

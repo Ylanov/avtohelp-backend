@@ -55,7 +55,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 await self.leave_room(room_id)
             except ClientError:
                 pass
-            await utils_methods.chat_logout_user(user_id=self.scope["user"].id, room_id=room_id)
+            await utils_methods.chat_logout_user(
+                user_id=self.scope["user"].id, room_id=room_id
+            )
 
     ##### Command helper methods called by receive_json
 
@@ -64,7 +66,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         Called by receive_json when someone sent a join command.
         """
         # Check if user isn't already in chat (check duplicates)
-        logged_users = caches['default'].get(f'room_{room_id}') or set()
+        logged_users = caches["default"].get(f"room_{room_id}") or set()
         if self.scope["user"].id in logged_users:
             await self.close()
 
@@ -76,11 +78,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         self.rooms.add(room_id)
 
         # Store logged users in cache
-        await utils_methods.chat_update_logged_users(user_id=self.scope["user"].id, room_id=room_id)
+        await utils_methods.chat_update_logged_users(
+            user_id=self.scope["user"].id, room_id=room_id
+        )
 
         # Send to Celery for making all messages in the room read.
         if settings.USE_CELERY:
-            celery_tasks.read_messages.delay(reader_id=self.scope["user"].id, room_id=room_id)
+            celery_tasks.read_messages.delay(
+                reader_id=self.scope["user"].id, room_id=room_id
+            )
         else:
             celery_tasks.read_messages(reader_id=self.scope["user"].id, room_id=room_id)
 
@@ -98,7 +104,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "type": "chat.join",
                     "room_id": room_id,
                     "profile_id": self.scope["user"].profile.id,
-                }
+                },
             )
 
     async def leave_room(self, room_id):
@@ -116,13 +122,15 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "type": "chat.leave",
                     "room_id": room_id,
                     "profile_id": self.scope["user"].profile.id,
-                }
+                },
             )
 
         # Remove that we're in the room
         self.rooms.discard(room_id)
 
-        await utils_methods.chat_logout_user(user_id=self.scope["user"].id, room_id=room_id)
+        await utils_methods.chat_logout_user(
+            user_id=self.scope["user"].id, room_id=room_id
+        )
 
         # Remove them from the group so they no longer get room messages
         await self.channel_layer.group_discard(
@@ -131,9 +139,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
         # Instruct their client to finish closing the room
-        await self.send_json({
-            "leave": room.id,
-        })
+        await self.send_json(
+            {
+                "leave": room.id,
+            }
+        )
 
     async def send_room(self, room_id, message):
         """
@@ -149,9 +159,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         room = await utils_methods.by_user_and_room_id(user, room_id)
 
         # Make a record in the DB
-        letter = await utils_methods.create_chat_message(room_id=room_id,
-                                                         message=message,
-                                                         sender=user)
+        letter = await utils_methods.create_chat_message(
+            room_id=room_id, message=message, sender=user
+        )
 
         await self.channel_layer.group_send(
             room.group_name,
@@ -162,10 +172,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "first_name": user.get_first_name,
                 "last_name": user.get_last_name,
                 "avatar": user.get_avatar,
-                'datetime': f'{letter.created.isoformat()}',
+                "datetime": f"{letter.created.isoformat()}",
                 "message": message,
-                "message_id": letter.id
-            }
+                "message_id": letter.id,
+            },
         )
 
     async def read_message(self, room_id, messages):
@@ -178,10 +188,13 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         # Send to Celery task for making a record in the DB
         if settings.USE_CELERY:
-            celery_tasks.read_message.delay(message_list=messages, reader_id=self.scope["user"].id)
+            celery_tasks.read_message.delay(
+                message_list=messages, reader_id=self.scope["user"].id
+            )
         else:
-            celery_tasks.read_message(message_list=messages, reader_id=self.scope["user"].id)
-
+            celery_tasks.read_message(
+                message_list=messages, reader_id=self.scope["user"].id
+            )
 
     ##### Handlers for messages sent over the channel layer
 
@@ -227,7 +240,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 "avatar": event["avatar"],
                 "first_name": event["first_name"],
                 "last_name": event["last_name"],
-                'datetime': event["datetime"],
+                "datetime": event["datetime"],
                 "message": event["message"],
                 "message_id": event["message_id"],
             },

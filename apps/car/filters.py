@@ -8,31 +8,31 @@ from car import models
 class CarListFilterSet(django_filters.FilterSet):
     """Filters for CarList"""
 
-    mark_name = django_filters.CharFilter(method='by_mark_name')
-    model_name = django_filters.CharFilter(method='by_model_name')
+    mark_name = django_filters.CharFilter(method="by_mark_name")
+    model_name = django_filters.CharFilter(method="by_model_name")
 
     class Meta:
         """Meta class."""
 
         model = models.Car
         fields = [
-            'mark_name',
-            'model_name',
+            "mark_name",
+            "model_name",
         ]
 
     def by_mark_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(mark__name=value).distinct('id')
+            qs = queryset.filter(mark__name=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(mark__name__icontains=value).distinct('id')
+                qs = queryset.filter(mark__name__icontains=value).distinct("id")
             return qs
         return queryset
 
     def by_model_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(car_model__name__contains=value).distinct('id')
+            qs = queryset.filter(car_model__name__contains=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(car_model__name__icontains=value).distinct('id')
+                qs = queryset.filter(car_model__name__icontains=value).distinct("id")
             return qs
         return queryset
 
@@ -40,14 +40,14 @@ class CarListFilterSet(django_filters.FilterSet):
 class CarColorFilterSet(django_filters.FilterSet):
     """Filters for CarList"""
 
-    color_name = django_filters.CharFilter(method='by_color_name')
+    color_name = django_filters.CharFilter(method="by_color_name")
 
     class Meta:
         """Meta class."""
 
         model = models.CarColor
         fields = [
-            'color_name',
+            "color_name",
         ]
 
     def by_color_name(self, queryset, name, value):
@@ -62,31 +62,28 @@ class CarColorFilterSet(django_filters.FilterSet):
 class CarMarkListFilterSet(django_filters.FilterSet):
     """Filters for CarMark"""
 
-    model_name = django_filters.CharFilter(method='by_model_name')
-    mark_name = django_filters.CharFilter(method='by_mark_name')
+    model_name = django_filters.CharFilter(method="by_model_name")
+    mark_name = django_filters.CharFilter(method="by_mark_name")
 
     class Meta:
         """Meta class."""
 
         model = models.CarMark
-        fields = [
-            'model_name',
-            'mark_name'
-        ]
+        fields = ["model_name", "mark_name"]
 
     def by_model_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(carmodel__name__contains=value).distinct('id')
+            qs = queryset.filter(carmodel__name__contains=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(carmodel__name__icontains=value).distinct('id')
+                qs = queryset.filter(carmodel__name__icontains=value).distinct("id")
             return qs
         return queryset
 
     def by_mark_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(name__contains=value).distinct('id')
+            qs = queryset.filter(name__contains=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(name__icontains=value).distinct('id')
+                qs = queryset.filter(name__icontains=value).distinct("id")
             return qs
         return queryset
 
@@ -94,31 +91,28 @@ class CarMarkListFilterSet(django_filters.FilterSet):
 class CarModelListFilterSet(django_filters.FilterSet):
     """Filters for CarModel"""
 
-    mark_name = django_filters.CharFilter(method='by_mark_name')
-    model_name = django_filters.CharFilter(method='by_model_name')
+    mark_name = django_filters.CharFilter(method="by_mark_name")
+    model_name = django_filters.CharFilter(method="by_model_name")
 
     class Meta:
         """Meta class."""
 
         model = models.CarModel
-        fields = [
-            'mark_name',
-            'model_name'
-        ]
+        fields = ["mark_name", "model_name"]
 
     def by_mark_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(mark__name=value).distinct('id')
+            qs = queryset.filter(mark__name=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(mark__name__icontains=value).distinct('id')
+                qs = queryset.filter(mark__name__icontains=value).distinct("id")
             return qs
         return queryset
 
     def by_model_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(name=value).distinct('id')
+            qs = queryset.filter(name=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(name__icontains=value).distinct('id')
+                qs = queryset.filter(name__icontains=value).distinct("id")
             return qs
         return queryset
 
@@ -146,10 +140,6 @@ class ServiceStationsFilterSet(django_filters.FilterSet):
 
     class Meta:
         """Meta class"""
+
         model = models.CarService
-        fields = [
-            'category_id',
-            'from_center',
-            'distance',
-            'icon_exists'
-        ]
+        fields = ["category_id", "from_center", "distance", "icon_exists"]

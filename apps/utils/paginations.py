@@ -8,7 +8,7 @@ from django.db.models import F
 from rest_framework.pagination import CursorPagination
 from rest_framework.pagination import _reverse_ordering
 
-Cursor = namedtuple('Cursor', ['offset', 'reverse', 'position'])
+Cursor = namedtuple("Cursor", ["offset", "reverse", "position"])
 
 
 class ProjectCursorPagination(CursorPagination):
@@ -20,26 +20,26 @@ class ProjectCursorPagination(CursorPagination):
         """
         tokens = {}
         if cursor.offset != 0:
-            tokens['o'] = str(cursor.offset)
+            tokens["o"] = str(cursor.offset)
         if cursor.reverse:
-            tokens['r'] = '1'
+            tokens["r"] = "1"
         if cursor.position is not None:
-            tokens['p'] = cursor.position
+            tokens["p"] = cursor.position
 
         querystring = urlparse.urlencode(tokens, doseq=True)
-        encoded = b64encode(querystring.encode('ascii')).decode('ascii')
+        encoded = b64encode(querystring.encode("ascii")).decode("ascii")
         return encoded
 
 
 class NewsCursorPagination(ProjectCursorPagination):
     """Custom cursor pagination"""
 
-    ordering = '-publish_date'
+    ordering = "-publish_date"
 
 
 class ChatCursorPagination(ProjectCursorPagination):
 
-    ordering = 'last_message_datetime'
+    ordering = "last_message_datetime"
 
     def paginate_queryset(self, queryset, request, view=None):
         self.page_size = self.get_page_size(request)
@@ -64,27 +64,29 @@ class ChatCursorPagination(ProjectCursorPagination):
         # If we have a cursor with a fixed position then filter by that.
         if current_position is not None:
             order = self.ordering[0]
-            is_reversed = order.startswith('-')
-            order_attr = order.lstrip('-')
+            is_reversed = order.startswith("-")
+            order_attr = order.lstrip("-")
 
             # Test for: (cursor reversed) XOR (queryset reversed)
             if self.cursor.reverse != is_reversed:
-                kwargs = {order_attr + '__lt': current_position}
+                kwargs = {order_attr + "__lt": current_position}
             else:
-                kwargs = {order_attr + '__gt': current_position}
+                kwargs = {order_attr + "__gt": current_position}
 
             queryset = queryset.filter(**kwargs)
 
         # If we have an offset cursor then offset the entire page by that amount.
         # We also always fetch an extra item in order to determine if there is a
         # page following on from this one.
-        results = list(queryset[offset:offset + self.page_size + 1])
-        self.page = list(results[:self.page_size])
+        results = list(queryset[offset : offset + self.page_size + 1])
+        self.page = list(results[: self.page_size])
 
         # Determine the position of the final item following the page.
         if len(results) > len(self.page):
             has_following_position = True
-            following_position = self._get_position_from_instance(results[-1], self.ordering)
+            following_position = self._get_position_from_instance(
+                results[-1], self.ordering
+            )
         else:
             has_following_position = False
             following_position = None

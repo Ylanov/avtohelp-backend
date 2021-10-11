@@ -8,13 +8,19 @@ import utils.mixins
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('car', '0001_initial'),
+        ("car", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='carservicecategory',
-            name='image',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, default=None, null=True, upload_to=utils.mixins.image_path, verbose_name='Image'),
+            model_name="carservicecategory",
+            name="image",
+            field=easy_thumbnails.fields.ThumbnailerImageField(
+                blank=True,
+                default=None,
+                null=True,
+                upload_to=utils.mixins.image_path,
+                verbose_name="Image",
+            ),
         ),
     ]

@@ -14,12 +14,12 @@ MSG_TYPE_ENTER = 4  # For just OK information that doesn't bother users
 MSG_TYPE_LEAVE = 5  # For just OK information that doesn't bother users
 
 MESSAGE_TYPES_CHOICES = (
-    (MSG_TYPE_MESSAGE, 'MESSAGE'),
-    (MSG_TYPE_WARNING, 'WARNING'),
-    (MSG_TYPE_ALERT, 'ALERT'),
-    (MSG_TYPE_MUTED, 'MUTED'),
-    (MSG_TYPE_ENTER, 'ENTER'),
-    (MSG_TYPE_LEAVE, 'LEAVE'),
+    (MSG_TYPE_MESSAGE, "MESSAGE"),
+    (MSG_TYPE_WARNING, "WARNING"),
+    (MSG_TYPE_ALERT, "ALERT"),
+    (MSG_TYPE_MUTED, "MUTED"),
+    (MSG_TYPE_ENTER, "ENTER"),
+    (MSG_TYPE_LEAVE, "LEAVE"),
 )
 
 MESSAGE_TYPES_LIST = [
@@ -40,14 +40,16 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.filter(room=room_id)
 
     def annotate_read_status(self, user):
-        return self.annotate(read=models.Case(
-            models.When(
-                models.Q(chatreadmessage__user=user) | models.Q(sender=user),
-                then=True
-            ),
-            default=False,
-            output_field=models.BooleanField(default=False)
-        ))
+        return self.annotate(
+            read=models.Case(
+                models.When(
+                    models.Q(chatreadmessage__user=user) | models.Q(sender=user),
+                    then=True,
+                ),
+                default=False,
+                output_field=models.BooleanField(default=False),
+            )
+        )
 
 
 class ChatMessageManager(models.Manager):
@@ -63,39 +65,46 @@ class ChatMessageManager(models.Manager):
 
 class ChatMessage(BaseMixin):
     """Chat messages"""
-    sender = models.ForeignKey('account.User',
-                               on_delete=models.CASCADE,
-                               verbose_name=_('Sender'))
-    room = models.ForeignKey('ChatRoom',
-                             on_delete=models.CASCADE,
-                             verbose_name=_('Room'))
-    message = models.TextField(verbose_name=_('Text message'))
-    timestamp = models.DateTimeField(blank=True, default=None, null=True,
-                                     verbose_name=_('Recording date'))
+
+    sender = models.ForeignKey(
+        "account.User", on_delete=models.CASCADE, verbose_name=_("Sender")
+    )
+    room = models.ForeignKey(
+        "ChatRoom", on_delete=models.CASCADE, verbose_name=_("Room")
+    )
+    message = models.TextField(verbose_name=_("Text message"))
+    timestamp = models.DateTimeField(
+        blank=True, default=None, null=True, verbose_name=_("Recording date")
+    )
 
     objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
 
     class Meta:
         """Meta class"""
-        ordering = ('-created',)
-        verbose_name = _('Chat message')
-        verbose_name_plural = _('Chat messages')
+
+        ordering = ("-created",)
+        verbose_name = _("Chat message")
+        verbose_name_plural = _("Chat messages")
 
     def send_push_notification_offline_users(self):
         """Sent push notification to offline users in chat room exclude sender"""
-        participants = {i.get('id') for i in self.room.participants.all().values('id')}
-        offline_users = participants.difference(caches['default'].get(f'room_{self.room.id}').union({self.sender.id}))
+        participants = {i.get("id") for i in self.room.participants.all().values("id")}
+        offline_users = participants.difference(
+            caches["default"].get(f"room_{self.room.id}").union({self.sender.id})
+        )
 
         if settings.USE_CELERY:
             tasks.notify_chat_participants.delay(
                 sender_id=self.sender.id,
                 room_id=self.room.id,
-                participants=list(offline_users))
+                participants=list(offline_users),
+            )
         else:
             tasks.notify_chat_participants(
                 sender_id=self.sender.id,
                 room_id=self.room.id,
-                participants=list(offline_users))
+                participants=list(offline_users),
+            )
 
 
 class ChatRoomManager(models.Manager):
@@ -119,21 +128,27 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(participants__blacked_user__owner=participant)\
-                   .exclude(participants__blacklist_owner__foe=participant)
+        return self.exclude(participants__blacked_user__owner=participant).exclude(
+            participants__blacklist_owner__foe=participant
+        )
 
     def friends(self, participant):
         """Filter by friend flag"""
         return self.filter(
             # Check if USER is an initiator of friend request (is OWNER)
-            models.Q(participants__friendlist_user__owner=participant) |
+            models.Q(participants__friendlist_user__owner=participant)
+            |
             # Check if USER is an invited person
             models.Q(participants__friendlist_owner__friend=participant)
         ).distinct()
 
     def private(self, initiator, participant):
         """Filter by two participants for find private room"""
-        return self.filter(is_public=False).filter(participants=initiator).filter(participants=participant)
+        return (
+            self.filter(is_public=False)
+            .filter(participants=initiator)
+            .filter(participants=participant)
+        )
 
     def by_participant(self, participant):
         """Find room by participant"""
@@ -144,36 +159,40 @@ class ChatRoomQuerySet(models.QuerySet):
         return self.filter(is_public=True)
 
     def annotate_unread_messages(self, user):
-        return self.annotate(unread_messages=models.Count('chatmessage',
-                                                          filter=~models.Q(chatmessage__chatreadmessage__user=user) &
-                                                                 ~models.Q(chatmessage__sender=user),
-                                                          distinct=True))
+        return self.annotate(
+            unread_messages=models.Count(
+                "chatmessage",
+                filter=~models.Q(chatmessage__chatreadmessage__user=user)
+                & ~models.Q(chatmessage__sender=user),
+                distinct=True,
+            )
+        )
 
     def annotate_message_count(self):
-        return self.annotate(message_count=models.Count('chatmessage',
-                                                        distinct=True))
+        return self.annotate(message_count=models.Count("chatmessage", distinct=True))
 
     def annotate_last_message_datetime(self):
-        return self.annotate(last_message_datetime=models.Max('chatmessage__created'))
+        return self.annotate(last_message_datetime=models.Max("chatmessage__created"))
 
 
 class ChatRoom(BaseMixin, ImageMixin):
     """Chat room"""
-    name = models.CharField(max_length=24,
-                            blank=True, default=None, null=True,
-                            verbose_name=_('Name'))
-    participants = models.ManyToManyField('account.User',
-                                          related_name='participants',
-                                          verbose_name=_('Participants'))
-    is_public = models.BooleanField(default=False,
-                                    verbose_name=_('is public'))
+
+    name = models.CharField(
+        max_length=24, blank=True, default=None, null=True, verbose_name=_("Name")
+    )
+    participants = models.ManyToManyField(
+        "account.User", related_name="participants", verbose_name=_("Participants")
+    )
+    is_public = models.BooleanField(default=False, verbose_name=_("is public"))
 
     objects = ChatRoomManager.from_queryset(ChatRoomQuerySet)()
 
     class Meta:
         """Meta class"""
-        verbose_name = _('Chat room')
-        verbose_name_plural = _('Chat rooms')
+
+        verbose_name = _("Chat room")
+        verbose_name_plural = _("Chat rooms")
 
     @property
     def group_name(self):
@@ -190,30 +209,38 @@ class ChatRole(BaseMixin):
     MODERATOR = 0
     PARTICIPANT = 1
 
-    ROLE_CHOICES = (
-        (MODERATOR, _('Moderator')),
-        (PARTICIPANT, _('Participant'))
-    )
+    ROLE_CHOICES = ((MODERATOR, _("Moderator")), (PARTICIPANT, _("Participant")))
 
-    user = models.ForeignKey('account.User',
-                             related_name='user_role',
-                             on_delete=models.CASCADE,
-                             verbose_name=_('User'))
-    room = models.ForeignKey('ChatRoom',
-                             related_name='room_role',
-                             on_delete=models.CASCADE,
-                             verbose_name=_('Room'))
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, default=PARTICIPANT,
-                                            blank=True, null=True, verbose_name=_('Role'))
+    user = models.ForeignKey(
+        "account.User",
+        related_name="user_role",
+        on_delete=models.CASCADE,
+        verbose_name=_("User"),
+    )
+    room = models.ForeignKey(
+        "ChatRoom",
+        related_name="room_role",
+        on_delete=models.CASCADE,
+        verbose_name=_("Room"),
+    )
+    role = models.PositiveSmallIntegerField(
+        choices=ROLE_CHOICES,
+        default=PARTICIPANT,
+        blank=True,
+        null=True,
+        verbose_name=_("Role"),
+    )
 
     class Meta:
         """Meta class"""
-        verbose_name = _('Chat role')
-        verbose_name_plural = _('Chat roles')
+
+        verbose_name = _("Chat role")
+        verbose_name_plural = _("Chat roles")
 
 
 class ChatReadMessageQuerySet(models.QuerySet):
     """QuerySets for model ChatReadMessage"""
+
     pass
 
 
@@ -229,14 +256,14 @@ class ChatReadMessageManager(models.Manager):
 
 class ChatReadMessage(BaseMixin):
     """Model for fixation read/unread messages in room"""
-    user = models.ForeignKey('account.User',
-                             on_delete=models.CASCADE)
-    message = models.ForeignKey('ChatMessage',
-                                on_delete=models.CASCADE)
+
+    user = models.ForeignKey("account.User", on_delete=models.CASCADE)
+    message = models.ForeignKey("ChatMessage", on_delete=models.CASCADE)
 
     objects = ChatReadMessageManager.from_queryset(ChatReadMessageQuerySet)()
 
     class Meta:
         """Meta class"""
-        ordering = ('created',)
-        unique_together = ('user', 'message')
+
+        ordering = ("created",)
+        unique_together = ("user", "message")

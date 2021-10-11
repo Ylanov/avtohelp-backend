@@ -16,6 +16,7 @@ class NewsViewSet(viewsets.ModelViewSet):
     """
     ViewSet for model News
     """
+
     permission_classes = (AllowAny,)
     model = models.Newsletter
     queryset = models.Newsletter.objects.filter(publish=True)
@@ -27,6 +28,7 @@ class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewS
     """
     ViewSet for model Notification
     """
+
     serializer_class = serializers.NotificationDetailSerializer
 
     def get_queryset(self):
@@ -49,13 +51,16 @@ class PushNotificationConfigurationView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         """Override get method"""
         obj = models.PushNotificationConfiguration.get_solo()
-        return Response(data=self.get_serializer(obj.notification_schedule, many=True).data)
+        return Response(
+            data=self.get_serializer(obj.notification_schedule, many=True).data
+        )
 
 
 class RecommendationsListView(generics.ListAPIView):
     """
     Recommendations list view
     """
+
     # permission_classes = (AllowAny,)
     serializer_class = serializers.RecommendationsListSerializer
     queryset = models.Newsletter.objects.all()
@@ -70,35 +75,43 @@ class RecommendationCreateView(generics.CreateAPIView):
     """
     Recommendation create view
     """
+
     serializer_class = serializers.RecommendationCreateSerializer
+
 
 class NewsToggleLikeView(generics.UpdateAPIView):
     """
     News toggle like view
     """
+
     queryset = models.Newsletter.objects.all()
     serializer_class = serializers.NewsToggleLikeSerializer
+
 
 class NewsCommentCreateView(generics.CreateAPIView):
     """
     News comment create view
     """
+
     queryset = models.NewsletterComment.objects.all()
     serializer_class = serializers.NewsletterCommentCreateSerializer
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
         # add things in context.
-        context['newsletter_id'] = self.kwargs['newsletter_id']
+        context["newsletter_id"] = self.kwargs["newsletter_id"]
         return context
+
 
 class NewsCommentUpdateView(generics.UpdateAPIView):
     queryset = models.NewsletterComment.objects.all()
     serializer_class = serializers.NewsletterCommentUpdateSerializer
 
+
 class NewsCommentDeleteView(generics.DestroyAPIView):
     queryset = models.NewsletterComment.objects.all()
     serializer_class = serializers.NewsletterCommentDeleteSerializer
+
 
 # class NewsListView(generics.ListAPIView):
 #     """

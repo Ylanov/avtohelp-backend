@@ -9,7 +9,7 @@ from order.serializers import current as serializers
 class AssistanceRequestBaseMixin:
     """AssistanceRequest mixin"""
 
-    queryset = models.AssistanceRequest.objects.select_related('user__profile')
+    queryset = models.AssistanceRequest.objects.select_related("user__profile")
 
 
 class AssistanceRequestMixin(AssistanceRequestBaseMixin):
@@ -19,8 +19,9 @@ class AssistanceRequestMixin(AssistanceRequestBaseMixin):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.available(self.request.user)\
-                            .annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))
+        return self.queryset.available(self.request.user).annotate_distance(
+            raw_coordinates=self.request.query_params.get("coordinates")
+        )
 
 
 class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
@@ -31,46 +32,52 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     ordering by:
     - distance
     """
+
     serializer_class = serializers.AssistanceRequestListSerializer
     pagination_class = None
     filter_class = filters.AssistanceRequestFitlerSet
 
     def get_queryset(self):
-        return super().get_queryset().annotate_owner_status(user=self.request.user)\
-                                     .order_by('distance')
+        return (
+            super()
+            .get_queryset()
+            .annotate_owner_status(user=self.request.user)
+            .order_by("distance")
+        )
 
 
 class AssistanceRequestCountView(views.APIView):
     """
     Return count of available assistance request
     """
+
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
         user = request.user
         push_config = PushNotificationConfiguration.get_solo()
         if user.location_is_valid:
 
-            countRequest = models.AssistanceRequest.objects.available(user)\
-                                .annotate_distance(point=user.profilelocation.location)\
-                                .filter(distance__lte=push_config.radius)\
-                                .distinct('user')\
-                                .count()
+            countRequest = (
+                models.AssistanceRequest.objects.available(user)
+                .annotate_distance(point=user.profilelocation.location)
+                .filter(distance__lte=push_config.radius)
+                .distinct("user")
+                .count()
+            )
 
-            readRequest = models.AssistanceRequest.objects.available(user)\
-                                .annotate_distance(point=user.profilelocation.location)\
-                                .filter(distance__lte=push_config.radius)\
-                                .filter(assistance_request_user_read__user=user)\
-                                .count()
+            readRequest = (
+                models.AssistanceRequest.objects.available(user)
+                .annotate_distance(point=user.profilelocation.location)
+                .filter(distance__lte=push_config.radius)
+                .filter(assistance_request_user_read__user=user)
+                .count()
+            )
 
-            return Response({
-                'count': countRequest,
-                'unread': countRequest - readRequest
-            })
+            return Response(
+                {"count": countRequest, "unread": countRequest - readRequest}
+            )
         else:
-            return Response({
-                'count': 0,
-                'unread': 0
-            })
+            return Response({"count": 0, "unread": 0})
 
 
 class AssistanceRequestCreateView(AssistanceRequestBaseMixin, generics.CreateAPIView):
@@ -104,6 +111,7 @@ class AssistanceRequestCreateView(AssistanceRequestBaseMixin, generics.CreateAPI
       "geo_lon": 123.124
     }
     """
+
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
     def get_queryset(self):
@@ -114,53 +122,78 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
     """
     Get detail information of assistance request
     """
+
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
         try:
-            request = models.AssistanceRequest.objects.get(pk=self.kwargs['pk'])
+            request = models.AssistanceRequest.objects.get(pk=self.kwargs["pk"])
             # listing = RealEstateListing.objects.get(slug_url=slug)
         except models.AssistanceRequest.DoesNotExist:
             request = None
 
         if request:
-            views = models.AssistanceRequestUserRead.objects.filter(request=request, user=self.request.user).count()
-            
+            views = models.AssistanceRequestUserRead.objects.filter(
+                request=request, user=self.request.user
+            ).count()
+
             # check views count of assistance request
             if views == 0:
-                read = models.AssistanceRequestUserRead.objects.make(request=request, user=self.request.user)
-        
-        return super().get_queryset().annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))\
-                                     .annotate_owner_status(user=self.request.user)
+                read = models.AssistanceRequestUserRead.objects.make(
+                    request=request, user=self.request.user
+                )
+
+        return (
+            super()
+            .get_queryset()
+            .annotate_distance(
+                raw_coordinates=self.request.query_params.get("coordinates")
+            )
+            .annotate_owner_status(user=self.request.user)
+        )
 
 
 class AssistanceRequestUpdateView(AssistanceRequestBaseMixin, generics.UpdateAPIView):
     """
     Get detail information of assistance request
     """
+
     serializer_class = serializers.AssistanceRequestUpdateSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return super().get_queryset().by_user(user=self.request.user)\
-                                     .available(user=self.request.user)
+        return (
+            super()
+            .get_queryset()
+            .by_user(user=self.request.user)
+            .available(user=self.request.user)
+        )
 
 
-class AssistanceRequestView(AssistanceRequestBaseMixin, generics.RetrieveDestroyAPIView):
+class AssistanceRequestView(
+    AssistanceRequestBaseMixin, generics.RetrieveDestroyAPIView
+):
     """
     Get detail information of assistance request
     """
+
     serializer_class = serializers.AssistanceRequestCreateSerializer
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return super().get_queryset().annotate_distance(raw_coordinates=self.request.query_params.get('coordinates'))
+        return (
+            super()
+            .get_queryset()
+            .annotate_distance(
+                raw_coordinates=self.request.query_params.get("coordinates")
+            )
+        )
 
 
 class AssistanceRequestDestroyView(generics.DestroyAPIView):
     """
-   Delete assistance request
+    Delete assistance request
     """
 
     def get_queryset(self):

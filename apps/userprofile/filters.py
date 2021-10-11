@@ -7,7 +7,7 @@ from userprofile import models
 class ProfileListFilterSet(django_filters.FilterSet):
     """ProfileList filter set."""
 
-    search = django_filters.CharFilter(method='full_text_search')
+    search = django_filters.CharFilter(method="full_text_search")
     online = django_filters.BooleanFilter()
     friend = django_filters.BooleanFilter()
 
@@ -16,33 +16,41 @@ class ProfileListFilterSet(django_filters.FilterSet):
 
         model = models.Profile
         fields = [
-            'online',
-            'friend',
-            'search',
+            "online",
+            "friend",
+            "search",
         ]
 
     def full_text_search(self, queryset, name, value):
         if value:
             # Parse search parameters in value
-            query_params = [item.strip() for item in value.split(' ')]
+            query_params = [item.strip() for item in value.split(" ")]
             # Full-text search
-            qs = queryset.annotate_full_text_search().filter(search=SearchQuery(value, config='simple'))
+            qs = queryset.annotate_full_text_search().filter(
+                search=SearchQuery(value, config="simple")
+            )
             # If qs is empty find by one of query parameter
             if not qs.exists():
                 count = len(query_params)
-                if count==2:
-                    qs = queryset.annotate_full_text_search()\
-                                .filter(search__icontains=query_params[0])\
-                                .filter(search__icontains=query_params[1])
-                elif count==3:
-                    qs = queryset.annotate_full_text_search()\
-                                .filter(search__icontains=query_params[0])\
-                                .filter(search__icontains=query_params[1])\
-                                .filter(search__icontains=query_params[2])
+                if count == 2:
+                    qs = (
+                        queryset.annotate_full_text_search()
+                        .filter(search__icontains=query_params[0])
+                        .filter(search__icontains=query_params[1])
+                    )
+                elif count == 3:
+                    qs = (
+                        queryset.annotate_full_text_search()
+                        .filter(search__icontains=query_params[0])
+                        .filter(search__icontains=query_params[1])
+                        .filter(search__icontains=query_params[2])
+                    )
 
                 # If qs is empty find something
                 if not qs.exists():
-                    qs = queryset.annotate_full_text_search().filter(search__icontains=value)
+                    qs = queryset.annotate_full_text_search().filter(
+                        search__icontains=value
+                    )
             return qs
         return queryset
 
@@ -50,40 +58,40 @@ class ProfileListFilterSet(django_filters.FilterSet):
 class ProfileGalleryListFilterSet(django_filters.FilterSet):
     """ProfileGallery filter set."""
 
-    person_id = django_filters.NumberFilter(field_name='profile__id')
+    person_id = django_filters.NumberFilter(field_name="profile__id")
 
     class Meta:
         """Meta class."""
 
         model = models.ProfileGallery
         fields = [
-            'person_id',
+            "person_id",
         ]
 
 
 class OutgoingRequestFilterSet(django_filters.FilterSet):
     """Outgoing friend request filter set."""
 
-    person_id = django_filters.NumberFilter(field_name='invited__profile__id')
+    person_id = django_filters.NumberFilter(field_name="invited__profile__id")
 
     class Meta:
         """Meta class."""
 
         model = models.FriendRequest
         fields = [
-            'person_id',
+            "person_id",
         ]
 
 
 class IncomingRequestFilterSet(django_filters.FilterSet):
     """Incoming friend request filter set."""
 
-    person_id = django_filters.NumberFilter(field_name='owner__profile__id')
+    person_id = django_filters.NumberFilter(field_name="owner__profile__id")
 
     class Meta:
         """Meta class."""
 
         model = models.FriendRequest
         fields = [
-            'person_id',
+            "person_id",
         ]

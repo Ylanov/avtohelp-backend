@@ -2,8 +2,6 @@
 from django.urls import path, include
 
 
-app_name = 'future'
+app_name = "future"
 
-urlpatterns = [
-
-]
+urlpatterns = []

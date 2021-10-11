@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0006_auto_20190520_0727'),
+        ("base", "0006_auto_20190520_0727"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='pushnotificationconfiguration',
-            name='geo_position_lifetime',
-            field=models.TimeField(blank=True, default=datetime.time(6, 0), help_text='Profile geo-position lifetime', null=True),
+            model_name="pushnotificationconfiguration",
+            name="geo_position_lifetime",
+            field=models.TimeField(
+                blank=True,
+                default=datetime.time(6, 0),
+                help_text="Profile geo-position lifetime",
+                null=True,
+            ),
         ),
     ]

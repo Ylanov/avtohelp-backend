@@ -8,13 +8,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0016_auto_20191223_1740'),
+        ("base", "0016_auto_20191223_1740"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='newsletter',
-            name='author',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Author'),
+            model_name="newsletter",
+            name="author",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Author",
+            ),
         ),
     ]

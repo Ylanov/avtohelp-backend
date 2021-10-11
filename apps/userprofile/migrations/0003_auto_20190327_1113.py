@@ -10,30 +10,64 @@ import utils.methods
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('userprofile', '0002_auto_20190314_1353'),
+        ("userprofile", "0002_auto_20190314_1353"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ProfileGallery',
+            name="ProfileGallery",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('image', easy_thumbnails.fields.ThumbnailerImageField(blank=True, default=None, null=True, upload_to=utils.methods.image_path, verbose_name='Image')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "image",
+                    easy_thumbnails.fields.ThumbnailerImageField(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        upload_to=utils.methods.image_path,
+                        verbose_name="Image",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Gallery item',
-                'verbose_name_plural': 'Gallery items',
+                "verbose_name": "Gallery item",
+                "verbose_name_plural": "Gallery items",
             },
         ),
         migrations.RemoveField(
-            model_name='profile',
-            name='avatar',
+            model_name="profile",
+            name="avatar",
         ),
         migrations.AddField(
-            model_name='profilegallery',
-            name='profile',
-            field=models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='gallery', to='userprofile.Profile'),
+            model_name="profilegallery",
+            name="profile",
+            field=models.ForeignKey(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="gallery",
+                to="userprofile.Profile",
+            ),
         ),
     ]

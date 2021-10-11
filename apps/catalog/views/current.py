@@ -12,9 +12,10 @@ VIEWSET
 
 class CityViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet for City model"""
+
     permission_classes = (AllowAny,)
     serializer_class = serializers.CityDetailSerializer
-    queryset = models.City.objects.order_by('name')
+    queryset = models.City.objects.order_by("name")
     pagination_class = None
 
 

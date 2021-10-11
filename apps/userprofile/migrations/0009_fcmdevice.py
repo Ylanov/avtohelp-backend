@@ -9,25 +9,82 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('userprofile', '0008_auto_20190423_0829'),
+        ("userprofile", "0008_auto_20190423_0829"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FCMDevice',
+            name="FCMDevice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=255, null=True, verbose_name='Name')),
-                ('active', models.BooleanField(default=True, help_text='Inactive devices will not be sent notifications', verbose_name='Is active')),
-                ('date_created', models.DateTimeField(auto_now_add=True, null=True, verbose_name='Creation date')),
-                ('device_id', models.CharField(blank=True, db_index=True, help_text='Unique device identifier', max_length=150, null=True, verbose_name='Device ID')),
-                ('registration_id', models.TextField(verbose_name='Registration token')),
-                ('type', models.CharField(choices=[('ios', 'ios'), ('android', 'android'), ('web', 'web')], max_length=10)),
-                ('user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fcm_user', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True, max_length=255, null=True, verbose_name="Name"
+                    ),
+                ),
+                (
+                    "active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Inactive devices will not be sent notifications",
+                        verbose_name="Is active",
+                    ),
+                ),
+                (
+                    "date_created",
+                    models.DateTimeField(
+                        auto_now_add=True, null=True, verbose_name="Creation date"
+                    ),
+                ),
+                (
+                    "device_id",
+                    models.CharField(
+                        blank=True,
+                        db_index=True,
+                        help_text="Unique device identifier",
+                        max_length=150,
+                        null=True,
+                        verbose_name="Device ID",
+                    ),
+                ),
+                (
+                    "registration_id",
+                    models.TextField(verbose_name="Registration token"),
+                ),
+                (
+                    "type",
+                    models.CharField(
+                        choices=[
+                            ("ios", "ios"),
+                            ("android", "android"),
+                            ("web", "web"),
+                        ],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="fcm_user",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'FCM device',
-                'verbose_name_plural': 'FCM devices',
+                "verbose_name": "FCM device",
+                "verbose_name_plural": "FCM devices",
             },
         ),
     ]

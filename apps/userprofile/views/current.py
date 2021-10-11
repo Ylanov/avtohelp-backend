@@ -18,7 +18,10 @@ class FCMDeviceViewSet(generics.GenericAPIView):
     """
 
     serializer_class = serializers.FCMDeviceSerializer
-    lookup_fields = ('registration_id', 'type',)
+    lookup_fields = (
+        "registration_id",
+        "type",
+    )
     queryset = FCMDevice.objects.all()
 
     def post(self, request, *args, **kwargs):
@@ -29,15 +32,21 @@ class FCMDeviceViewSet(generics.GenericAPIView):
         serializer = self.get_serializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK if instance else status.HTTP_201_CREATED,
+        )
 
     def get_object_or_none(self):
         """Object as result and the view is displaying or None."""
         queryset = self.get_queryset()  # get the base queryset
         queryset = self.filter_queryset(queryset)  # apply any filter backends
         # generate filter
-        filter_params = {f: self.request.data.get(f) for f in self.lookup_fields
-                         if self.request.data.get(f)}
+        filter_params = {
+            f: self.request.data.get(f)
+            for f in self.lookup_fields
+            if self.request.data.get(f)
+        }
 
         # get object and check permissions or return None
         obj = queryset.filter(**filter_params).first()
@@ -51,16 +60,17 @@ class FCMDeviceViewSet(generics.GenericAPIView):
 class ProfileMixin:
     """Profile mixin"""
 
-    queryset = models.Profile.objects.select_related('user')
+    queryset = models.Profile.objects.select_related("user")
 
 
 class ProfileCountView(ProfileMixin, generics.ListAPIView):
     """
     View for counter of user profiles
     """
+
     def get(self, request, format=None):
         user_count = self.queryset.count()
-        content = {'user_count': user_count}
+        content = {"user_count": user_count}
         return Response(content)
 
 
@@ -84,12 +94,14 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.annotate_online_status()\
-                            .annotate_friend_status(self.request.user)\
-                            .valid()\
-                            .friendly(self.request.user)\
-                            .order_by('first_name', 'last_name')\
-                            .distinct()
+        return (
+            self.queryset.annotate_online_status()
+            .annotate_friend_status(self.request.user)
+            .valid()
+            .friendly(self.request.user)
+            .order_by("first_name", "last_name")
+            .distinct()
+        )
 
 
 class MyProfileDetailView(ProfileMixin, generics.RetrieveUpdateAPIView):
@@ -163,11 +175,13 @@ class ProfileDetailView(ProfileMixin, generics.RetrieveAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return self.queryset.annotate_online_status()\
-                            .annotate_friend_status(self.request.user)\
-                            .annotate_foe_status(self.request.user)\
-                            .annotate_friend_request_status(self.request.user)\
-                            .distinct('id')
+        return (
+            self.queryset.annotate_online_status()
+            .annotate_friend_status(self.request.user)
+            .annotate_foe_status(self.request.user)
+            .annotate_friend_request_status(self.request.user)
+            .distinct("id")
+        )
 
 
 class ProfileLocationUpdateView(generics.UpdateAPIView):
@@ -182,14 +196,16 @@ class ProfileLocationUpdateView(generics.UpdateAPIView):
         """Override get_object method"""
         return self.request.user.profilelocation
 
+
 # Car
 
 
 class ProfileCarMixin:
     """ProfileCar mixin"""
 
-    queryset = models.ProfileCar.objects.select_related('owner', 'car', 'color',
-                                                        'car__mark', 'car__car_model__mark')
+    queryset = models.ProfileCar.objects.select_related(
+        "owner", "car", "color", "car__mark", "car__car_model__mark"
+    )
 
 
 class MyProfileCarMixin(ProfileCarMixin):
@@ -213,6 +229,7 @@ class ProfileCarCreateView(ProfileCarMixin, generics.CreateAPIView):
     RESPONSE: object
     :return: object
     """
+
     serializer_class = serializers.ProfileCarCreateSerializer
 
     def get_queryset(self):
@@ -233,6 +250,7 @@ class ProfileCarDetailView(MyProfileCarMixin, generics.RetrieveUpdateAPIView):
     View for retrieve profile car
     :return: object
     """
+
     serializer_class = serializers.ProfileCarCreateSerializer
 
 
@@ -241,6 +259,7 @@ class ProfileCarListView(MyProfileCarMixin, generics.ListAPIView):
     View for retrieve profile cars
     :return: object
     """
+
     serializer_class = serializers.ProfileCarListSerializer
 
 
@@ -250,7 +269,7 @@ class ProfileCarListView(MyProfileCarMixin, generics.ListAPIView):
 class ProfileGalleryMixin:
     """ProfileGallery mixin"""
 
-    queryset = models.ProfileGallery.objects.select_related('profile')
+    queryset = models.ProfileGallery.objects.select_related("profile")
 
 
 class MyProfileGalleryMixin(ProfileGalleryMixin, generics.GenericAPIView):
@@ -274,6 +293,7 @@ class ProfileGalleryCreateView(ProfileGalleryMixin, generics.CreateAPIView):
     RESPONSE: object
     :return: object
     """
+
     serializer_class = serializers.ProfileGalleryCreateSerializer
 
     def get_queryset(self):
@@ -294,6 +314,7 @@ class ProfileGalleryDetailView(ProfileGalleryMixin, generics.RetrieveAPIView):
     View for retrieve profile gallery
     :return: object
     """
+
     serializer_class = serializers.ProfileGalleryDetailSerializer
 
     def get_queryset(self):
@@ -306,6 +327,7 @@ class ProfileGalleryListView(ProfileGalleryMixin, generics.ListAPIView):
     View for retrieve profile gallery
     :return: object
     """
+
     serializer_class = serializers.ProfileGalleryListSerializer
     filter_class = filters.ProfileGalleryListFilterSet
 
@@ -320,7 +342,9 @@ class ProfileGalleryListView(ProfileGalleryMixin, generics.ListAPIView):
 class FriendRequestMixin:
     """FriendRequest mixin"""
 
-    queryset = models.FriendRequest.objects.select_related('owner__profile', 'invited__profile')
+    queryset = models.FriendRequest.objects.select_related(
+        "owner__profile", "invited__profile"
+    )
 
 
 class ProfileFriendListView(generics.ListAPIView):
@@ -332,7 +356,9 @@ class ProfileFriendListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendList.objects.common(user=self.request.user).exclude(friend__profile__first_name__isnull=True)
+        return models.FriendList.objects.common(user=self.request.user).exclude(
+            friend__profile__first_name__isnull=True
+        )
 
 
 class FriendRequestCreateView(FriendRequestMixin, generics.CreateAPIView):
@@ -343,6 +369,7 @@ class FriendRequestCreateView(FriendRequestMixin, generics.CreateAPIView):
     RESPONSE:
     object
     """
+
     serializer_class = serializers.FriendRequestCreateSerializer
 
     def get_queryset(self):
@@ -362,8 +389,11 @@ class FriendListDestroyView(generics.DestroyAPIView):
 
     def get_object(self):
         """Override get_object method"""
-        return get_object_or_404(models.FriendList.objects.by_profiles(self.request.user.profile,
-                                                                       self.kwargs.get('profile_id')))
+        return get_object_or_404(
+            models.FriendList.objects.by_profiles(
+                self.request.user.profile, self.kwargs.get("profile_id")
+            )
+        )
 
 
 class FriendRequestApproveView(FriendRequestMixin, generics.UpdateAPIView):
@@ -376,6 +406,7 @@ class FriendRequestApproveView(FriendRequestMixin, generics.UpdateAPIView):
         "approved": BooleanField
     }
     """
+
     serializer_class = serializers.FriendRequestApproveSerializer
 
     def get_queryset(self):
@@ -436,9 +467,12 @@ class InFriendRequestDeleteView(generics.DestroyAPIView):
     """
     View for delete incoming friend request
     """
+
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.FriendRequest.objects.common_by_user(user=self.request.user).not_approved()
+        return models.FriendRequest.objects.common_by_user(
+            user=self.request.user
+        ).not_approved()
 
 
 # Blacklist
@@ -447,7 +481,7 @@ class InFriendRequestDeleteView(generics.DestroyAPIView):
 class ProfileBlackListMixin:
     """ProfileBlackLists mixin"""
 
-    queryset = models.BlackList.objects.select_related('owner__profile', 'foe__profile')
+    queryset = models.BlackList.objects.select_related("owner__profile", "foe__profile")
 
 
 class ProfileBlackListView(ProfileBlackListMixin, generics.ListAPIView):
@@ -474,6 +508,7 @@ class BlackListCreateView(ProfileBlackListMixin, generics.CreateAPIView):
         "user_id": IntegerField
     }
     """
+
     serializer_class = serializers.BlackListCreateSerializer
 
     def get_queryset(self):
@@ -485,6 +520,7 @@ class BlackListDetailView(ProfileBlackListMixin, generics.RetrieveAPIView):
     """
     Retrieve view blacklist object
     """
+
     serializer_class = serializers.BlackListDetailSerializer
 
     def get_queryset(self):
@@ -496,7 +532,11 @@ class BlackListDestroyView(generics.DestroyAPIView):
     """
     View for destroy blacklist request
     """
+
     def get_object(self):
         """Override get_object method"""
-        return get_object_or_404(models.BlackList.objects.by_profiles(
-            owner=self.request.user.profile, foe=self.kwargs.get('profile_id')))
+        return get_object_or_404(
+            models.BlackList.objects.by_profiles(
+                owner=self.request.user.profile, foe=self.kwargs.get("profile_id")
+            )
+        )

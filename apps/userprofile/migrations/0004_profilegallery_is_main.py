@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('userprofile', '0003_auto_20190327_1113'),
+        ("userprofile", "0003_auto_20190327_1113"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profilegallery',
-            name='is_main',
+            model_name="profilegallery",
+            name="is_main",
             field=models.BooleanField(default=False),
         ),
     ]

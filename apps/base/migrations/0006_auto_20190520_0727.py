@@ -6,12 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0005_auto_20190517_1357'),
+        ("base", "0005_auto_20190517_1357"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='pushnotificationschedule',
-            options={'ordering': ('time',), 'verbose_name': 'Push-notification schedule', 'verbose_name_plural': 'Push-notification schedules'},
+            name="pushnotificationschedule",
+            options={
+                "ordering": ("time",),
+                "verbose_name": "Push-notification schedule",
+                "verbose_name_plural": "Push-notification schedules",
+            },
         ),
     ]

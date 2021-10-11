@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('userprofile', '0009_fcmdevice'),
+        ("userprofile", "0009_fcmdevice"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='friendlist',
-            unique_together={('owner', 'friend')},
+            name="friendlist",
+            unique_together={("owner", "friend")},
         ),
     ]

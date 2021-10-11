@@ -8,13 +8,19 @@ import utils.mixins
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('order', '0002_auto_20190401_1459'),
+        ("order", "0002_auto_20190401_1459"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assistancerequest',
-            name='image',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, default=None, null=True, upload_to=utils.mixins.image_path, verbose_name='Image'),
+            model_name="assistancerequest",
+            name="image",
+            field=easy_thumbnails.fields.ThumbnailerImageField(
+                blank=True,
+                default=None,
+                null=True,
+                upload_to=utils.mixins.image_path,
+                verbose_name="Image",
+            ),
         ),
     ]

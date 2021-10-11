@@ -6,18 +6,31 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0012_auto_20191025_1308'),
+        ("base", "0012_auto_20191025_1308"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='UserVerificationConfiguration',
+            name="UserVerificationConfiguration",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('mode', models.CharField(choices=[('0', 'SMS'), ('1', 'Phone call')], max_length=2)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "mode",
+                    models.CharField(
+                        choices=[("0", "SMS"), ("1", "Phone call")], max_length=2
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'User phone verification configuration',
+                "verbose_name": "User phone verification configuration",
             },
         ),
     ]

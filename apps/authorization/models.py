@@ -17,7 +17,7 @@ from utils.methods import generate_sms_code
 from utils.mixins import BaseMixin
 
 # Logging error messages
-logger = logging.getLogger('CELERY')
+logger = logging.getLogger("CELERY")
 
 # Create your models here.
 class SMSCodeManager(models.Manager):
@@ -90,7 +90,7 @@ class SMSCodeQuerySet(models.query.QuerySet):
 
     def ordered(self):
         """Default ordering."""
-        return self.order_by('-id')
+        return self.order_by("-id")
 
     def ready_to_go(self):
         """Filter only waiting and sent codes."""
@@ -112,7 +112,7 @@ class SMSCodeQuerySet(models.query.QuerySet):
 class SMSCode(BaseMixin):
     """Sms codes model."""
 
-    URL = 'http://smsc.ru/sys/send.php'
+    URL = "http://smsc.ru/sys/send.php"
     LOGIN = settings.SMS_LOGIN
     PASSWORD = settings.SMS_PASSWORD
 
@@ -126,38 +126,40 @@ class SMSCode(BaseMixin):
     CALL = 1
 
     STATUS_CHOICES = (
-        (WAITING, _('Waiting')),
-        (SENT, _('Sent')),
-        (ACTIVATED, _('Activated')),
-        (DECLINED, _('Declined')),
-        (EXPIRED, _('Expired'))
+        (WAITING, _("Waiting")),
+        (SENT, _("Sent")),
+        (ACTIVATED, _("Activated")),
+        (DECLINED, _("Declined")),
+        (EXPIRED, _("Expired")),
     )
 
-    MODE_CHOICES = (
-        (SMS, 'SMS'),
-        (CALL, 'CALL')
-    )
+    MODE_CHOICES = ((SMS, "SMS"), (CALL, "CALL"))
 
-    phone = PhoneNumberField(verbose_name=_('Phone'))
-    user = models.ForeignKey('account.User', default=None,
-                             null=True, blank=True, verbose_name=_('User'),
-                             on_delete=models.CASCADE)
+    phone = PhoneNumberField(verbose_name=_("Phone"))
+    user = models.ForeignKey(
+        "account.User",
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
+    )
 
     mode = models.PositiveSmallIntegerField(default=SMS, choices=MODE_CHOICES)
     status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS_CHOICES)
-    code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_('Code'))
+    code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_("Code"))
 
     objects = SMSCodeManager.from_queryset(SMSCodeQuerySet)()
 
     class Meta:
         """Meta class."""
 
-        verbose_name = _('SMS code')
-        verbose_name_plural = _('SMS codes')
+        verbose_name = _("SMS code")
+        verbose_name_plural = _("SMS codes")
 
     def __str__(self):
         """String method."""
-        return self.phone.as_e164 if hasattr(self.phone, 'as_e164') else 'SMS'
+        return self.phone.as_e164 if hasattr(self.phone, "as_e164") else "SMS"
 
     def generate_code(self):
         """Code generation method."""
@@ -165,13 +167,13 @@ class SMSCode(BaseMixin):
 
     def send_sms(self):
         """Send sms method."""
-        message = _('Verification code is %s.\nRoad.Helper') % self.code
+        message = _("Verification code is %s.\nRoad.Helper") % self.code
         params = {
-            'login': settings.SMS_LOGIN,
-            'psw': settings.SMS_PASSWORD,
+            "login": settings.SMS_LOGIN,
+            "psw": settings.SMS_PASSWORD,
             # 'sender': settings.SMS_SENDER,
-            'phones': self.phone.as_e164,
-            'mes': message,
+            "phones": self.phone.as_e164,
+            "mes": message,
         }
         requests.post(url=self.URL, params=params)
         self.status = self.SENT
@@ -179,44 +181,44 @@ class SMSCode(BaseMixin):
 
     def phone_call(self):
         """Phone call method."""
-        endpoint = 'call/start-password-call'
-        logger.info('endpoint: ' + endpoint)
-        url = settings.OTP_SERVICE + '/' + endpoint
+        endpoint = "call/start-password-call"
+        logger.info("endpoint: " + endpoint)
+        url = settings.OTP_SERVICE + "/" + endpoint
         server_key = settings.OTP_SERVER_KEY
         server_signature_key = settings.OTP_SIGNATURE_KEY
 
         data = {
-            'async': 1,
-            'dstNumber': self.phone.as_e164.replace('+', ''),
-            'pin': self.code,
-            'timeout': 20,
+            "async": 1,
+            "dstNumber": self.phone.as_e164.replace("+", ""),
+            "pin": self.code,
+            "timeout": 20,
         }
         data = json.dumps(data)
-        logger.info('data: ' + data)
+        logger.info("data: " + data)
 
         timestamp = str(calendar.timegm(time.gmtime()))
-        logger.info('timestamp: ' + timestamp)
+        logger.info("timestamp: " + timestamp)
 
         signature_text = "%s\n%s\n%s\n%s\n%s" % (
             endpoint,
             timestamp,
             server_key,
             data,
-            server_signature_key
+            server_signature_key,
         )
 
         sha_signature = hashlib.sha256(signature_text.encode()).hexdigest()
-        logger.info('sha_signature: ' + sha_signature)
+        logger.info("sha_signature: " + sha_signature)
         access_token = server_key + timestamp + sha_signature
-        logger.info('access_token: ' + access_token)
+        logger.info("access_token: " + access_token)
 
         headers = {
-            'Content-type': 'application/json',  # Определение типа данных
-            'Authorization': 'Bearer ' + access_token
+            "Content-type": "application/json",  # Определение типа данных
+            "Authorization": "Bearer " + access_token,
         }
 
         response = requests.post(url=url, headers=headers, data=data)
-        logger.info('response: ' + response.text)
+        logger.info("response: " + response.text)
 
         self.status = self.SENT
         self.save()
@@ -234,14 +236,14 @@ class SMSCode(BaseMixin):
     @property
     def datetime_before_resend(self):
         """Datetime before for re-request sms code"""
-        last_sms_datetime = SMSCode.objects.order_by('created').last().created
+        last_sms_datetime = SMSCode.objects.order_by("created").last().created
         timedelta_datetime = timezone.timedelta(seconds=settings.SMS_SEND_DELAY)
         return last_sms_datetime + timedelta_datetime
 
     @property
     def datetime_before_unlock(self):
         """Datetime before for unlock"""
-        last_sms_datetime = SMSCode.objects.order_by('created').last().created
+        last_sms_datetime = SMSCode.objects.order_by("created").last().created
         timedelta_datetime = timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
         return last_sms_datetime + timedelta_datetime
 
@@ -266,23 +268,28 @@ class UserLockQuerySet(models.QuerySet):
 
 class UserLockManager(models.Manager):
     """Manager for model UserLock"""
+
     pass
 
 
 class UserLock(BaseMixin):
     """Model for keep not valid login attempts."""
 
-    user = models.OneToOneField('account.User', on_delete=models.CASCADE)
+    user = models.OneToOneField("account.User", on_delete=models.CASCADE)
     attempts = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
-    attempt_timestamp = models.DateTimeField(blank=True, null=True, default=None,
-                                             verbose_name=_('Last datetime authorization attempt'))
+    attempt_timestamp = models.DateTimeField(
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Last datetime authorization attempt"),
+    )
     objects = UserLockManager.from_queryset(UserLockQuerySet)()
 
     class Meta:
         """Meta class."""
 
-        verbose_name = _('User lock')
-        verbose_name_plural = _('User locks')
+        verbose_name = _("User lock")
+        verbose_name_plural = _("User locks")
 
     def increment_attempts(self):
         """Increment attempts"""

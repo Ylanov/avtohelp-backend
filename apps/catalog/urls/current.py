@@ -4,10 +4,10 @@ from catalog.views import current as views
 from rest_framework import routers
 
 
-app_name = 'catalog'
+app_name = "catalog"
 
 router = routers.SimpleRouter()
-router.register(r'cities', views.CityViewSet)
+router.register(r"cities", views.CityViewSet)
 
 # urlpatterns = [
 #     path('cities', views.CityListView.as_view(),  name='city-list'),

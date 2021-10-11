@@ -16,37 +16,110 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Newsletter',
+            name="Newsletter",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('title', models.CharField(max_length=255, verbose_name='Title')),
-                ('text', models.TextField(verbose_name='Text')),
-                ('publish', models.BooleanField(default=False, verbose_name='Publish')),
-                ('publish_date', models.DateTimeField(help_text='Uses instead created if set', verbose_name='Publish date')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("title", models.CharField(max_length=255, verbose_name="Title")),
+                ("text", models.TextField(verbose_name="Text")),
+                ("publish", models.BooleanField(default=False, verbose_name="Publish")),
+                (
+                    "publish_date",
+                    models.DateTimeField(
+                        help_text="Uses instead created if set",
+                        verbose_name="Publish date",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'News',
-                'verbose_name_plural': 'Newsletter',
+                "verbose_name": "News",
+                "verbose_name_plural": "Newsletter",
             },
         ),
         migrations.CreateModel(
-            name='PushNotification',
+            name="PushNotification",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('title', models.CharField(max_length=255, verbose_name='Title')),
-                ('description', models.CharField(max_length=255, verbose_name='Description')),
-                ('event', models.PositiveSmallIntegerField(choices=[(0, 'Initialization'), (1, 'Create assistance request'), (2, 'New message')], default=0, verbose_name='Event')),
-                ('status', models.BooleanField(blank=True, default=False, null=True, verbose_name='Status')),
-                ('sent_count', models.PositiveIntegerField(blank=True, default=0, verbose_name='Sent notifications count')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("title", models.CharField(max_length=255, verbose_name="Title")),
+                (
+                    "description",
+                    models.CharField(max_length=255, verbose_name="Description"),
+                ),
+                (
+                    "event",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "Initialization"),
+                            (1, "Create assistance request"),
+                            (2, "New message"),
+                        ],
+                        default=0,
+                        verbose_name="Event",
+                    ),
+                ),
+                (
+                    "status",
+                    models.BooleanField(
+                        blank=True, default=False, null=True, verbose_name="Status"
+                    ),
+                ),
+                (
+                    "sent_count",
+                    models.PositiveIntegerField(
+                        blank=True, default=0, verbose_name="Sent notifications count"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Push notification',
-                'verbose_name_plural': 'Push notifications',
+                "verbose_name": "Push notification",
+                "verbose_name_plural": "Push notifications",
             },
         ),
     ]

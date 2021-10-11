@@ -17,20 +17,73 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='AssistanceRequest',
+            name="AssistanceRequest",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('issue', models.CharField(blank=True, default=None, max_length=255, null=True, verbose_name='Issue')),
-                ('description', models.TextField(verbose_name='Description')),
-                ('location', django.contrib.gis.db.models.fields.PointField(blank=True, default=None, null=True, srid=4326, verbose_name='Location')),
-                ('status', models.PositiveSmallIntegerField(choices=[(1, 'Assistance request is available'), (0, 'Assistance request was expired')], default=1, verbose_name='Status')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "issue",
+                    models.CharField(
+                        blank=True,
+                        default=None,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Issue",
+                    ),
+                ),
+                ("description", models.TextField(verbose_name="Description")),
+                (
+                    "location",
+                    django.contrib.gis.db.models.fields.PointField(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        srid=4326,
+                        verbose_name="Location",
+                    ),
+                ),
+                (
+                    "status",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (1, "Assistance request is available"),
+                            (0, "Assistance request was expired"),
+                        ],
+                        default=1,
+                        verbose_name="Status",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Assistance request',
-                'verbose_name_plural': 'Assistance requests',
+                "verbose_name": "Assistance request",
+                "verbose_name_plural": "Assistance requests",
             },
         ),
     ]

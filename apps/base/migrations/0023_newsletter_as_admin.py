@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0022_auto_20200222_2030'),
+        ("base", "0022_auto_20200222_2030"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='newsletter',
-            name='as_admin',
-            field=models.BooleanField(default=False, verbose_name='Publish as administrator'),
+            model_name="newsletter",
+            name="as_admin",
+            field=models.BooleanField(
+                default=False, verbose_name="Publish as administrator"
+            ),
         ),
     ]

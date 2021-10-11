@@ -8,16 +8,16 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('userprofile', '0010_auto_20190708_1111'),
+        ("userprofile", "0010_auto_20190708_1111"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='blacklist',
-            unique_together={('owner', 'foe')},
+            name="blacklist",
+            unique_together={("owner", "foe")},
         ),
         migrations.AlterUniqueTogether(
-            name='friendrequest',
-            unique_together={('owner', 'invited')},
+            name="friendrequest",
+            unique_together={("owner", "invited")},
         ),
     ]

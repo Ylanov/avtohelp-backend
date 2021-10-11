@@ -11,7 +11,7 @@ class CityListSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.City
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CityDetailSerializer(serializers.ModelSerializer):
@@ -21,4 +21,4 @@ class CityDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.City
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")

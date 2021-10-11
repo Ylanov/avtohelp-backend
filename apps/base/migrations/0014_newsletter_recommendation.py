@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0013_userverificationconfiguration'),
+        ("base", "0013_userverificationconfiguration"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='newsletter',
-            name='recommendation',
-            field=models.BooleanField(default=False, verbose_name='Recommendation'),
+            model_name="newsletter",
+            name="recommendation",
+            field=models.BooleanField(default=False, verbose_name="Recommendation"),
         ),
     ]

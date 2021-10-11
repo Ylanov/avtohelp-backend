@@ -9,13 +9,16 @@ from . import models
 
 class DistanceOrderingFilter(filters.OrderingFilter):
     """Ordering by distance"""
+
     def filter(self, qs, value):
         if value:
             return qs.order_by(value[0])
         return qs
 
 
-class AssistanceRequestRadiusFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
+class AssistanceRequestRadiusFilter(
+    django_filters.BaseInFilter, django_filters.NumberFilter
+):
     """Filter by distance"""
 
     def filter(self, qs, value):
@@ -23,34 +26,45 @@ class AssistanceRequestRadiusFilter(django_filters.BaseInFilter, django_filters.
             x, y = float(value[0]), float(value[1])
             point = Point(x, y, srid=4326)
             if settings.DEFAULT_REQUEST_RADIUS:
-                return qs.filter(location__distance_lte=(point, Distance(m=settings.DEFAULT_REQUEST_RADIUS)))
+                return qs.filter(
+                    location__distance_lte=(
+                        point,
+                        Distance(m=settings.DEFAULT_REQUEST_RADIUS),
+                    )
+                )
             else:
-                return qs.filter(location__distance_lte=(point, Distance(
-                    m=float(value[2]) if len(value) == 3 else settings.DEFAULT_REQUEST_RADIUS)))
+                return qs.filter(
+                    location__distance_lte=(
+                        point,
+                        Distance(
+                            m=float(value[2])
+                            if len(value) == 3
+                            else settings.DEFAULT_REQUEST_RADIUS
+                        ),
+                    )
+                )
         return qs
 
 
 class AssistanceRequestFitlerSet(django_filters.FilterSet):
     """Filters for AssistanceRequest"""
 
-    profile_id = django_filters.NumberFilter(field_name='user__profile__id')
+    profile_id = django_filters.NumberFilter(field_name="user__profile__id")
     coordinates = AssistanceRequestRadiusFilter()
     o = DistanceOrderingFilter(
         # tuple-mapping retains order
-        fields=(
-            ('distance', 'distance'),
-        ),
-
+        fields=(("distance", "distance"),),
         # labels do not need to retain order
         field_labels={
-            'distance': 'Distance',
-        }
+            "distance": "Distance",
+        },
     )
 
     class Meta:
         """Meta class"""
+
         model = models.AssistanceRequest
         fields = [
-            'profile_id',
-            'coordinates',
+            "profile_id",
+            "coordinates",
         ]

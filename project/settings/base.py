@@ -18,12 +18,12 @@ from easy_thumbnails.conf import Settings as thumbnail_settings
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Common path section
-PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..', 'media'))
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "media"))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
 # Insert apps and libs dirs to sys.path
-for path in ('apps', 'libs'):
-    path = os.path.abspath(os.path.join(PROJECT_ROOT, '%s' % path))
+for path in ("apps", "libs"):
+    path = os.path.abspath(os.path.join(PROJECT_ROOT, "%s" % path))
     path in sys.path or sys.path.insert(0, path)
 
 
@@ -31,84 +31,87 @@ for path in ('apps', 'libs'):
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1'
+SECRET_KEY = "^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1"
 
-ALLOWED_HOSTS = ['roadhelper.spider.ru', ]
+ALLOWED_HOSTS = [
+    "roadhelper.spider.ru",
+]
 
 
 # Application definition
 
 CONTRIB_APPS = [
-    'bootstrap_admin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.gis',
+    "bootstrap_admin",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.gis",
 ]
 
 PROJECT_APPS = [
-    'authorization.apps.AuthorizationConfig',
-    'account.apps.AccountConfig',
-    'utils.apps.UtilsConfig',
-    'versioning.apps.VersioningConfig',
-    'userprofile.apps.UserprofileConfig',
-    'catalog.apps.CatalogConfig',
-    'base.apps.BaseConfig',
-    'order.apps.OrderConfig',
-    'car.apps.CarConfig',
-    'chat.apps.ChatConfig'
+    "authorization.apps.AuthorizationConfig",
+    "account.apps.AccountConfig",
+    "utils.apps.UtilsConfig",
+    "versioning.apps.VersioningConfig",
+    "userprofile.apps.UserprofileConfig",
+    "catalog.apps.CatalogConfig",
+    "base.apps.BaseConfig",
+    "order.apps.OrderConfig",
+    "car.apps.CarConfig",
+    "chat.apps.ChatConfig",
 ]
 
 EXTERNAL_APPS = [
-    'rest_framework',
-    'rest_framework_gis',
-    'rest_framework.authtoken',
-    'rest_framework_swagger',
-    'channels',
-    'solo',
-    'django_filters',
-    'phonenumber_field',
-    'easy_thumbnails',
-    'image_cropping',
-    'fcm_django',
-    'easy_select2',
-    'inline_actions',
-    'django_object_actions',
-    'multiselectfield',
-    'online_users',
-    'colorful'
-
+    "rest_framework",
+    "rest_framework_gis",
+    "rest_framework.authtoken",
+    "rest_framework_swagger",
+    "channels",
+    "solo",
+    "django_filters",
+    "phonenumber_field",
+    "easy_thumbnails",
+    "image_cropping",
+    "fcm_django",
+    "easy_select2",
+    "inline_actions",
+    "django_object_actions",
+    "multiselectfield",
+    "online_users",
+    "colorful",
 ]
 
 INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'online_users.middleware.OnlineNowMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "online_users.middleware.OnlineNowMiddleware",
 ]
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = "project.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates'), ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            os.path.join(BASE_DIR, "templates"),
+        ],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -116,20 +119,20 @@ TEMPLATES = [
 
 
 # WSGI_APPLICATION = 'project.wsgi.application'
-ASGI_APPLICATION = 'project.routing.application'
+ASGI_APPLICATION = "project.routing.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USERNAME'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOSTNAME'),
-        'PORT': os.environ.get('DB_PORT'),
+    "default": {
+        "ENGINE": "django.contrib.gis.db.backends.postgis",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USERNAME"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOSTNAME"),
+        "PORT": os.environ.get("DB_PORT"),
     }
 }
 
@@ -141,34 +144,33 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 9,
-        }
-
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {
+            "min_length": 9,
+        },
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
-AUTH_USER_MODEL = 'account.User'
-LOGIN_URL = 'admin:login'
-LOGOUT_URL = 'admin:logout'
+AUTH_USER_MODEL = "account.User"
+LOGIN_URL = "admin:login"
+LOGOUT_URL = "admin:logout"
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = "ru"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -176,66 +178,58 @@ USE_L10N = True
 
 USE_TZ = True
 
-LOCALE_PATHS = (
-    os.path.abspath(os.path.join(BASE_DIR, 'locale')),
-)
+LOCALE_PATHS = (os.path.abspath(os.path.join(BASE_DIR, "locale")),)
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 # STATIC_ROOT = os.path.join(PUBLIC_ROOT, 'static')
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-MEDIA_ROOT = os.path.join(PUBLIC_ROOT, 'media')
-MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PUBLIC_ROOT, "media")
+MEDIA_URL = "/media/"
 
-STATICFILES_DIRS = (
-    os.path.join(PUBLIC_ROOT, 'static'),
-)
+STATICFILES_DIRS = (os.path.join(PUBLIC_ROOT, "static"),)
 
 
 # Celery settings
-CELERY_BROKER_URL = 'redis://base:6379/13'
+CELERY_BROKER_URL = "redis://base:6379/13"
 USE_CELERY = False
 
 # Versioning
 AVAILABLE_VERSIONS = {
-    'future': '1.0.1',
-    'current': '1.0.0',
+    "future": "1.0.1",
+    "current": "1.0.0",
 }
 
 # DjangoRestFramework settings
-REST_DATE_FORMAT = '%d-%m-%Y'
+REST_DATE_FORMAT = "%d-%m-%Y"
 
 # REST Framework
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 15,
+    "COERCE_DECIMAL_TO_STRING": False,
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15,
-    'COERCE_DECIMAL_TO_STRING': False,
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    'DEFAULT_VERSION': (AVAILABLE_VERSIONS['current'],),
-    'ALLOWED_VERSIONS': AVAILABLE_VERSIONS.values(),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'EXCEPTION_HANDLER': 'utils.api_exceptions.roadhelper_exception_handler'
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSION": (AVAILABLE_VERSIONS["current"],),
+    "ALLOWED_VERSIONS": AVAILABLE_VERSIONS.values(),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "EXCEPTION_HANDLER": "utils.api_exceptions.roadhelper_exception_handler",
 }
 
 
 # Thumbnail settings
 THUMBNAIL_ALIASES = {
-    '': {
-        'news_small': {'size': (900, 600), 'crop': True},
-        'news_big': {'size': (1600, 1200), 'crop': True},
-        'news_large': {'size': (2400, 1800), 'crop': True},
+    "": {
+        "news_small": {"size": (900, 600), "crop": True},
+        "news_big": {"size": (1600, 1200), "crop": True},
+        "news_large": {"size": (2400, 1800), "crop": True},
     },
 }
 
@@ -251,7 +245,7 @@ SMS_INPUT_ATTEMPTS = 2  # count of attempts
 SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
 
 
-NEWSLETTER_USERPROFILE_ID=1
+NEWSLETTER_USERPROFILE_ID = 1
 
 # CHAT
 NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
@@ -265,27 +259,27 @@ DEFAULT_REQUEST_RADIUS = 100000  # in meters
 # PUSH-NOTIFICATIONS
 # Django FCM (Firebase push notifications)
 FCM_DJANGO_SETTINGS = {
-    'FCM_SERVER_KEY': (
+    "FCM_SERVER_KEY": (
         "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"
     ),
 }
 
 
 # SMSC Settings
-SMS_SERVICE = 'http://smsc.ru/sys/send.php'
-SMS_LOGIN = 'ilyaarzumanyan92'
-SMS_PASSWORD = '93Damybee281'
-SMS_SENDER = 'RoadHelper'
+SMS_SERVICE = "http://smsc.ru/sys/send.php"
+SMS_LOGIN = "ilyaarzumanyan92"
+SMS_PASSWORD = "93Damybee281"
+SMS_SENDER = "RoadHelper"
 
-# STORE URL FOR MOBILE APPLICATION 
+# STORE URL FOR MOBILE APPLICATION
 # set urls in file: media/static/js/device.js
 # comment this lines
-#STORE_APPLE = 'https://apps.apple.com/ru/app/id1419101818'
-#STORE_GOOGLE = 'https://play.google.com/store/apps/details?id=ru.autohelp'
+# STORE_APPLE = 'https://apps.apple.com/ru/app/id1419101818'
+# STORE_GOOGLE = 'https://play.google.com/store/apps/details?id=ru.autohelp'
 
-OTP_SERVICE='https://api.new-tel.net'
-OTP_SERVER_KEY='f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714'
-OTP_SIGNATURE_KEY='ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2'
+OTP_SERVICE = "https://api.new-tel.net"
+OTP_SERVER_KEY = "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714"
+OTP_SIGNATURE_KEY = "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2"
 
 # Message PUSH-notifications
 LIMIT_UNREAD_MESSAGES = 3
@@ -298,14 +292,14 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Django Rest Swagger
 SWAGGER_SETTINGS = {
-    'JSON_EDITOR': False,
-    'SHOW_REQUEST_HEADERS': True,
-    'SECURITY_DEFINITIONS': {
-        'api_key': {
-            'type': 'apiKey',
-            'description': 'Token authorization',
-            'name': 'Authorization',
-            'in': 'header',
+    "JSON_EDITOR": False,
+    "SHOW_REQUEST_HEADERS": True,
+    "SECURITY_DEFINITIONS": {
+        "api_key": {
+            "type": "apiKey",
+            "description": "Token authorization",
+            "name": "Authorization",
+            "in": "header",
         }
     },
 }
@@ -317,13 +311,9 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 THUMBNAIL_PROCESSORS = (
-    'image_cropping.thumbnail_processors.crop_corners',
+    "image_cropping.thumbnail_processors.crop_corners",
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-IMAGE_CROPPING_BACKEND = 'image_cropping.backends.easy_thumbs.EasyThumbnailsBackend'
+IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
 IMAGE_CROPPING_BACKEND_PARAMS = {}
 # IMAGE_CROPPING_THUMB_SIZE = (600, 600)
-
-
-
-
