@@ -8,21 +8,38 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='City',
+            name="City",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
             ],
             options={
-                'verbose_name': 'City',
-                'verbose_name_plural': 'Cities',
+                "verbose_name": "City",
+                "verbose_name_plural": "Cities",
             },
         ),
     ]

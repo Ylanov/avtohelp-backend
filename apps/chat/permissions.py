@@ -8,7 +8,7 @@ class ChatMessagePermission(BasePermission):
         Return `True` if permission is granted, `False` otherwise.
         """
         if not request.user.is_anonymous:
-            room = view.kwargs.get('pk')
+            room = view.kwargs.get("pk")
             qs = models.ChatRoom.objects.filter(id=room).by_participant(request.user)
             if qs.exists():
                 return True

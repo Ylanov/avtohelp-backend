@@ -10,21 +10,51 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('chat', '0001_initial'),
+        ("chat", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChatReadMessage',
+            name="ChatReadMessage",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('message', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='chat.ChatMessage')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "message",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="chat.ChatMessage",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ('created',),
+                "ordering": ("created",),
             },
         ),
     ]

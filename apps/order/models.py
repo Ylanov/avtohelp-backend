@@ -40,12 +40,16 @@ class AssistanceRequestQuerySet(models.QuerySet):
         :return: AssistanceRequestQuerySet
         """
         return self.exclude(
-            Q(user__blacklist_owner__foe=user) |
-            Q(user__blacked_user__owner=user))
+            Q(user__blacklist_owner__foe=user) | Q(user__blacked_user__owner=user)
+        )
 
-    def annotate_distance(self, raw_coordinates: list = None,
-                          latitude: float = None, longitude: float = None,
-                          point: Point = None):
+    def annotate_distance(
+        self,
+        raw_coordinates: list = None,
+        latitude: float = None,
+        longitude: float = None,
+        point: Point = None,
+    ):
         """
         Annotate service distance from position
         raw_coordinates can contain -
@@ -55,23 +59,30 @@ class AssistanceRequestQuerySet(models.QuerySet):
         point parameter is Point object
         """
         if raw_coordinates:
-            x, y = raw_coordinates.split(',')[0], raw_coordinates.split(',')[1]
-            return self.annotate(distance=Distance('location', Point(float(x), float(y), srid=4326)))
+            x, y = raw_coordinates.split(",")[0], raw_coordinates.split(",")[1]
+            return self.annotate(
+                distance=Distance("location", Point(float(x), float(y), srid=4326))
+            )
         elif latitude and longitude:
-            return self.annotate(distance=Distance('location', Point(float(latitude), float(longitude), srid=4326)))
+            return self.annotate(
+                distance=Distance(
+                    "location", Point(float(latitude), float(longitude), srid=4326)
+                )
+            )
         elif point:
-            return self.annotate(distance=Distance('location', point, srid=4326))
+            return self.annotate(distance=Distance("location", point, srid=4326))
         else:
             return self
 
     def annotate_owner_status(self, user):
 
-        return self.annotate(is_owner=models.Case(
-            models.When(user=user,
-                        then=True),
-            output_field=models.BooleanField(default=False),
-            default=False
-        ))
+        return self.annotate(
+            is_owner=models.Case(
+                models.When(user=user, then=True),
+                output_field=models.BooleanField(default=False),
+                default=False,
+            )
+        )
 
 
 class AssistanceRequestManager(models.Manager):
@@ -93,40 +104,47 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     CANCELED = 2
 
     STATUS_CHOICES = (
-        (AVAILABLE, _('Assistance request is available')),
-        (EXPIRED, _('Assistance request was expired')),
-        (CANCELED, _('Assistance request was canceled'))
+        (AVAILABLE, _("Assistance request is available")),
+        (EXPIRED, _("Assistance request was expired")),
+        (CANCELED, _("Assistance request was canceled")),
     )
 
-    user = models.ForeignKey('account.User',
-                             verbose_name=_('User'),
-                             on_delete=models.CASCADE)
-    issue = models.CharField(max_length=255,
-                             verbose_name=_('Issue'),
-                             blank=True, null=True, default=None)
-    description = models.TextField(verbose_name=_('Description'))
-    location = gis_models.PointField(_('Location'),
-                                     blank=True, null=True, default=None)
-    status = models.PositiveSmallIntegerField(verbose_name=_('Status'),
-                                              default=AVAILABLE, choices=STATUS_CHOICES)
-    contact_phone = PhoneNumberField(verbose_name=_('User contact phone'),
-                                     blank=True, null=True, default=None)
-    text_address = models.CharField(max_length=255,
-                                    verbose_name=_('Text address'),
-                                    blank=True, null=True, default=None)
+    user = models.ForeignKey(
+        "account.User", verbose_name=_("User"), on_delete=models.CASCADE
+    )
+    issue = models.CharField(
+        max_length=255, verbose_name=_("Issue"), blank=True, null=True, default=None
+    )
+    description = models.TextField(verbose_name=_("Description"))
+    location = gis_models.PointField(_("Location"), blank=True, null=True, default=None)
+    status = models.PositiveSmallIntegerField(
+        verbose_name=_("Status"), default=AVAILABLE, choices=STATUS_CHOICES
+    )
+    contact_phone = PhoneNumberField(
+        verbose_name=_("User contact phone"), blank=True, null=True, default=None
+    )
+    text_address = models.CharField(
+        max_length=255,
+        verbose_name=_("Text address"),
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
 
     class Meta:
         """Meta class"""
 
-        verbose_name = _('Assistance request')
-        verbose_name_plural = _('Assistance requests')
+        verbose_name = _("Assistance request")
+        verbose_name_plural = _("Assistance requests")
 
     def send_push_notification(self):
         """Notify all users about new assistance request"""
         if settings.USE_CELERY:
-            transaction.on_commit(lambda: tasks.notify_assistance_request.delay(self.id))
+            transaction.on_commit(
+                lambda: tasks.notify_assistance_request.delay(self.id)
+            )
         else:
             transaction.on_commit(lambda: tasks.notify_assistance_request(self.id))
 
@@ -140,14 +158,17 @@ class AssistanceRequestUserReadManager(models.Manager):
         obj.save()
         return obj
 
+
 class AssistanceRequestUserRead(BaseMixin):
     """Assistance request User read model"""
 
-    request = models.ForeignKey('order.AssistanceRequest',
-                              verbose_name=_('Order'),
-                              related_name='assistance_request_user_read', on_delete=models.CASCADE)
-    user = models.ForeignKey('account.User',
-                             verbose_name=_('User'),
-                             on_delete=models.CASCADE)
+    request = models.ForeignKey(
+        "order.AssistanceRequest",
+        verbose_name=_("Order"),
+        related_name="assistance_request_user_read",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(
+        "account.User", verbose_name=_("User"), on_delete=models.CASCADE
+    )
     objects = AssistanceRequestUserReadManager()
-

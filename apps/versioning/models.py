@@ -17,14 +17,14 @@ class RemoteServer(SingletonModel):
 
 class Version(BaseMixin):
 
-    version = models.CharField(_('Version'), max_length=6, unique=True,
-                               help_text=_('Example: 1.0.0'))
-    active = models.BooleanField(_('Active'), default=False)
+    version = models.CharField(
+        _("Version"), max_length=6, unique=True, help_text=_("Example: 1.0.0")
+    )
+    active = models.BooleanField(_("Active"), default=False)
 
     def __str__(self):
         return self.version
 
     class Meta:
-        verbose_name = _('Version')
-        verbose_name_plural = _('Versions')
-
+        verbose_name = _("Version")
+        verbose_name_plural = _("Versions")

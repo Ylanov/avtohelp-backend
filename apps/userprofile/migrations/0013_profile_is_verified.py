@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('userprofile', '0012_auto_20191025_1308'),
+        ("userprofile", "0012_auto_20191025_1308"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='is_verified',
-            field=models.BooleanField(blank=True, default=False, null=True, verbose_name='Recommendation'),
+            model_name="profile",
+            name="is_verified",
+            field=models.BooleanField(
+                blank=True, default=False, null=True, verbose_name="Recommendation"
+            ),
         ),
     ]

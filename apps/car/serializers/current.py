@@ -7,14 +7,14 @@ from utils.serializers import GeoLocationSerializerMixin
 class CarListSerializer(serializers.ModelSerializer):
     """Car list serializer"""
 
-    mark_name = serializers.CharField(source='mark.name')
-    model_name = serializers.CharField(source='car_model.name')
+    mark_name = serializers.CharField(source="mark.name")
+    model_name = serializers.CharField(source="car_model.name")
 
     class Meta:
         """Meta model"""
 
         model = models.Car
-        fields = ('id', 'created', 'mark_name', 'model_name')
+        fields = ("id", "created", "mark_name", "model_name")
 
 
 class CarMarkListSerializer(serializers.ModelSerializer):
@@ -24,7 +24,7 @@ class CarMarkListSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarMark
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CarMarkDetailSerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class CarMarkDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarMark
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CarModelListSerializer(serializers.ModelSerializer):
@@ -44,7 +44,7 @@ class CarModelListSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarModel
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CarModelDetailSerializer(serializers.ModelSerializer):
@@ -54,7 +54,7 @@ class CarModelDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarModel
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CarColorListSerializer(serializers.ModelSerializer):
@@ -64,7 +64,7 @@ class CarColorListSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarColor
-        fields = ('id', 'created', 'name')
+        fields = ("id", "created", "name")
 
 
 class CarColorDetailSerializer(serializers.ModelSerializer):
@@ -74,20 +74,20 @@ class CarColorDetailSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarColor
-        fields = ('id', 'created', 'name', 'hex_color')
+        fields = ("id", "created", "name", "hex_color")
 
 
 class CarDetailSerializer(serializers.ModelSerializer):
     """Car detail serializer"""
 
     mark = CarMarkDetailSerializer()
-    model = CarModelDetailSerializer(source='car_model')
+    model = CarModelDetailSerializer(source="car_model")
 
     class Meta:
         """Meta model"""
 
         model = models.Car
-        fields = ('id', 'created', 'mark', 'model')
+        fields = ("id", "created", "mark", "model")
 
 
 class CarServiceCategorySerializer(serializers.ModelSerializer):
@@ -97,12 +97,13 @@ class CarServiceCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta model"""
+
         model = models.CarServiceCategory
-        fields = ('id', 'name', 'icon')
+        fields = ("id", "name", "icon")
 
     def get_icon(self, obj):
         """Get icon"""
-        return obj.get_full_image_url(request=self.context.get('request'))
+        return obj.get_full_image_url(request=self.context.get("request"))
 
 
 class ServiceListSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
@@ -115,15 +116,25 @@ class ServiceListSerializer(serializers.ModelSerializer, GeoLocationSerializerMi
         """Meta model"""
 
         model = models.CarService
-        fields = ('id', 'created', 'name', 'geo_lat', 'geo_lon', 'category_detail', 'distance')
+        fields = (
+            "id",
+            "created",
+            "name",
+            "geo_lat",
+            "geo_lon",
+            "category_detail",
+            "distance",
+        )
 
     def get_distance(self, obj):
         """Get distance in meters"""
-        return obj.distance.m if hasattr(obj, 'distance') else None
+        return obj.distance.m if hasattr(obj, "distance") else None
 
     def get_category_detail(self, obj):
         """Method to get category"""
-        return CarServiceCategorySerializer(obj.category, context={'request': self.context.get('request')}).data
+        return CarServiceCategorySerializer(
+            obj.category, context={"request": self.context.get("request")}
+        ).data
 
 
 class ServiceStationsCategoriesSerializer(serializers.ModelSerializer):
@@ -133,7 +144,7 @@ class ServiceStationsCategoriesSerializer(serializers.ModelSerializer):
         """Meta model"""
 
         model = models.CarServiceCategory
-        fields = ('id', 'name', 'image')
+        fields = ("id", "name", "image")
 
 
 class ServiceDetailSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
@@ -143,6 +154,14 @@ class ServiceDetailSerializer(serializers.ModelSerializer, GeoLocationSerializer
         """Meta model"""
 
         model = models.CarService
-        fields = ('id', 'created', 'modified', 'name',
-                  'category_id', 'description', 'geo_lat',
-                  'geo_lon', 'phone')
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "name",
+            "category_id",
+            "description",
+            "geo_lat",
+            "geo_lon",
+            "phone",
+        )

@@ -29,16 +29,15 @@ class AuthorizationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIVi
 
 
 class LogoutView(views.APIView):
-        """
-        An endpoint for logout.
-        Logout authorized user by recreating token (delete existed token and create a new one)
-        :return: None
-        """
+    """
+    An endpoint for logout.
+    Logout authorized user by recreating token (delete existed token and create a new one)
+    :return: None
+    """
 
-        queryset = account_models.User.objects.all()
+    queryset = account_models.User.objects.all()
 
-        def post(self, request, format=None):
-            """Delete existed auth token and then create new one for logout"""
-            self.request.user.logout()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-
+    def post(self, request, format=None):
+        """Delete existed auth token and then create new one for logout"""
+        self.request.user.logout()
+        return Response(status=status.HTTP_204_NO_CONTENT)

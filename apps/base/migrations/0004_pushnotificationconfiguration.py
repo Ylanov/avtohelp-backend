@@ -6,19 +6,35 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0003_newsletter_image'),
+        ("base", "0003_newsletter_image"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='PushNotificationConfiguration',
+            name="PushNotificationConfiguration",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('radius', models.FloatField(blank=True, default=5000, null=True)),
-                ('geo_position_lifetime', models.TimeField(blank=True, help_text='Lifetime for user geo-position', null=True, verbose_name='User geo-position lifetime')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("radius", models.FloatField(blank=True, default=5000, null=True)),
+                (
+                    "geo_position_lifetime",
+                    models.TimeField(
+                        blank=True,
+                        help_text="Lifetime for user geo-position",
+                        null=True,
+                        verbose_name="User geo-position lifetime",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Push notification configuration',
+                "verbose_name": "Push notification configuration",
             },
         ),
     ]

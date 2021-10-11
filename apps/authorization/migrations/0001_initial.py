@@ -17,34 +17,114 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='SMSCode',
+            name="SMSCode",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('phone', phonenumber_field.modelfields.PhoneNumberField(max_length=128, verbose_name='Phone')),
-                ('status', models.PositiveSmallIntegerField(choices=[(0, 'Waiting'), (1, 'Sent'), (2, 'Activated'), (3, 'Declined'), (4, 'Expired')], default=0)),
-                ('code', models.CharField(max_length=4, verbose_name='Code')),
-                ('user', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "phone",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        max_length=128, verbose_name="Phone"
+                    ),
+                ),
+                (
+                    "status",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "Waiting"),
+                            (1, "Sent"),
+                            (2, "Activated"),
+                            (3, "Declined"),
+                            (4, "Expired"),
+                        ],
+                        default=0,
+                    ),
+                ),
+                ("code", models.CharField(max_length=4, verbose_name="Code")),
+                (
+                    "user",
+                    models.ForeignKey(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'SMS code',
-                'verbose_name_plural': 'SMS codes',
+                "verbose_name": "SMS code",
+                "verbose_name_plural": "SMS codes",
             },
         ),
         migrations.CreateModel(
-            name='UserLock',
+            name="UserLock",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('attempts', models.PositiveSmallIntegerField(blank=True, default=0, null=True)),
-                ('attempt_timestamp', models.DateTimeField(blank=True, default=None, null=True, verbose_name='Last datetime authorization attempt')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "attempts",
+                    models.PositiveSmallIntegerField(blank=True, default=0, null=True),
+                ),
+                (
+                    "attempt_timestamp",
+                    models.DateTimeField(
+                        blank=True,
+                        default=None,
+                        null=True,
+                        verbose_name="Last datetime authorization attempt",
+                    ),
+                ),
+                (
+                    "user",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'User lock',
-                'verbose_name_plural': 'User locks',
+                "verbose_name": "User lock",
+                "verbose_name_plural": "User locks",
             },
         ),
     ]

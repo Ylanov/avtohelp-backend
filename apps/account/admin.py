@@ -7,15 +7,15 @@ from .models import User
 class UserAdminModel(admin.ModelAdmin):
     """Custom admin page for User"""
 
-    readonly_fields = ('id', 'profile', 'phone', 'created', 'modified')
-    search_fields = ('phone', )
-    list_display = ('id', 'profile', 'phone', 'created', 'modified')
-    actions = ('block_user', )
-    list_filter = ('is_active', )
+    readonly_fields = ("id", "profile", "phone", "created", "modified")
+    search_fields = ("phone",)
+    list_display = ("id", "profile", "phone", "created", "modified")
+    actions = ("block_user",)
+    list_filter = ("is_active",)
     fieldsets = (
-        (_('User\'s data'), {'fields': ('id', 'phone')}),
-        (_('Info'), {'fields': ('created', 'modified')}),
-        (_('Flags'), {'fields': ('is_active', 'is_staff')})
+        (_("User's data"), {"fields": ("id", "phone")}),
+        (_("Info"), {"fields": ("created", "modified")}),
+        (_("Flags"), {"fields": ("is_active", "is_staff")}),
     )
 
     def block_user(self, request, queryset):
@@ -31,14 +31,19 @@ class UserAdminModel(admin.ModelAdmin):
             # Logout user
             if user.has_token:
                 user.logout()
-        selected_users = set(queryset.values_list('phone', flat=True))
-        self.message_user(request=request,
-                          message=_("""User\'s %s was successfully disabled.
+        selected_users = set(queryset.values_list("phone", flat=True))
+        self.message_user(
+            request=request,
+            message=_(
+                """User\'s %s was successfully disabled.
                                        User\'s %s was already disabled.
-                                    """) % (selected_users.difference(disabled_users) or 0,
-                                            disabled_users or 0))
+                                    """
+            )
+            % (selected_users.difference(disabled_users) or 0, disabled_users or 0),
+        )
 
-    block_user.short_description = _('Mark selected users as disabled')
+    block_user.short_description = _("Mark selected users as disabled")
+
 
 # Register your models here.
 admin.site.register(User, UserAdminModel)

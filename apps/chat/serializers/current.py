@@ -7,18 +7,19 @@ from utils import api_exceptions
 
 
 class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
-    """Serializer for field participants in ChatRoom """
+    """Serializer for field participants in ChatRoom"""
 
-    id = serializers.IntegerField(source='profile.id')
-    first_name = serializers.CharField(source='get_first_name')
-    last_name = serializers.CharField(source='get_last_name')
-    avatar = serializers.ImageField(source='profile.image')
-    is_verified = serializers.BooleanField(source='profile.is_verified')
+    id = serializers.IntegerField(source="profile.id")
+    first_name = serializers.CharField(source="get_first_name")
+    last_name = serializers.CharField(source="get_last_name")
+    avatar = serializers.ImageField(source="profile.image")
+    is_verified = serializers.BooleanField(source="profile.is_verified")
 
     class Meta:
         """Meta class"""
+
         model = User
-        fields = ('id', 'first_name', 'last_name', 'avatar', 'is_verified')
+        fields = ("id", "first_name", "last_name", "avatar", "is_verified")
 
 
 class ChatMessageListSerializer(serializers.ModelSerializer):
@@ -29,9 +30,9 @@ class ChatMessageListSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
+
         model = models.ChatMessage
-        fields = ('id', 'created', 'modified',
-                  'sender', 'room_id', 'message', 'read')
+        fields = ("id", "created", "modified", "sender", "room_id", "message", "read")
 
 
 class ChatReadMessageSerializer(serializers.ModelSerializer):
@@ -43,33 +44,39 @@ class ChatReadMessageSerializer(serializers.ModelSerializer):
         many=True,
         write_only=True,
         allow_null=False,
-        allow_empty=False
+        allow_empty=False,
     )
 
     class Meta:
         """Meta class"""
+
         model = models.ChatReadMessage
-        fields = ('messages',)
+        fields = ("messages",)
 
     def validate(self, attrs):
         """Validate method"""
-        user = self.context.get('request').user
-        messages = attrs.get('messages')
+        user = self.context.get("request").user
+        messages = attrs.get("messages")
 
         # Check existence of requested messages
-        qs = models.ChatMessage.objects.exclude(sender=user)\
-                                       .exclude(chatreadmessage__user_id=user)\
-                                       .filter(id__in=[message.id for message in messages])
-        attrs['messages'] = list(qs)
+        qs = (
+            models.ChatMessage.objects.exclude(sender=user)
+            .exclude(chatreadmessage__user_id=user)
+            .filter(id__in=[message.id for message in messages])
+        )
+        attrs["messages"] = list(qs)
         return attrs
 
     def create(self, validated_data):
-        for message in validated_data.get('messages'):
+        for message in validated_data.get("messages"):
             if message is not None:
-                self.Meta.model.objects.bulk_create([
-                    self.Meta.model(user=self.context.get('request').user,
-                                    message=message)
-                ])
+                self.Meta.model.objects.bulk_create(
+                    [
+                        self.Meta.model(
+                            user=self.context.get("request").user, message=message
+                        )
+                    ]
+                )
         return response.Response()
 
 
@@ -80,9 +87,9 @@ class ChatRoomDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
+
         model = models.ChatRoom
-        fields = ('id', 'created', 'modified',
-                  'participants', 'name', 'image')
+        fields = ("id", "created", "modified", "participants", "name", "image")
 
 
 class LastChatMessageSerializer(serializers.ModelSerializer):
@@ -90,65 +97,83 @@ class LastChatMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
+
         model = models.ChatMessage
-        fields = ('id', 'created', 'message')
+        fields = ("id", "created", "message")
 
 
 class ChatRoomListSerializer(serializers.ModelSerializer):
     """Serializer for model ChatRoom"""
 
     participants = ChatRoomParticipantsSerializer(many=True)
-    last_message = LastChatMessageSerializer(source='chatmessage_set.first')
+    last_message = LastChatMessageSerializer(source="chatmessage_set.first")
     unread_messages = serializers.IntegerField(read_only=True)
     message_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         """Meta class"""
+
         model = models.ChatRoom
-        fields = ('id', 'created', 'participants',
-                  'image', 'name', 'last_message',
-                  'unread_messages', 'message_count')
+        fields = (
+            "id",
+            "created",
+            "participants",
+            "image",
+            "name",
+            "last_message",
+            "unread_messages",
+            "message_count",
+        )
 
 
 class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
     """Serializer for create ChatRoom"""
 
     # REQUEST
-    participant = serializers.PrimaryKeyRelatedField(queryset=profile_models.Profile.objects.select_related('user').all(),
-                                                     write_only=True)
+    participant = serializers.PrimaryKeyRelatedField(
+        queryset=profile_models.Profile.objects.select_related("user").all(),
+        write_only=True,
+    )
 
     # RESPONSE
-    participants = ChatRoomParticipantsSerializer(read_only=True,
-                                                  required=False,
-                                                  many=True)
+    participants = ChatRoomParticipantsSerializer(
+        read_only=True, required=False, many=True
+    )
 
     class Meta:
         """Meta class"""
+
         model = models.ChatRoom
-        fields = ('id', 'created', 'participant', 'participants')
+        fields = ("id", "created", "participant", "participants")
 
     def validate(self, attrs):
         """Override validate method"""
-        attrs['initiator'] = self.context.get('request').user
-        attrs['participant'] = attrs.get('participant').user
+        attrs["initiator"] = self.context.get("request").user
+        attrs["participant"] = attrs.get("participant").user
 
         # Check if participant is not an initiator
-        if attrs['initiator'] == attrs['participant']:
+        if attrs["initiator"] == attrs["participant"]:
             raise api_exceptions.EqualIDError()
 
         # Check if participant not in black list
-        are_foes = profile_models.BlackList.objects.are_foes(attrs['initiator'], attrs['participant'])
+        are_foes = profile_models.BlackList.objects.are_foes(
+            attrs["initiator"], attrs["participant"]
+        )
         if are_foes:
-            raise api_exceptions.AreFoesError(attrs['initiator'], attrs['participant'])
+            raise api_exceptions.AreFoesError(attrs["initiator"], attrs["participant"])
 
         return attrs
 
     def create(self, validated_data):
         """Override create method"""
-        room = models.ChatRoom.objects.private(validated_data['initiator'], validated_data['participant'])
+        room = models.ChatRoom.objects.private(
+            validated_data["initiator"], validated_data["participant"]
+        )
         if room.exists():
             obj = models.ChatRoom.objects.get(id=room[0].id)
             return obj
 
-        obj = models.ChatRoom.objects.make(participants=validated_data.values(), public=False)
+        obj = models.ChatRoom.objects.make(
+            participants=validated_data.values(), public=False
+        )
         return obj

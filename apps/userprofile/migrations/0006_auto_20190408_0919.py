@@ -8,17 +8,23 @@ import utils.mixins
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('userprofile', '0005_auto_20190404_0626'),
+        ("userprofile", "0005_auto_20190404_0626"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='profilegallery',
-            name='is_main',
+            model_name="profilegallery",
+            name="is_main",
         ),
         migrations.AddField(
-            model_name='profile',
-            name='image',
-            field=easy_thumbnails.fields.ThumbnailerImageField(blank=True, default=None, null=True, upload_to=utils.mixins.image_path, verbose_name='Image'),
+            model_name="profile",
+            name="image",
+            field=easy_thumbnails.fields.ThumbnailerImageField(
+                blank=True,
+                default=None,
+                null=True,
+                upload_to=utils.mixins.image_path,
+                verbose_name="Image",
+            ),
         ),
     ]

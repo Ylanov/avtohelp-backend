@@ -7,18 +7,30 @@ import phonenumber_field.modelfields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('order', '0003_assistancerequest_image'),
+        ("order", "0003_assistancerequest_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='assistancerequest',
-            name='contact_phone',
-            field=phonenumber_field.modelfields.PhoneNumberField(blank=True, default=None, max_length=128, null=True, verbose_name='User contact phone'),
+            model_name="assistancerequest",
+            name="contact_phone",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                blank=True,
+                default=None,
+                max_length=128,
+                null=True,
+                verbose_name="User contact phone",
+            ),
         ),
         migrations.AddField(
-            model_name='assistancerequest',
-            name='text_address',
-            field=models.CharField(blank=True, default=None, max_length=255, null=True, verbose_name='Text address'),
+            model_name="assistancerequest",
+            name="text_address",
+            field=models.CharField(
+                blank=True,
+                default=None,
+                max_length=255,
+                null=True,
+                verbose_name="Text address",
+            ),
         ),
     ]

@@ -15,23 +15,30 @@ from account import models as account_models
 
 def generate_image_name():
     """Generate code method."""
-    return '%06d' % random.randint(0, 999999)
+    return "%06d" % random.randint(0, 999999)
 
 
 def image_path(instance, filename):
     """Determine avatar path method."""
-    filename = '%s.jpeg' % generate_image_name()
-    return 'image/%s/%s/%s' % (
+    filename = "%s.jpeg" % generate_image_name()
+    return "image/%s/%s/%s" % (
         instance._meta.model_name,
         timezone.now().strftime(settings.REST_DATE_FORMAT),
-        filename)
+        filename,
+    )
 
 
 class ImageMixin(models.Model):
     """Image field model mixin."""
 
-    THUMBNAIL_KEY = 'news_small'
-    image = ThumbnailerImageField(upload_to=image_path, null=True, blank=True, default=None, verbose_name=_('Image'))
+    THUMBNAIL_KEY = "news_small"
+    image = ThumbnailerImageField(
+        upload_to=image_path,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("Image"),
+    )
 
     class Meta:
         """Meta class."""
@@ -62,17 +69,17 @@ class ImageMixin(models.Model):
         else:
             return None
 
-    image_tag.short_description = _('Image')
+    image_tag.short_description = _("Image")
     image_tag.allow_tags = True
 
 
 class BaseMixin(models.Model):
     """Base mixin model."""
 
-    created = models.DateTimeField(default=timezone.now, editable=False,
-                                   verbose_name=_('Date created'))
-    modified = models.DateTimeField(auto_now=True,
-                                    verbose_name=_('Date updated'))
+    created = models.DateTimeField(
+        default=timezone.now, editable=False, verbose_name=_("Date created")
+    )
+    modified = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
 
     class Meta:
         """Meta-class"""
@@ -83,7 +90,7 @@ class BaseMixin(models.Model):
 class NameMixin(models.Model):
     """Name field model mixin."""
 
-    name = models.CharField(max_length=255, verbose_name=_('Name'))
+    name = models.CharField(max_length=255, verbose_name=_("Name"))
 
     class Meta:
         """Meta class."""
@@ -102,14 +109,14 @@ class AuthorizationMixin(object):
         """Validate phone"""
         qs = account_models.User.objects.filter(phone=value.as_e164)
         if not qs.exists():
-            raise ValidationError(detail={
-                'detail': _('User with this phone number is not found')
-            })
+            raise ValidationError(
+                detail={"detail": _("User with this phone number is not found")}
+            )
         return value
 
     def validate_code(self, value):
         """Validate code method."""
-        pattern = r'[0-9]{4}'
+        pattern = r"[0-9]{4}"
         if not re.fullmatch(pattern, str(value)):
-            raise ValidationError(_('Invalid code'))
+            raise ValidationError(_("Invalid code"))
         return value

@@ -14,6 +14,7 @@ from utils.paginations import ProjectCursorPagination, ChatCursorPagination
 
 class ChatMessageListView(generics.ListAPIView):
     """MessageList view"""
+
     serializer_class = serializers.ChatMessageListSerializer
     permission_classes = (permissions.ChatMessagePermission,)
     filter_class = filters.ChatMessageFilterSet
@@ -21,9 +22,11 @@ class ChatMessageListView(generics.ListAPIView):
 
     def get_queryset(self):
         """Override get_queryset method"""
-        return models.ChatMessage.objects.filter(room=self.kwargs.get('pk'))\
-                                         .annotate_read_status(user=self.request.user)\
-                                         .distinct()
+        return (
+            models.ChatMessage.objects.filter(room=self.kwargs.get("pk"))
+            .annotate_read_status(user=self.request.user)
+            .distinct()
+        )
 
 
 class ChatReadMessageView(generics.CreateAPIView):
@@ -43,17 +46,21 @@ class ChatTotalUnreadMessageCountView(views.APIView):
     def get(self, request, *args, **kwargs):
         """Get count of assistance requests"""
         user = self.request.user
-        return Response({
-            'count': models.ChatMessage.objects.exclude(sender=user)\
-                                               .exclude(room__participants__blacklist_owner__foe=user)\
-                                               .exclude(room__participants__blacked_user__owner=user)\
-                                               .filter(room__participants=user)\
-                                               .filter(~Q(chatreadmessage__user=user))\
-                                               .count()})
+        return Response(
+            {
+                "count": models.ChatMessage.objects.exclude(sender=user)
+                .exclude(room__participants__blacklist_owner__foe=user)
+                .exclude(room__participants__blacked_user__owner=user)
+                .filter(room__participants=user)
+                .filter(~Q(chatreadmessage__user=user))
+                .count()
+            }
+        )
 
 
 class ChatRoomDetailView(generics.RetrieveAPIView):
     """MessageList view"""
+
     serializer_class = serializers.ChatRoomDetailSerializer
     permission_classes = (permissions.ChatMessagePermission,)
     queryset = models.ChatRoom.objects.all()
@@ -61,6 +68,7 @@ class ChatRoomDetailView(generics.RetrieveAPIView):
 
 class ChatRoomListView(generics.ListAPIView):
     """Chat room list view"""
+
     serializer_class = serializers.ChatRoomListSerializer
     filter_class = filters.ChatRoomListFilterSet
     pagination_class = ChatCursorPagination
@@ -68,24 +76,32 @@ class ChatRoomListView(generics.ListAPIView):
     def get_queryset(self):
         """Override get queryset method"""
         user = self.request.user
-        return models.ChatRoom.objects.by_participant(participant=user)\
-                                      .annotate_last_message_datetime()\
-                                      .annotate_unread_messages(user)\
-                                      .annotate_message_count()\
-                                      .filter(message_count__gte=1)
+        return (
+            models.ChatRoom.objects.by_participant(participant=user)
+            .annotate_last_message_datetime()
+            .annotate_unread_messages(user)
+            .annotate_message_count()
+            .filter(message_count__gte=1)
+        )
 
 
 class ChatView(generics.GenericAPIView):
     """Private room view"""
 
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
         """Override get method."""
 
-        return render(request, 'chat/private.html', {
-            'rooms': models.ChatRoom.objects.by_participant(participant=self.request.user)
-        })
+        return render(
+            request,
+            "chat/private.html",
+            {
+                "rooms": models.ChatRoom.objects.by_participant(
+                    participant=self.request.user
+                )
+            },
+        )
 
 
 class PrivateChatRoomCreateView(generics.CreateAPIView):

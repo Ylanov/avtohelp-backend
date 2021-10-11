@@ -6,18 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0011_auto_20191023_1739'),
+        ("base", "0011_auto_20191023_1739"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='newsletter',
-            name='push',
-            field=models.BooleanField(default=False, verbose_name='Push notification'),
+            model_name="newsletter",
+            name="push",
+            field=models.BooleanField(default=False, verbose_name="Push notification"),
         ),
         migrations.AlterField(
-            model_name='pushnotification',
-            name='event',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'Initialization'), (1, 'Create assistance request'), (2, 'New message'), (3, 'Friend request'), (4, 'Newsletter')], default=0, verbose_name='Event'),
+            model_name="pushnotification",
+            name="event",
+            field=models.PositiveSmallIntegerField(
+                choices=[
+                    (0, "Initialization"),
+                    (1, "Create assistance request"),
+                    (2, "New message"),
+                    (3, "Friend request"),
+                    (4, "Newsletter"),
+                ],
+                default=0,
+                verbose_name="Event",
+            ),
         ),
     ]

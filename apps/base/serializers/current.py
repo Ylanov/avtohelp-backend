@@ -8,6 +8,7 @@ from image_cropping.utils import get_backend
 from utils import api_exceptions
 from userprofile.serializers import current as profile_serializers
 
+
 class NewsListSerializer(serializers.ModelSerializer):
     """Serializer for NewsListView"""
 
@@ -15,18 +16,22 @@ class NewsListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Newsletter
-        fields = ('id', 'created', 'title', 'short_description', 'publish_date')
+        fields = ("id", "created", "title", "short_description", "publish_date")
+
 
 class NewsletterCommentListSerializer(serializers.ModelSerializer):
     """Serializer for NewsletterComment"""
 
-    author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
+    author = profile_serializers.ProfileBaseSerializer(
+        read_only=True, source="author.profile"
+    )
 
     class Meta:
         """Meta class"""
 
         model = models.NewsletterComment
-        fields = ('id', 'created', 'modified', 'author', 'text')
+        fields = ("id", "created", "modified", "author", "text")
+
 
 class NewsDetailSerializer(serializers.ModelSerializer):
     """Serializer for NewsDetailView"""
@@ -43,11 +48,25 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Newsletter
-        fields = ('id', 'created', 'modified', 'title',
-                  'short_description', 'text', 'publish',
-                  'publish_date', 'recommendation', 'author', 'image', 'image_resolution', 'refused','likes',
-                  'i_like', 'comments')
-        read_only_fields = ('id', 'image', 'publish', 'refused')
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "title",
+            "short_description",
+            "text",
+            "publish",
+            "publish_date",
+            "recommendation",
+            "author",
+            "image",
+            "image_resolution",
+            "refused",
+            "likes",
+            "i_like",
+            "comments",
+        )
+        read_only_fields = ("id", "image", "publish", "refused")
 
     def get_author(self, news):
         profile = None
@@ -58,13 +77,15 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
         profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
 
-        if profile==None:
+        if profile == None:
             profile = news.author.profile
 
-        return profile_serializers.ProfileBaseSerializer(profile, context={'request': self.context.get('request')}).data
+        return profile_serializers.ProfileBaseSerializer(
+            profile, context={"request": self.context.get("request")}
+        ).data
 
     def get_image(self, news):
-        request = self.context.get('request')
+        request = self.context.get("request")
 
         if not news.image:
             return None
@@ -76,64 +97,68 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         thumbnail_url = get_backend().get_thumbnail_url(
             news.image,
             {
-                'size': (demention[0], demention[1]),
-                'box': news.cropping,
-                'crop': True,
-                'detail': True,
-            }
+                "size": (demention[0], demention[1]),
+                "box": news.cropping,
+                "crop": True,
+                "detail": True,
+            },
         )
         return request.build_absolute_uri(thumbnail_url)
-
 
     def get_dementions(news):
         if not news.cropping:
             return [news.image.width, news.image.height]
 
-        demention = [int(x) for x in news.cropping.split(',') if x]
+        demention = [int(x) for x in news.cropping.split(",") if x]
         x = demention[0] - demention[1]
         y = demention[3] - demention[2]
 
-        if x==0:
+        if x == 0:
             return [demention[2], demention[3]]
         else:
-            if x<0:
-                x = x*(-1)
-            if y<0:
-                y = y*(-1)
+            if x < 0:
+                x = x * (-1)
+            if y < 0:
+                y = y * (-1)
 
-        return [x,y]
+        return [x, y]
 
     def get_image_resolution(self, news):
         if not news.image:
             return None
-            
-        dementions = NewsDetailSerializer.get_dementions(news)
-        return {
-            'width': dementions[0],
-            'height': dementions[1]
-        }
 
+        dementions = NewsDetailSerializer.get_dementions(news)
+        return {"width": dementions[0], "height": dementions[1]}
 
     def get_likes(self, news):
         return models.NewsletterLike.objects.filter(newsletter=news).count()
 
     def get_i_like(self, news):
-        user = self.context['request'].user
-        return models.NewsletterLike.objects.filter(newsletter=news, owner=user).first() != None
+        user = self.context["request"].user
+        return (
+            models.NewsletterLike.objects.filter(newsletter=news, owner=user).first()
+            != None
+        )
+
 
 class NewsToggleLikeSerializer(serializers.ModelSerializer):
     """Serializer for NewsToggleLike"""
+
     like = serializers.SerializerMethodField()
 
     class Meta:
         """Meta class"""
 
         model = models.Newsletter
-        fields = ('like',)
+        fields = ("like",)
 
     def get_like(self, news):
-        user = self.context['request'].user
-        like = models.NewsletterLike.objects.filter(newsletter=news).filter(owner=user).first()
+        user = self.context["request"].user
+        like = (
+            models.NewsletterLike.objects.filter(newsletter=news)
+            .filter(owner=user)
+            .first()
+        )
 
         if like == None:
             like = models.NewsletterLike.objects.create(newsletter=news, owner=user)
@@ -142,6 +167,7 @@ class NewsToggleLikeSerializer(serializers.ModelSerializer):
             like.delete()
             return False
 
+
 class NewsletterCommentCreateSerializer(serializers.ModelSerializer):
     """Serializer for NewsletterComment"""
 
@@ -149,29 +175,30 @@ class NewsletterCommentCreateSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.NewsletterComment
-        fields = ('id', 'created', 'modified', 'newsletter_id', 'author_id', 'text')
+        fields = ("id", "created", "modified", "newsletter_id", "author_id", "text")
 
     def validate(self, attrs):
         """Override validate method"""
 
-        newsletter_id = self.context.get('newsletter_id')
+        newsletter_id = self.context.get("newsletter_id")
         newsletter = models.Newsletter.objects.filter(id=newsletter_id).first()
 
         if newsletter == None:
             raise api_exceptions.NewsletterNotFound()
 
-        attrs['newsletter_id'] = newsletter_id
+        attrs["newsletter_id"] = newsletter_id
         return attrs
 
     def create(self, validated_data):
         """Override create method"""
 
-        user = self.context['request'].user
+        user = self.context["request"].user
         if not user.is_anonymous:
-            validated_data['author'] = user
+            validated_data["author"] = user
 
         comment = models.NewsletterComment.objects.create(**validated_data)
         return comment
+
 
 class NewsletterCommentUpdateSerializer(serializers.ModelSerializer):
     """Serializer for NewsletterComment"""
@@ -180,12 +207,12 @@ class NewsletterCommentUpdateSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.NewsletterComment
-        fields = ('id', 'created', 'modified', 'newsletter_id', 'author_id', 'text')
+        fields = ("id", "created", "modified", "newsletter_id", "author_id", "text")
 
     def update(self, instance, validated_data):
         """Override update method"""
-        user = self.context['request'].user
-        instance.text = validated_data['text']
+        user = self.context["request"].user
+        instance.text = validated_data["text"]
 
         if instance.author != user:
             raise api_exceptions.YouAreNotOwner()
@@ -201,10 +228,10 @@ class NewsletterCommentDeleteSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.NewsletterComment
-    
+
     def destroy(request, *args, **kwargs):
         user = request.user
-        instance = kwargs['instance']
+        instance = kwargs["instance"]
 
         if instance.author != user:
             raise api_exceptions.YouAreNotOwner()
@@ -220,19 +247,33 @@ class RecommendationsListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Newsletter
-        fields = ('id', 'created', 'title', 'short_description', 
-                    'text', 'publish_date', 'status')
-        read_only_fields = ('id', 'created', 'title', 'short_description', 
-                    'text', 'publish_date', 'status')
+        fields = (
+            "id",
+            "created",
+            "title",
+            "short_description",
+            "text",
+            "publish_date",
+            "status",
+        )
+        read_only_fields = (
+            "id",
+            "created",
+            "title",
+            "short_description",
+            "text",
+            "publish_date",
+            "status",
+        )
 
     def get_status(self, obj):
         if obj.refused == True:
-            return 'refused'
+            return "refused"
         if obj.publish == False:
-            return 'pending'
+            return "pending"
         if obj.publish == True:
-            return 'published'
-        return 'refused'
+            return "published"
+        return "refused"
 
 
 class RecommendationCreateSerializer(serializers.ModelSerializer):
@@ -242,44 +283,55 @@ class RecommendationCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         """Meta class"""
+
         model = models.Newsletter
-        fields = ('id', 'created', 'title', 'short_description', 
-                    'text', 'publish_date', 'recommendation', 'image')
+        fields = (
+            "id",
+            "created",
+            "title",
+            "short_description",
+            "text",
+            "publish_date",
+            "recommendation",
+            "image",
+        )
 
     def create(self, validated_data):
         """Override create method"""
-        user = self.context['request'].user
+        user = self.context["request"].user
         if not user.is_anonymous:
-            validated_data['author'] = user
-        validated_data['recommendation'] = True
-        validated_data['publish_date'] = datetime.datetime.now()
+            validated_data["author"] = user
+        validated_data["recommendation"] = True
+        validated_data["publish_date"] = datetime.datetime.now()
         news = models.Newsletter.objects.create(**validated_data)
         return news
-
 
 
 class PushNotificationScheduleSerializer(serializers.ModelSerializer):
     """Serializer for PushNotificationSchedule model"""
 
-    hours = serializers.IntegerField(source='time.hour')
-    minutes = serializers.IntegerField(source='time.minute')
+    hours = serializers.IntegerField(source="time.hour")
+    minutes = serializers.IntegerField(source="time.minute")
 
     class Meta:
         """Meta class"""
+
         model = models.PushNotificationSchedule
-        fields = ('hours', 'minutes')
+        fields = ("hours", "minutes")
 
 
 class PushNotificationConfigurationSerializer(serializers.ModelSerializer):
     """Serializer for PushNotificationConfiguration model"""
 
-    schedule = PushNotificationScheduleSerializer(many=True, source='notification_schedule')
+    schedule = PushNotificationScheduleSerializer(
+        many=True, source="notification_schedule"
+    )
 
     class Meta:
         """Meta class"""
 
         model = models.PushNotificationConfiguration
-        fields = ('radius', 'geo_position_lifetime', 'schedule')
+        fields = ("radius", "geo_position_lifetime", "schedule")
 
 
 class NotificationListSerializer(serializers.ModelSerializer):
@@ -289,8 +341,7 @@ class NotificationListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.PushNotification
-        fields = ('id', 'created', 'user',
-                  'event', 'status', 'sent_count')
+        fields = ("id", "created", "user", "event", "status", "sent_count")
 
 
 class NotificationDetailSerializer(serializers.ModelSerializer):
@@ -300,6 +351,13 @@ class NotificationDetailSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.PushNotification
-        fields = ('id', 'created', 'user',
-                  'title', 'description', 'event',
-                  'sent_count', 'status')
+        fields = (
+            "id",
+            "created",
+            "user",
+            "title",
+            "description",
+            "event",
+            "sent_count",
+            "status",
+        )

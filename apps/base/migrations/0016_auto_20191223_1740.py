@@ -8,13 +8,20 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0015_newsletter_author'),
+        ("base", "0015_newsletter_author"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='newsletter',
-            name='author',
-            field=models.OneToOneField(blank=True, default=None, null=True, on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='Author'),
+            model_name="newsletter",
+            name="author",
+            field=models.OneToOneField(
+                blank=True,
+                default=None,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Author",
+            ),
         ),
     ]

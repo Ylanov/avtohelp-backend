@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('authorization', '0002_auto_20190326_1502'),
+        ("authorization", "0002_auto_20190326_1502"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='smscode',
-            name='mode',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'SMS'), (1, 'CALL')], default=0),
+            model_name="smscode",
+            name="mode",
+            field=models.PositiveSmallIntegerField(
+                choices=[(0, "SMS"), (1, "CALL")], default=0
+            ),
         ),
     ]

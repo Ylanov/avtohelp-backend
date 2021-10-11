@@ -7,13 +7,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('order', '0005_assistancerequestuserread'),
+        ("order", "0005_assistancerequestuserread"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='assistancerequestuserread',
-            name='request',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='assistance_request_user_read', to='order.AssistanceRequest', verbose_name='Order'),
+            model_name="assistancerequestuserread",
+            name="request",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="assistance_request_user_read",
+                to="order.AssistanceRequest",
+                verbose_name="Order",
+            ),
         ),
     ]

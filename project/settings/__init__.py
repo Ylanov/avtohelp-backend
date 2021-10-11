@@ -4,26 +4,26 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Common path section
-PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, ".."))
 
-CONFIG_FILE = f'{PROJECT_ROOT}/roadhelper.ini'
+CONFIG_FILE = f"{PROJECT_ROOT}/roadhelper.ini"
 if os.path.exists(CONFIG_FILE):
     for i in open(CONFIG_FILE):
-        key, value = i.rstrip().split('=')
+        key, value = i.rstrip().split("=")
         os.environ[key] = value
 
-configuration = os.environ.get('SETTINGS_CONFIGURATION', None)
+configuration = os.environ.get("SETTINGS_CONFIGURATION", None)
 
-if configuration == 'local':
+if configuration == "local":
     # local machine server settings
     from .local import *
 # elif configuration == 'ci':
 #     # continious integration server settings
 #     from .ci import *
-elif configuration == 'development':
+elif configuration == "development":
     # development server settings
     from .development import *
-elif configuration == 'production':
+elif configuration == "production":
     # production server settings
     from .production import *
 # elif configuration == 'stage':

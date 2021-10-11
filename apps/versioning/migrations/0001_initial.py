@@ -8,32 +8,65 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='RemoteServer',
+            name="RemoteServer",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField(blank=True, default=None, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("url", models.URLField(blank=True, default=None, null=True)),
             ],
             options={
-                'verbose_name': 'Remote Server',
+                "verbose_name": "Remote Server",
             },
         ),
         migrations.CreateModel(
-            name='Version',
+            name="Version",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('version', models.CharField(help_text='Example: 1.0.0', max_length=6, unique=True, verbose_name='Version')),
-                ('active', models.BooleanField(default=False, verbose_name='Active')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                (
+                    "version",
+                    models.CharField(
+                        help_text="Example: 1.0.0",
+                        max_length=6,
+                        unique=True,
+                        verbose_name="Version",
+                    ),
+                ),
+                ("active", models.BooleanField(default=False, verbose_name="Active")),
             ],
             options={
-                'verbose_name': 'Version',
-                'verbose_name_plural': 'Versions',
+                "verbose_name": "Version",
+                "verbose_name_plural": "Versions",
             },
         ),
     ]

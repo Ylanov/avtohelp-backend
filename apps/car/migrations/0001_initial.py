@@ -11,100 +11,235 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Car',
+            name="Car",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
             ],
             options={
-                'verbose_name': 'Car',
-                'verbose_name_plural': 'Cars',
+                "verbose_name": "Car",
+                "verbose_name_plural": "Cars",
             },
         ),
         migrations.CreateModel(
-            name='CarColor',
+            name="CarColor",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
             ],
         ),
         migrations.CreateModel(
-            name='CarMark',
+            name="CarMark",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
             ],
             options={
-                'verbose_name': 'Car brand',
-                'verbose_name_plural': 'Car brands',
+                "verbose_name": "Car brand",
+                "verbose_name_plural": "Car brands",
             },
         ),
         migrations.CreateModel(
-            name='CarModel',
+            name="CarModel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
-                ('mark', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='car.CarMark')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "mark",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="car.CarMark"
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Car model',
-                'verbose_name_plural': 'Car models',
+                "verbose_name": "Car model",
+                "verbose_name_plural": "Car models",
             },
         ),
         migrations.CreateModel(
-            name='CarService',
+            name="CarService",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
-                ('description', models.CharField(max_length=255, verbose_name='Description')),
-                ('location', django.contrib.gis.db.models.fields.PointField(srid=4326, verbose_name='Location')),
-                ('phone', phonenumber_field.modelfields.PhoneNumberField(error_messages={'unique': 'A service with that phone already exists.'}, max_length=128, verbose_name='Service contact phone')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "description",
+                    models.CharField(max_length=255, verbose_name="Description"),
+                ),
+                (
+                    "location",
+                    django.contrib.gis.db.models.fields.PointField(
+                        srid=4326, verbose_name="Location"
+                    ),
+                ),
+                (
+                    "phone",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        error_messages={
+                            "unique": "A service with that phone already exists."
+                        },
+                        max_length=128,
+                        verbose_name="Service contact phone",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Service',
-                'verbose_name_plural': 'Services',
+                "verbose_name": "Service",
+                "verbose_name_plural": "Services",
             },
         ),
         migrations.CreateModel(
-            name='CarServiceCategory',
+            name="CarServiceCategory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='Date created')),
-                ('modified', models.DateTimeField(auto_now=True, verbose_name='Date updated')),
-                ('name', models.CharField(max_length=255, verbose_name='Name')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    models.DateTimeField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="Date created",
+                    ),
+                ),
+                (
+                    "modified",
+                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                ),
+                ("name", models.CharField(max_length=255, verbose_name="Name")),
             ],
             options={
-                'verbose_name': 'Service category',
-                'verbose_name_plural': 'Service categories',
+                "verbose_name": "Service category",
+                "verbose_name_plural": "Service categories",
             },
         ),
         migrations.AddField(
-            model_name='carservice',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='car.CarServiceCategory'),
+            model_name="carservice",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="car.CarServiceCategory"
+            ),
         ),
         migrations.AddField(
-            model_name='car',
-            name='car_model',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='car.CarModel'),
+            model_name="car",
+            name="car_model",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="car.CarModel"
+            ),
         ),
         migrations.AddField(
-            model_name='car',
-            name='mark',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='car.CarMark'),
+            model_name="car",
+            name="mark",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="car.CarMark"
+            ),
         ),
     ]

@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('chat', '0005_auto_20190523_1406'),
+        ("chat", "0005_auto_20190523_1406"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='chatreadmessage',
-            unique_together={('user', 'message')},
+            name="chatreadmessage",
+            unique_together={("user", "message")},
         ),
     ]
