@@ -1,6 +1,5 @@
 from fabric.api import *  # NOQA
 
-
 user = "roadhelper"
 
 env.roledefs = {
