@@ -1,11 +1,12 @@
 from colorful.fields import RGBColorField
 from django.contrib.gis.db import models as gis_models
-from django.contrib.gis.db.models.functions import Distance
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from utils.mixins import BaseMixin, ImageMixin, NameMixin
+from .managers import CarServiceManager
+from .query_set import CarServiceQuerySet
 
 
 class CarMark(BaseMixin, NameMixin):
@@ -53,30 +54,6 @@ class Car(BaseMixin):
 
         verbose_name = _("Car")
         verbose_name_plural = _("Cars")
-
-
-class CarServiceManager(models.Manager):
-    """Manager for model CarServiceManager"""
-
-    pass
-
-
-class CarServiceQuerySet(models.QuerySet):
-    """QuerySet for model CarService"""
-
-    def annotate_distance(self, position):
-        """Annotate service distance from position"""
-        return self.annotate(distance=Distance("location", position))
-
-    def annotate_icon_exists(self):
-        """Annotate flag that return True if service category icon is exists"""
-        return self.annotate(
-            icon_exists=models.Case(
-                models.When(category__image__isnull=False, then=True),
-                output_field=models.BooleanField(default=False),
-                default=False,
-            )
-        )
 
 
 class CarService(NameMixin, BaseMixin):
