@@ -1,13 +1,30 @@
 FROM python:3.7.2
-ENV PYTHONUNBUFFERED 1
-RUN apt-get update ; apt-get --assume-yes install binutils libproj-dev gdal-bin
 
-RUN mkdir /code
-WORKDIR /code
-ADD requirements/base.txt /code/
-ADD requirements/development.txt /code/
-RUN pip install -r base.txt
-RUN pip install -r development.txt
-ADD . /code/
-# ad gettext for makemessages command
-RUN apt-get update && apt-get install -y gettext
+RUN apt-get update -y
+RUN apt-get -y install libcurl4-openssl-dev \
+    libssl-dev \
+    binutils \
+    libproj-dev \
+    gettext \
+    gdal-bin
+
+RUN apt-get clean autoclean
+RUN apt-get autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+
+RUN pip install --upgrade pip
+RUN pip install poetry
+COPY Makefile /app/
+COPY poetry.lock pyproject.toml /app/
+
+RUN cd app/ && poetry config virtualenvs.create false \
+  && poetry install --no-dev
+
+COPY src /app/src/
+
+WORKDIR /app
+
+RUN mkdir media
+RUN mkdir static
+
