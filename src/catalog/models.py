@@ -1,6 +1,9 @@
 from django.utils.translation import ugettext_lazy as _
 
-from utils.mixins import BaseMixin, NameMixin
+from utils.mixins import (
+    BaseMixin,
+    NameMixin,
+)
 
 
 class City(BaseMixin, NameMixin):

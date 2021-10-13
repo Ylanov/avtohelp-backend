@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from utils.mixins import BaseMixin
+
 from ..managers import BlackListManager
 from ..query_set import BlackListQuerySet
 

@@ -2,7 +2,10 @@ from rest_framework import generics
 
 from .. import filters
 from ..serializers import current as serializers
-from .mixins import MyProfileGalleryMixin, ProfileGalleryMixin
+from .mixins import (
+    MyProfileGalleryMixin,
+    ProfileGalleryMixin,
+)
 
 
 class ProfileGalleryCreateView(ProfileGalleryMixin, generics.CreateAPIView):

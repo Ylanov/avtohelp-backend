@@ -7,7 +7,12 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
-from car.models import Car, CarColor, CarMark, CarModel
+from car.models import (
+    Car,
+    CarColor,
+    CarMark,
+    CarModel,
+)
 from catalog.models import City
 from userprofile.models import (
     BlackList,

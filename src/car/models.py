@@ -4,7 +4,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from utils.mixins import BaseMixin, ImageMixin, NameMixin
+from utils.mixins import (
+    BaseMixin,
+    ImageMixin,
+    NameMixin,
+)
+
 from .managers import CarServiceManager
 from .query_set import CarServiceQuerySet
 

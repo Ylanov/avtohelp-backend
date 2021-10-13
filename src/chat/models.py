@@ -4,7 +4,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from roadhelpbackend import celery as tasks
-from utils.mixins import BaseMixin, ImageMixin
+from utils.mixins import (
+    BaseMixin,
+    ImageMixin,
+)
 
 MSG_TYPE_MESSAGE = 0  # For standard messages
 MSG_TYPE_WARNING = 1  # For yellow messages

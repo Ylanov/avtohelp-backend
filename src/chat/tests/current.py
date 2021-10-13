@@ -5,8 +5,16 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from account.models import User
-from chat.models import ChatMessage, ChatReadMessage, ChatRoom
-from userprofile.models import BlackList, FriendList, FriendRequest
+from chat.models import (
+    ChatMessage,
+    ChatReadMessage,
+    ChatRoom,
+)
+from userprofile.models import (
+    BlackList,
+    FriendList,
+    FriendRequest,
+)
 from utils import api_exceptions
 
 

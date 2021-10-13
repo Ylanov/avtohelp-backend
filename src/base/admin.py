@@ -6,6 +6,7 @@ from image_cropping.admin import ImageCroppingMixin
 from solo.admin import SingletonModelAdmin
 
 from userprofile.models import Profile
+
 from .models import (
     Newsletter,
     NewsletterComment,

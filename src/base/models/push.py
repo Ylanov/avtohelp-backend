@@ -7,8 +7,8 @@ from solo.models import SingletonModel
 
 from utils.mixins import BaseMixin
 
-from ..query_set import PushNotificationQuerySet
 from ..managers import PushNotificationManager
+from ..query_set import PushNotificationQuerySet
 
 #   Logging error messages
 logger = logging.getLogger("app")

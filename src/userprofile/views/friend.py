@@ -3,7 +3,10 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from .. import filters
-from ..models import FriendList, FriendRequest
+from ..models import (
+    FriendList,
+    FriendRequest,
+)
 from ..serializers import current as serializers
 from .mixins import FriendRequestMixin
 

@@ -1,7 +1,11 @@
 import django_filters
 from django.contrib.postgres.search import SearchQuery
 
-from userprofile.models import FriendRequest, Profile, ProfileGallery
+from userprofile.models import (
+    FriendRequest,
+    Profile,
+    ProfileGallery,
+)
 
 
 class ProfileListFilterSet(django_filters.FilterSet):

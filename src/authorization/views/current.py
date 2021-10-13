@@ -1,4 +1,8 @@
-from rest_framework import generics, status, views
+from rest_framework import (
+    generics,
+    status,
+    views,
+)
 from rest_framework.response import Response
 
 from account import models as account_models

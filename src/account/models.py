@@ -3,8 +3,10 @@
 import logging
 
 from django.apps import apps
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.models import UserManager as AbstractUserManager
+from django.contrib.auth.models import (
+    AbstractUser,
+    UserManager as AbstractUserManager,
+)
 from django.contrib.gis.db.models.functions import Distance
 from django.db import models
 from django.utils import timezone

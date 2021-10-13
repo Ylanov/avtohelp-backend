@@ -1,11 +1,17 @@
-from rest_framework import generics, viewsets
+from rest_framework import (
+    generics,
+    viewsets,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from base import models
 from base.serializers import current as serializers
 from utils import views as view_mixins
-from utils.paginations import NewsCursorPagination, ProjectCursorPagination
+from utils.paginations import (
+    NewsCursorPagination,
+    ProjectCursorPagination,
+)
 
 """
 VIEWSETS

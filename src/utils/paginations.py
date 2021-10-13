@@ -5,7 +5,10 @@ from collections import namedtuple
 from urllib import parse as urlparse
 
 from django.db.models import F
-from rest_framework.pagination import CursorPagination, _reverse_ordering
+from rest_framework.pagination import (
+    CursorPagination,
+    _reverse_ordering,
+)
 
 Cursor = namedtuple("Cursor", ["offset", "reverse", "position"])
 

@@ -35,6 +35,9 @@ sentry-sdk = "0.10.0"
 celery = "^5.1.2"
 billiard = "^3.6.4"
 pathlib = "^1.0.1"
+pep8 = "^1.7.1"
+isort = "^5.9.3"
+flake8 = "^4.0.1"
 
 
 [tool.poetry.dev-dependencies]

@@ -1,0 +1,23 @@
+[flake8]
+exclude =
+	.git,
+	__pycache__,
+	*/migrations/*,
+max-line-length = 79
+ignore =
+    # trailing comma prohibited, like (x, y,)
+    C819,
+    # line break before binary operator
+    W503,
+    # invalid escape sequence, like '\('
+    W605,
+    # multiple spaces after ':'
+    E241,
+    # do not assign a lambda expression, use a def
+    E731,
+    # 'import *' used; unable to detect undefined names
+    F403,
+    # something may be undefined, or defined from star imports
+    F405,
+    # redefinition of unused
+    F811

@@ -1,4 +1,7 @@
-from rest_framework import generics, viewsets
+from rest_framework import (
+    generics,
+    viewsets,
+)
 from rest_framework.permissions import AllowAny
 
 from catalog import models

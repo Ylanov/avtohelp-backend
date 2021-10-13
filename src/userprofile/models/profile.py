@@ -4,7 +4,11 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from roadhelpbackend import celery as tasks
-from utils.mixins import BaseMixin, ImageMixin
+from utils.mixins import (
+    BaseMixin,
+    ImageMixin,
+)
+
 from ..managers import (
     FriendRequestManager,
     ProfileGalleryManager,

@@ -1,13 +1,12 @@
 from .news import (
     Newsletter,
-    NewsletterLike,
     NewsletterComment,
     NewsletterCommentLike,
+    NewsletterLike,
 )
+from .other import UserVerificationConfiguration
 from .push import (
+    PushNotification,
     PushNotificationConfiguration,
     PushNotificationSchedule,
-    PushNotification,
 )
-
-from .other import UserVerificationConfiguration

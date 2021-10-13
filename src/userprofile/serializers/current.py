@@ -1,6 +1,9 @@
 from django.contrib.gis.geos import Point
 from phonenumber_field.serializerfields import PhoneNumberField
-from rest_framework import exceptions, serializers
+from rest_framework import (
+    exceptions,
+    serializers,
+)
 
 from car import models as car_models
 from car.serializers import current as car_serializers

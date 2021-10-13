@@ -9,7 +9,14 @@ from account.models import User
 from catalog.models import City
 from userprofile.models import ProfileCar
 
-from ..models import Car, CarColor, CarMark, CarModel, CarService, CarServiceCategory
+from ..models import (
+    Car,
+    CarColor,
+    CarMark,
+    CarModel,
+    CarService,
+    CarServiceCategory,
+)
 
 
 class TestCatalog(APITestCase):

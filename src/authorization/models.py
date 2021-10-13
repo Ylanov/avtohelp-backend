@@ -3,7 +3,10 @@ import hashlib
 import json
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 import requests
 from django.conf import settings

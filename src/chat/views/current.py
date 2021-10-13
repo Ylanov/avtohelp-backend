@@ -1,12 +1,23 @@
 from django.db.models import Q
 from django.shortcuts import render
-from rest_framework import generics, status, views
+from rest_framework import (
+    generics,
+    status,
+    views,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from chat import filters, models, permissions
+from chat import (
+    filters,
+    models,
+    permissions,
+)
 from chat.serializers import current as serializers
-from utils.paginations import ChatCursorPagination, ProjectCursorPagination
+from utils.paginations import (
+    ChatCursorPagination,
+    ProjectCursorPagination,
+)
 
 
 class ChatMessageListView(generics.ListAPIView):

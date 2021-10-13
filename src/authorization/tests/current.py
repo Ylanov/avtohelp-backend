@@ -6,7 +6,10 @@ from django.urls import reverse
 from rest_framework import status
 
 from authorization.models import SMSCode
-from utils import api_exceptions, custom_statuses
+from utils import (
+    api_exceptions,
+    custom_statuses,
+)
 
 
 class TestCatalog(TestCase):

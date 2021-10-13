@@ -3,10 +3,16 @@ import logging
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from image_cropping import ImageCropField, ImageRatioField
+from image_cropping import (
+    ImageCropField,
+    ImageRatioField,
+)
 
 from roadhelpbackend import celery as tasks
-from utils.mixins import BaseMixin, image_path
+from utils.mixins import (
+    BaseMixin,
+    image_path,
+)
 
 # Logging error messages
 logger = logging.getLogger("app")

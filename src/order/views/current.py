@@ -1,8 +1,15 @@
-from rest_framework import generics, status, views
+from rest_framework import (
+    generics,
+    status,
+    views,
+)
 from rest_framework.response import Response
 
 from base.models import PushNotificationConfiguration
-from order import filters, models
+from order import (
+    filters,
+    models,
+)
 from order.serializers import current as serializers
 
 

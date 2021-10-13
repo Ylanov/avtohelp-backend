@@ -1,7 +1,10 @@
 from rest_framework import generics
 
 from ..serializers import current as serializers
-from .mixins import MyProfileCarMixin, ProfileCarMixin
+from .mixins import (
+    MyProfileCarMixin,
+    ProfileCarMixin,
+)
 
 
 class ProfileCarCreateView(ProfileCarMixin, generics.CreateAPIView):

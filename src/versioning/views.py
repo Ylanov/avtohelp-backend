@@ -1,6 +1,9 @@
 from rest_framework import generics
 
-from . import models, serializers
+from . import (
+    models,
+    serializers,
+)
 
 
 class VersionView(generics.RetrieveAPIView):

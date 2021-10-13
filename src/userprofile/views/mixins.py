@@ -1,6 +1,12 @@
 from rest_framework import generics
 
-from ..models import BlackList, FriendRequest, Profile, ProfileCar, ProfileGallery
+from ..models import (
+    BlackList,
+    FriendRequest,
+    Profile,
+    ProfileCar,
+    ProfileGallery,
+)
 
 
 class ProfileMixin:
