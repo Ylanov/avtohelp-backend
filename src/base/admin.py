@@ -1,19 +1,14 @@
 import datetime
-import logging
 
 from django.conf import settings
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from easy_thumbnails.fields import ThumbnailerImageField
 from image_cropping.admin import ImageCroppingMixin
 from solo.admin import SingletonModelAdmin
 
 from userprofile.models import Profile
-
 from .models import (
     Newsletter,
     NewsletterComment,
-    NewsletterCommentLike,
     NewsletterLike,
     PushNotification,
     PushNotificationConfiguration,
@@ -22,6 +17,7 @@ from .models import (
 )
 
 
+@admin.register(Newsletter)
 class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
     # class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
@@ -41,46 +37,38 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
         "short_description",
     )
 
-    # def get_form(self, request, obj=None, **kwargs):
-    #     if obj:
-    #         if obj.recommendation != None and obj.recommendation == False:
-    #             self.exclude = ('title', 'short_description', 'refused', )
-    #     form = super().get_form(request, obj, **kwargs)
-    #     return form
-
     def save_model(self, request, obj, form, change):
-        if obj.publish == True:
+        if obj.publish is True:
             obj.publish_date = datetime.datetime.now()
 
-        if obj.as_admin == True:
+        if obj.as_admin is True:
             author_id = 1
             if settings.NEWSLETTER_USERPROFILE_ID:
                 profile_id = settings.NEWSLETTER_USERPROFILE_ID
                 profile = Profile.objects.filter(id=profile_id).get()
                 if profile:
                     author_id = profile.user.id
-            author = obj.author_id = author_id
+
+            obj.author_id = author_id
+
         super().save_model(request, obj, form, change)
 
         if obj.push:
             obj.send_push_notification()
 
 
+@admin.register(NewsletterLike)
 class NewsletterLikeModelAdmin(admin.ModelAdmin):
-    """Custom page for NewsletterLike"""
-
     pass
 
 
+@admin.register(NewsletterComment)
 class NewsletterCommentModelAdmin(admin.ModelAdmin):
-    """Custom page for NewsletterLike"""
-
     pass
 
 
+@admin.register(PushNotification)
 class PushNotificationModelAdmin(admin.ModelAdmin):
-    """Custom page for PushNotification"""
-
     common_fields = ("id", "user", "status", "event")
     readonly_fields = common_fields + ("created", "modified")
     list_display = readonly_fields
@@ -89,10 +77,6 @@ class PushNotificationModelAdmin(admin.ModelAdmin):
 
 
 # Register your models here.
-admin.site.register(Newsletter, NewsletterModelAdmin)
-admin.site.register(NewsletterLike, NewsletterLikeModelAdmin)
-admin.site.register(NewsletterComment, NewsletterCommentModelAdmin)
-admin.site.register(PushNotification, PushNotificationModelAdmin)
 admin.site.register(PushNotificationConfiguration, SingletonModelAdmin)
 admin.site.register(PushNotificationSchedule)
 admin.site.register(UserVerificationConfiguration, SingletonModelAdmin)

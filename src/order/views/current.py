@@ -134,13 +134,14 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
             request = None
 
         if request:
-            views = models.AssistanceRequestUserRead.objects.filter(
+
+            views_count = models.AssistanceRequestUserRead.objects.filter(
                 request=request, user=self.request.user
             ).count()
 
             # check views count of assistance request
-            if views == 0:
-                read = models.AssistanceRequestUserRead.objects.make(
+            if views_count == 0:
+                models.AssistanceRequestUserRead.objects.make(
                     request=request, user=self.request.user
                 )
 

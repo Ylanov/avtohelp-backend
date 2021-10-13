@@ -7,3 +7,5 @@ from .profile import (
     FriendList,
     FriendRequest,
 )
+
+from .profile_car import ProfileCar

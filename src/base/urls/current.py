@@ -1,13 +1,18 @@
 from django.urls import path
-from rest_framework import routers
+from rest_framework.routers import SimpleRouter
 
-from base import models as base_models
 from base.views import current as views
 
 app_name = "base"
 
-# router = routers.SimpleRouter()
-router = base_models.BaseSimpleRouter()
+
+class BaseSimpleRouter(SimpleRouter):
+    def __init__(self):
+        self.trailing_slash = "/?"
+        super(SimpleRouter, self).__init__()
+
+
+router = BaseSimpleRouter()
 
 router.register(r"news", views.NewsViewSet)
 router.register(r"notifications", views.NotificationViewSet)
@@ -48,10 +53,6 @@ urlpatterns = [
         views.NewsCommentDeleteView.as_view(),
         name="news-comment-delete",
     ),
-    # path('news', views.NewsListView.as_view(), name='news-list'),
-    # path('news/<int:pk>', views.NewsDetailView, name='news-detail'),
-    # path('notifications', views.NotificationListView.as_view(), name='notifications-list'),
-    # path('notifications/<int:pk>', views.NotificationDetailView.as_view(), name='notifications-detail'),
 ]
 
 urlpatterns = router.urls + urlpatterns

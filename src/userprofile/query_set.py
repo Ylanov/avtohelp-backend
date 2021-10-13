@@ -1,7 +1,6 @@
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.postgres.search import SearchVector
 from django.db import models
-from django.db.models import Q
 from django.utils import timezone
 from fcm_django import models as fcm_models
 
@@ -106,12 +105,12 @@ class ProfileQuerySet(models.QuerySet):
         return self.annotate(
             friend=models.Case(
                 models.When(
-                    Q(
+                    models.Q(
                         user_id__in=models.Subquery(
                             FriendList.objects.common(user).values("friend__id")
                         )
                     )
-                    | Q(
+                    | models.Q(
                         user_id__in=models.Subquery(
                             FriendList.objects.common(user).values("owner__id")
                         )
@@ -133,12 +132,12 @@ class ProfileQuerySet(models.QuerySet):
         return self.annotate(
             foe=models.Case(
                 models.When(
-                    Q(
+                    models.Q(
                         user_id__in=models.Subquery(
                             BlackList.objects.common(user).values("foe__id")
                         )
                     )
-                    | Q(
+                    | models.Q(
                         user_id__in=models.Subquery(
                             BlackList.objects.common(user).values("owner__id")
                         )
@@ -207,8 +206,8 @@ class FriendRequestQuerySet(models.QuerySet):
     def common(self, owner, invited):
         """Common request"""
         return self.filter(
-            Q(owner=owner, invited=invited)
-            | Q(owner=invited, invited=owner) & Q(approved=False)
+            models.Q(owner=owner, invited=invited)
+            | models.Q(owner=invited, invited=owner) & models.Q(approved=False)
         )
 
     def from_me_to_user(self, owner, invited):
@@ -217,7 +216,9 @@ class FriendRequestQuerySet(models.QuerySet):
 
     def common_by_user(self, user):
         """My requests to add SOMEONE in my friend list"""
-        return self.filter(Q(owner=user) | Q(invited=user) & Q(approved=False))
+        return self.filter(
+            models.Q(owner=user) | models.Q(invited=user) & models.Q(approved=False)
+        )
 
     def approved(self):
         """Approved requests"""
@@ -244,21 +245,22 @@ class FriendListQuerySet(models.QuerySet):
 
     def common(self, user):
         """Get user friends"""
-        return self.filter(Q(owner=user) | Q(friend=user)).filter(
+        return self.filter(models.Q(owner=user) | models.Q(friend=user)).filter(
             friend__profile__last_name__isnull=False
         )
 
     def by_profiles(self, owner, friend):
         """Get user friend by profiles"""
         return self.filter(
-            Q(owner__profile=owner) & Q(friend__profile=friend)
-            | Q(owner__profile=friend) & Q(friend__profile=owner)
+            models.Q(owner__profile=owner) & models.Q(friend__profile=friend)
+            | models.Q(owner__profile=friend) & models.Q(friend__profile=owner)
         )
 
     def by_users(self, owner, friend):
         """Get user friend" by users"""
         return self.filter(
-            Q(owner=owner) & Q(friend=friend) | Q(owner=friend) & Q(friend=owner)
+            models.Q(owner=owner) & models.Q(friend=friend)
+            | models.Q(owner=friend) & models.Q(friend=owner)
         )
 
     def in_list(self, user):
@@ -268,7 +270,7 @@ class FriendListQuerySet(models.QuerySet):
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
         if self.filter(
-            Q(owner=owner, friend=user) | Q(owner=user, friend=owner)
+            models.Q(owner=owner, friend=user) | models.Q(owner=user, friend=owner)
         ).exists():
             return True
         else:
@@ -299,7 +301,9 @@ class BlackListQuerySet(models.QuerySet):
 
     def are_foes(self, owner, user):
         """Check if owner has an enemy"""
-        if self.filter(Q(owner=owner, foe=user) | Q(owner=user, foe=owner)).exists():
+        if self.filter(
+            models.Q(owner=owner, foe=user) | models.Q(owner=user, foe=owner)
+        ).exists():
             return True
         else:
             return False
