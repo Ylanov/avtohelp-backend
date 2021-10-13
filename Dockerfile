@@ -25,3 +25,6 @@ COPY src /app/src/
 
 WORKDIR /app
 
+RUN mkdir media
+RUN mkdir static
+

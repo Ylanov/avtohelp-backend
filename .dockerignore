@@ -4,6 +4,9 @@
 /migrations/
 /scripts/
 
+media/
+static/
+
 .env/
 .venv/
 .env.example
