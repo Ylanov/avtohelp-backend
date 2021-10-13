@@ -51,7 +51,7 @@ class BlackListDetailView(ProfileBlackListMixin, generics.RetrieveAPIView):
         return self.queryset
 
 
-class BlackListDestroyView(generics.DestroyAPIView):
+class BlackListDestroyView(ProfileBlackListMixin, generics.DestroyAPIView):
     """
     View for destroy blacklist request
     """

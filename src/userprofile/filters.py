@@ -1,7 +1,7 @@
 import django_filters
 from django.contrib.postgres.search import SearchQuery
 
-from userprofile import models
+from userprofile.models import FriendRequest, Profile, ProfileGallery
 
 
 class ProfileListFilterSet(django_filters.FilterSet):
@@ -14,7 +14,7 @@ class ProfileListFilterSet(django_filters.FilterSet):
     class Meta:
         """Meta class."""
 
-        model = models.Profile
+        model = Profile
         fields = [
             "online",
             "friend",
@@ -63,7 +63,7 @@ class ProfileGalleryListFilterSet(django_filters.FilterSet):
     class Meta:
         """Meta class."""
 
-        model = models.ProfileGallery
+        model = ProfileGallery
         fields = [
             "person_id",
         ]
@@ -77,7 +77,7 @@ class OutgoingRequestFilterSet(django_filters.FilterSet):
     class Meta:
         """Meta class."""
 
-        model = models.FriendRequest
+        model = FriendRequest
         fields = [
             "person_id",
         ]
@@ -91,7 +91,7 @@ class IncomingRequestFilterSet(django_filters.FilterSet):
     class Meta:
         """Meta class."""
 
-        model = models.FriendRequest
+        model = FriendRequest
         fields = [
             "person_id",
         ]

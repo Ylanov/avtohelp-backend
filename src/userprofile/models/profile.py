@@ -2,42 +2,19 @@ from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from fcm_django import models as fcm_models
 
 from roadhelpbackend import celery as tasks
 from utils.mixins import BaseMixin, ImageMixin
-
-from .managers import (
-    BlackListManager,
-    FCMDeviceManager,
+from ..managers import (
     FriendRequestManager,
     ProfileGalleryManager,
 )
-from .query_set import (
-    BlackListQuerySet,
+from ..query_set import (
     FriendListQuerySet,
     FriendRequestQuerySet,
     ProfileGalleryQuerySet,
     ProfileQuerySet,
 )
-
-
-class FCMDevice(fcm_models.AbstractFCMDevice):
-    """Firebase Cloud Messaging model"""
-
-    user = models.ForeignKey(
-        "account.User",
-        blank=True,
-        null=True,
-        related_name="fcm_user",
-        on_delete=models.CASCADE,
-    )
-
-    objects = FCMDeviceManager()
-
-    class Meta:
-        verbose_name = _("FCM device")
-        verbose_name_plural = _("FCM devices")
 
 
 class Profile(BaseMixin, ImageMixin):
@@ -73,27 +50,6 @@ class Profile(BaseMixin, ImageMixin):
             if profile_car
             else None
         )
-
-
-class ProfileCar(BaseMixin):
-    """User profile car"""
-
-    owner = models.ForeignKey("account.User", on_delete=models.PROTECT)
-    car = models.ForeignKey("car.Car", on_delete=models.PROTECT)
-    color = models.ForeignKey("car.CarColor", on_delete=models.CASCADE)
-    license_plate = models.CharField(
-        max_length=255,
-        verbose_name=_("License plate"),
-        blank=True,
-        null=False,
-        default="",
-    )
-
-    class Meta:
-        """Meta class"""
-
-        verbose_name = _("Profile car")
-        verbose_name_plural = _("Profile cars")
 
 
 class ProfileLocation(BaseMixin):
@@ -205,33 +161,4 @@ class FriendList(BaseMixin):
         unique_together = (
             "owner",
             "friend",
-        )
-
-
-class BlackList(BaseMixin):
-    """BlackList model"""
-
-    owner = models.ForeignKey(
-        "account.User",
-        verbose_name=_("Owner"),
-        related_name="blacklist_owner",
-        on_delete=models.CASCADE,
-    )
-    foe = models.ForeignKey(
-        "account.User",
-        verbose_name=_("Foe"),
-        related_name="blacked_user",
-        on_delete=models.CASCADE,
-    )
-
-    objects = BlackListManager.from_queryset(BlackListQuerySet)()
-
-    class Meta:
-        """Meta-class"""
-
-        verbose_name = _("Black list")
-        verbose_name_plural = _("Black lists")
-        unique_together = (
-            "owner",
-            "foe",
         )

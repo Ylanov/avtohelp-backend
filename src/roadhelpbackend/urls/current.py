@@ -8,7 +8,7 @@ urlpatterns = [
     path("base/", include("base.urls.current")),
     path("car/", include("car.urls.current")),
     path("catalog/", include("catalog.urls.current")),
-    path("userprofile/", include("userprofile.urls.current")),
+    path("userprofile/", include("userprofile.urls")),
     path("order/", include("order.urls.current")),
     path("chat/", include("chat.urls.current")),
 ]

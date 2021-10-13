@@ -6,11 +6,10 @@ from django.utils import timezone
 from fcm_django import models as fcm_models
 
 from base.models import PushNotificationConfiguration
-from userprofile.models import BlackList, FriendList
 
 
 class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
-    """Firebase Cloud Messaging querysets"""
+    """Firebase Cloud Messaging queryset"""
 
     def by_geo_position(self, point):
         """Filter by geo position"""
@@ -25,11 +24,6 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
 
     def annotate_device_geo_position_relevance(self):
         """Is the device geo-position information current?"""
-        geo_pos_settings = PushNotificationConfiguration.get_solo()
-        hours, minutes = (
-            geo_pos_settings.geo_position_lifetime.hour,
-            geo_pos_settings.geo_position_lifetime.minute,
-        )
 
         delta = (timezone.now() - timezone.timedelta(hours=99, minutes=0),)
 
@@ -107,6 +101,8 @@ class ProfileQuerySet(models.QuerySet):
         Annotate friend status
         :return: annotated field
         """
+        from userprofile.models import FriendList
+
         return self.annotate(
             friend=models.Case(
                 models.When(
@@ -132,6 +128,7 @@ class ProfileQuerySet(models.QuerySet):
         Annotate foe status
         :return: annotated field
         """
+        from .models import BlackList
 
         return self.annotate(
             foe=models.Case(
