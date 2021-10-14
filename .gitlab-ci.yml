@@ -1,0 +1,46 @@
+stages:
+  - build
+  - release
+
+variables:
+  KANIKO_VERSION: "debug-v1.3.0"
+  PROJECT_DOCKER_REGISTRY: "registry.gitlab.com/agencypro"
+  DOCKER_IMAGE_NAME: "registry.gitlab.com/agencypro/roadhelpbackend"
+  RELEASE_TAG: $(date '+%Y.%m.%d.%H.%M')
+
+build_image:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:${KANIKO_VERSION}
+    entrypoint: [""]
+  before_script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+  script:
+    - /kaniko/executor
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/Dockerfile
+      --destination ${DOCKER_IMAGE_NAME}:${CI_COMMIT_REF_SLUG}
+      --cache-ttl=1h
+      --cache=true
+      --cache-repo=${DOCKER_IMAGE_NAME}/cache
+  only:
+    refs:
+      - dev
+      - master
+      - feature/viewed-issues
+  tags:
+    - docker
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo $RELEASE_TAG
+  release:
+    tag_name: ${RELEASE_TAG}
+    description: 'Release description'
+  only:
+    - master
+  when: manual
+  tags:
+    - docker
