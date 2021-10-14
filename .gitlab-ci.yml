@@ -35,10 +35,10 @@ release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   script:
-    - echo $RELEASE_TAG
-  release:
-    tag_name: ${RELEASE_TAG}
-    description: 'Release description'
+    - echo "running release"
+    - export VERSION="$(date '+%Y.%m.%d.%H.%M')"
+    - echo "$VERSION"
+    - release-cli create --name "Release $VERSION" --description "Автоматическая сборка" --tag-name "$VERSION"
   only:
     - master
   when: manual
