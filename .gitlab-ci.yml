@@ -16,12 +16,13 @@ build_image:
     name: gcr.io/kaniko-project/executor:${KANIKO_VERSION}
     entrypoint: [""]
   before_script:
+    - echo $VERSION
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
   script:
     - /kaniko/executor
       --context $CI_PROJECT_DIR
       --dockerfile $CI_PROJECT_DIR/Dockerfile
-      --destination ${DOCKER_IMAGE_NAME}:${VERSION}
+      --destination ${DOCKER_IMAGE_NAME}:$VERSION
       --cache-ttl=1h
       --cache=true
       --cache-repo=${DOCKER_IMAGE_NAME}/cache
