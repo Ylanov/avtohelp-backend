@@ -1,6 +1,6 @@
 # Introduction 
 
-This is backend application of the super-team-lab. 
+This is backend application of the roadhelpbackend. 
 
 # Development
 
@@ -10,6 +10,7 @@ Requirements:
 - Python 3.7
 - Poetry
 - Postgres 12
+- Redis-server
 
 # Introduction 
 
@@ -37,6 +38,15 @@ pip install poetry
 poetry install
 ```
 
+For added new dependency
+```
+poetry add <dependency-name>
+```
+
+For remove some dependency
+```
+poetry remove <dependency-name>
+```
 
 ## Admin url
 
