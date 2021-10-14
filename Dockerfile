@@ -1,4 +1,4 @@
-FROM python:3.7.2
+FROM registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2
 
 RUN apt-get update -y
 RUN apt-get -y install libcurl4-openssl-dev \
