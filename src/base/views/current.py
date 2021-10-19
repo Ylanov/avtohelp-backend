@@ -105,7 +105,10 @@ class NewsCommentCreateView(generics.CreateAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         # add things in context.
-        context["newsletter_id"] = self.kwargs["newsletter_id"]
+        try:
+            context["newsletter_id"] = self.kwargs["newsletter_id"]
+        except (KeyError,):
+            pass
         return context
 
 

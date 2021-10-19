@@ -42,7 +42,6 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     image_resolution = serializers.SerializerMethodField()
     likes = serializers.SerializerMethodField()
     i_like = serializers.SerializerMethodField()
-    # author = profile_serializers.ProfileBaseSerializer(read_only=True, source='author.profile')
     author = serializers.SerializerMethodField()
     comments = NewsletterCommentListSerializer(many=True, read_only=True)
 
@@ -77,9 +76,12 @@ class NewsDetailSerializer(serializers.ModelSerializer):
         if settings.NEWSLETTER_USERPROFILE_ID:
             profile_id = settings.NEWSLETTER_USERPROFILE_ID
 
-        profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
+        try:
+            profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
+        except (Exception,):
+            pass
 
-        if profile is None:
+        if profile is None and news.author:
             profile = news.author.profile
 
         return profile_serializers.ProfileBaseSerializer(
@@ -94,18 +96,20 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
         if not news.cropping:
             return request.build_absolute_uri(news.image.url)
-
-        demention = NewsDetailSerializer.get_dementions(news)
-        thumbnail_url = get_backend().get_thumbnail_url(
-            news.image,
-            {
-                "size": (demention[0], demention[1]),
-                "box": news.cropping,
-                "crop": True,
-                "detail": True,
-            },
-        )
-        return request.build_absolute_uri(thumbnail_url)
+        try:
+            demention = NewsDetailSerializer.get_dementions(news)
+            thumbnail_url = get_backend().get_thumbnail_url(
+                news.image,
+                {
+                    "size": (demention[0], demention[1]),
+                    "box": news.cropping,
+                    "crop": True,
+                    "detail": True,
+                },
+            )
+            return request.build_absolute_uri(thumbnail_url)
+        except (Exception,):
+            return None
 
     def get_dementions(news):
         if not news.cropping:

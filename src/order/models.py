@@ -6,15 +6,26 @@ from django.db import (
     models,
     transaction,
 )
+
+from django.contrib.gis.db.models import Manager as GeoManager
+
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from base.models import PushNotificationConfiguration
+
 from roadhelpbackend import celery as tasks
 from utils.mixins import (
     BaseMixin,
     ImageMixin,
+)
+
+from .choices import (
+    EXPIRED,
+    CANCELED,
+    AVAILABLE,
+    STATUS_CHOICES,
 )
 
 
@@ -31,11 +42,15 @@ class AssistanceRequestQuerySet(models.QuerySet):
 
     def available(self, user):
         """Filter by valid requests"""
-        return self.ordinary(user=user).filter(status=AssistanceRequest.AVAILABLE)
+        return self.ordinary(user=user).filter(status=AVAILABLE)
 
     def expired(self):
         """Filter by valid requests"""
-        return self.filter(status=AssistanceRequest.EXPIRED)
+        return self.filter(status=EXPIRED)
+
+    def canceled(self):
+        """Filter by valid requests"""
+        return self.filter(status=CANCELED)
 
     def ordinary(self, user):
         """
@@ -104,16 +119,6 @@ class AssistanceRequestManager(models.Manager):
 class AssistanceRequest(BaseMixin, ImageMixin):
     """Assistance request model"""
 
-    EXPIRED = 0
-    AVAILABLE = 1
-    CANCELED = 2
-
-    STATUS_CHOICES = (
-        (AVAILABLE, _("Assistance request is available")),
-        (EXPIRED, _("Assistance request was expired")),
-        (CANCELED, _("Assistance request was canceled")),
-    )
-
     user = models.ForeignKey(
         "account.User", verbose_name=_("User"), on_delete=models.CASCADE
     )
@@ -137,6 +142,8 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     )
 
     objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
+
+    gis = GeoManager()
 
     class Meta:
         """Meta class"""
