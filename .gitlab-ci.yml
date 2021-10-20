@@ -54,4 +54,4 @@ pull-new-master-image:
   only:
     - master
   tags:
-    - docker
+    - shell
