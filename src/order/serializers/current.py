@@ -3,6 +3,7 @@ from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 
 from order import models
+from order.choices import STATUS_CHOICES
 from userprofile.serializers import current as profile_serializers
 from utils.serializers import GeoLocationSerializerMixin
 
@@ -108,7 +109,7 @@ class AssistanceRequestCreateSerializer(serializers.ModelSerializer):
 class AssistanceRequestUpdateSerializer(serializers.ModelSerializer):
     """Update object of AssistanceRequest by user"""
 
-    status = serializers.ChoiceField(choices=models.AssistanceRequest.STATUS_CHOICES)
+    status = serializers.ChoiceField(choices=STATUS_CHOICES)
 
     class Meta:
         """Meta class"""
