@@ -1,7 +1,9 @@
 from django.conf import settings
+from django.contrib.gis.db.models import (
+    Manager as GeoManager,
+    PointField,
+)
 from django.contrib.gis.geos import Point
-from django.contrib.gis.db.models import Manager as GeoManager, PointField
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -64,11 +66,14 @@ class ProfileLocation(BaseMixin):
     user = models.OneToOneField("account.User", on_delete=models.PROTECT)
     location = PointField(_("Location"), blank=True, null=True, default=Point(0, 0))
 
+    lng = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
+    lat = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
+
     gis = GeoManager()
     objects = models.Manager()
 
     class Meta:
-        """Meta class."""
+        index_together = ["user", "lng", "lat"]
 
         verbose_name = _("Profile location")
         verbose_name_plural = _("Profile locations")
