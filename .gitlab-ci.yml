@@ -1,6 +1,7 @@
 stages:
   - build
   - release
+  - deploy
 
 variables:
   KANIKO_VERSION: "debug-v1.3.0"
