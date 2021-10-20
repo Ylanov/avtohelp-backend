@@ -69,6 +69,9 @@ class Newsletter(BaseMixin):
         verbose_name = _("News")
         verbose_name_plural = _("Newsletter")
 
+    def __str__(self):
+        return f"{self.title}"
+
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""
 
@@ -90,20 +93,22 @@ class Newsletter(BaseMixin):
 
 
 class NewsletterLike(BaseMixin):
-    """Comments for Newsletter"""
 
-    newsletter = models.ForeignKey("Newsletter", on_delete=models.CASCADE)
+    newsletter = models.ForeignKey(
+        "Newsletter", on_delete=models.CASCADE, db_index=True
+    )
     owner = models.ForeignKey("account.User", on_delete=models.PROTECT)
 
     class Meta:
-        """Meta class"""
-
+        unique_together = (
+            "newsletter",
+            "owner",
+        )
         verbose_name = _("Newsletter like")
         verbose_name_plural = _("Newsletter likes")
 
     def save(self, *args, **kwargs):
         super(NewsletterLike, self).save(*args, **kwargs)
-        # self.send_push_notification()
 
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""
@@ -121,7 +126,7 @@ class NewsletterComment(BaseMixin):
     """Comments for Newsletter"""
 
     newsletter = models.ForeignKey(
-        "Newsletter", related_name="comments", on_delete=models.CASCADE
+        "Newsletter", related_name="comments", on_delete=models.CASCADE, db_index=True
     )
     author = models.ForeignKey("account.User", on_delete=models.PROTECT)
     text = models.CharField(
@@ -140,7 +145,6 @@ class NewsletterComment(BaseMixin):
 
     def save(self, *args, **kwargs):
         super(NewsletterComment, self).save(*args, **kwargs)
-        # self.send_push_notification()
 
     def send_push_notification(self):
         """Sent PUSH-notification to all active users"""
@@ -157,11 +161,18 @@ class NewsletterComment(BaseMixin):
 class NewsletterCommentLike(BaseMixin):
     """Comments for Newsletter"""
 
-    comment = models.ForeignKey("NewsletterComment", on_delete=models.CASCADE)
+    comment = models.ForeignKey(
+        "NewsletterComment", on_delete=models.CASCADE, db_index=True
+    )
     owner = models.ForeignKey("account.User", on_delete=models.PROTECT)
 
     class Meta:
         """Meta class"""
+
+        unique_together = (
+            "comment",
+            "owner",
+        )
 
         verbose_name = _("Comment like")
         verbose_name_plural = _("Comment likes")

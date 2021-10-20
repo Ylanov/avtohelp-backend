@@ -1,6 +1,7 @@
 stages:
   - build
   - release
+  - deploy
 
 variables:
   KANIKO_VERSION: "debug-v1.3.0"
@@ -15,9 +16,8 @@ build_image:
   image:
     name: gcr.io/kaniko-project/executor:${KANIKO_VERSION}
     entrypoint: [""]
-  before_script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
   script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor
       --context $CI_PROJECT_DIR
       --dockerfile $CI_PROJECT_DIR/Dockerfile
@@ -40,6 +40,18 @@ release:
     - release-cli create --name "Release $VERSION" --description "Автоматическая сборка" --tag-name "$VERSION"
   only:
     - master
-  when: manual
+  tags:
+    - docker
+
+pull-new-master-image:
+  stage: deploy
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - docker pull ${DOCKER_IMAGE_NAME}:${VERSION}
+  only:
+    - master
   tags:
     - docker

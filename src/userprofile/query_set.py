@@ -307,3 +307,8 @@ class BlackListQuerySet(models.QuerySet):
             return True
         else:
             return False
+
+
+class ProfileLocationQuerySet(models.QuerySet):
+    def nearby(self):
+        pass

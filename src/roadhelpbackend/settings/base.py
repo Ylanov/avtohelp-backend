@@ -15,8 +15,13 @@ PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "media"))
 
 SECRET_KEY = "^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1"
 
+USE_SMS = True  # Actual sms sending switcher
+TEST_SMS_CODE = False
+APPROVE_ACCOUNT = "+79000000000"
+
 ALLOWED_HOSTS = [
     "0.0.0.0",
+    "127.0.0.1",
     "localhost",
     "roadhelper.spider.ru",
 ]
@@ -84,7 +89,7 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [
-            os.path.join(BASE_DIR, "templates"),
+            PROJECT_ROOT / "templates",
         ],
         "APP_DIRS": True,
         "OPTIONS": {
@@ -105,11 +110,11 @@ ASGI_APPLICATION = "roadhelpbackend.routing.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.environ.get("DB_NAME"),
-        "USER": os.environ.get("DB_USERNAME"),
-        "PASSWORD": os.environ.get("DB_PASSWORD"),
-        "HOST": os.environ.get("DB_HOSTNAME"),
-        "PORT": os.environ.get("DB_PORT"),
+        "NAME": "roadhelper",
+        "USER": "roadhelper",
+        "PASSWORD": "roadhelper",
+        "HOST": "127.0.0.1",
+        "PORT": 5432,
     }
 }
 
