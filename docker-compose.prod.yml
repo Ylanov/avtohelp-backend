@@ -1,0 +1,39 @@
+version: '3'
+services:
+  redis:
+   image: redis:2.8.23
+   ports:
+      - "6379:6379"
+  worker:
+    build: .
+    command: make celery
+    environment:
+      - SETTINGS_CONFIGURATION=local
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_HOSTNAME=db
+      - DB_PORT=5432
+      - DB_PASSWORD=postgres
+    volumes:
+      - .:/code
+    links:
+      - db
+      - redis
+  road_helper:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      - SETTINGS_CONFIGURATION=local
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_HOSTNAME=db
+      - DB_PORT=5432
+      - DB_PASSWORD=postgres
+    depends_on:
+      - db
+      - redis
+      - worker
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"

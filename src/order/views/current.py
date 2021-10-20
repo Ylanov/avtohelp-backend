@@ -64,7 +64,7 @@ class AssistanceRequestCountView(views.APIView):
         push_config = PushNotificationConfiguration.get_solo()
         if user.location_is_valid:
 
-            countRequest = (
+            count_request = (
                 models.AssistanceRequest.objects.available(user)
                 .annotate_distance(point=user.profilelocation.location)
                 .filter(distance__lte=push_config.radius)
@@ -72,7 +72,7 @@ class AssistanceRequestCountView(views.APIView):
                 .count()
             )
 
-            readRequest = (
+            read_request = (
                 models.AssistanceRequest.objects.available(user)
                 .annotate_distance(point=user.profilelocation.location)
                 .filter(distance__lte=push_config.radius)
@@ -81,7 +81,7 @@ class AssistanceRequestCountView(views.APIView):
             )
 
             return Response(
-                {"count": countRequest, "unread": countRequest - readRequest}
+                {"count": count_request, "unread": count_request - read_request}
             )
         else:
             return Response({"count": 0, "unread": 0})

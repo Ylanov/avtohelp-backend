@@ -60,12 +60,12 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
 
 @admin.register(NewsletterLike)
 class NewsletterLikeModelAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("newsletter", "owner")
 
 
 @admin.register(NewsletterComment)
 class NewsletterCommentModelAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("id", "newsletter", "author", "created")
 
 
 @admin.register(PushNotification)

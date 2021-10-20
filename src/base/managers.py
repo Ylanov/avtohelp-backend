@@ -70,7 +70,7 @@ class PushNotificationManager(models.Manager):
     ) -> object:
         """Make common notification for new newsletter"""
         user_id = user.id if isinstance(user, User) else user
-        from .models import PushNotificationConfiguration
+        from .models import Newsletter
 
         if newsletter:
             newsletter_qs = Newsletter.objects.filter(id=newsletter)
