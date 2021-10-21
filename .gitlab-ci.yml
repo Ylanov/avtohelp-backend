@@ -50,8 +50,8 @@ pull-new-master-image:
   variables:
     GIT_STRATEGY: none
   script:
-    - docker pull ${DOCKER_IMAGE_NAME}:${VERSION}
+    - docker pull $DOCKER_IMAGE_NAME:$VERSION
   only:
     - master
   tags:
-    - docker
+    - shell
