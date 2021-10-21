@@ -7,9 +7,13 @@ class BaseMixin(models.Model):
     """Base mixin model."""
 
     created = models.DateTimeField(
-        default=timezone.now, editable=False, verbose_name=_("Date created")
+        default=timezone.now,
+        editable=False,
+        verbose_name=_("Date created"),
     )
-    modified = models.DateTimeField(auto_now=True, verbose_name=_("Date updated"))
+    modified = models.DateTimeField(
+        auto_now=True, verbose_name=_("Date updated")
+    )
 
     class Meta:
         """Meta-class"""

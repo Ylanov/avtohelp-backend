@@ -18,7 +18,10 @@ class RemoteServer(SingletonModel):
 class Version(BaseMixin):
 
     version = models.CharField(
-        _("Version"), max_length=6, unique=True, help_text=_("Example: 1.0.0")
+        _("Version"),
+        max_length=6,
+        unique=True,
+        help_text=_("Example: 1.0.0"),
     )
     active = models.BooleanField(_("Active"), default=False)
 

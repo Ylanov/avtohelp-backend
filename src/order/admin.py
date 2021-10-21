@@ -12,7 +12,10 @@ class AssistanceRequestModelAdmin(admin.ModelAdmin):
     list_filter = ("user", "status")
     fieldsets = (
         (_("User's data"), {"fields": ("user",)}),
-        (_("Assistance request"), {"fields": ("issue", "description", "status")}),
+        (
+            _("Assistance request"),
+            {"fields": ("issue", "description", "status")},
+        ),
         (_("Location"), {"fields": ("location",)}),
         (_("Info"), {"fields": ("created", "modified")}),
     )

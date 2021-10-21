@@ -46,7 +46,8 @@ class ChatMessageQuerySet(models.QuerySet):
         return self.annotate(
             read=models.Case(
                 models.When(
-                    models.Q(chatreadmessage__user=user) | models.Q(sender=user),
+                    models.Q(chatreadmessage__user=user)
+                    | models.Q(sender=user),
                     then=True,
                 ),
                 default=False,
@@ -70,14 +71,19 @@ class ChatMessage(BaseMixin):
     """Chat messages"""
 
     sender = models.ForeignKey(
-        "account.User", on_delete=models.CASCADE, verbose_name=_("Sender")
+        "account.User",
+        on_delete=models.CASCADE,
+        verbose_name=_("Sender"),
     )
     room = models.ForeignKey(
         "ChatRoom", on_delete=models.CASCADE, verbose_name=_("Room")
     )
     message = models.TextField(verbose_name=_("Text message"))
     timestamp = models.DateTimeField(
-        blank=True, default=None, null=True, verbose_name=_("Recording date")
+        blank=True,
+        default=None,
+        null=True,
+        verbose_name=_("Recording date"),
     )
 
     objects = ChatMessageManager.from_queryset(ChatMessageQuerySet)()
@@ -90,10 +96,17 @@ class ChatMessage(BaseMixin):
         verbose_name_plural = _("Chat messages")
 
     def send_push_notification_offline_users(self):
-        """Sent push notification to offline users in chat room exclude sender"""
-        participants = {i.get("id") for i in self.room.participants.all().values("id")}
+        """
+        Sent push notification to offline users in chat
+        room exclude sender
+        """
+        participants = {
+            i.get("id") for i in self.room.participants.all().values("id")
+        }
         offline_users = participants.difference(
-            caches["default"].get(f"room_{self.room.id}").union({self.sender.id})
+            caches["default"]
+            .get(f"room_{self.room.id}")
+            .union({self.sender.id})
         )
 
         if settings.USE_CELERY:
@@ -131,9 +144,9 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def friendly(self, participant):
         """Only friendly rooms"""
-        return self.exclude(participants__blacked_user__owner=participant).exclude(
-            participants__blacklist_owner__foe=participant
-        )
+        return self.exclude(
+            participants__blacked_user__owner=participant
+        ).exclude(participants__blacklist_owner__foe=participant)
 
     def friends(self, participant):
         """Filter by friend flag"""
@@ -155,7 +168,9 @@ class ChatRoomQuerySet(models.QuerySet):
 
     def by_participant(self, participant):
         """Find room by participant"""
-        return self.filter(participants=participant).friendly(participant=participant)
+        return self.filter(participants=participant).friendly(
+            participant=participant
+        )
 
     def public(self):
         """Find if room already exists"""
@@ -166,26 +181,36 @@ class ChatRoomQuerySet(models.QuerySet):
             unread_messages=models.Count(
                 "chatmessage",
                 filter=~models.Q(chatmessage__chatreadmessage__user=user)
-                & ~models.Q(chatmessage__sender=user),
+                & ~models.Q(chatmessage__sender=user),  # noqa
                 distinct=True,
             )
         )
 
     def annotate_message_count(self):
-        return self.annotate(message_count=models.Count("chatmessage", distinct=True))
+        return self.annotate(
+            message_count=models.Count("chatmessage", distinct=True)
+        )
 
     def annotate_last_message_datetime(self):
-        return self.annotate(last_message_datetime=models.Max("chatmessage__created"))
+        return self.annotate(
+            last_message_datetime=models.Max("chatmessage__created")
+        )
 
 
 class ChatRoom(BaseMixin, ImageMixin):
     """Chat room"""
 
     name = models.CharField(
-        max_length=24, blank=True, default=None, null=True, verbose_name=_("Name")
+        max_length=24,
+        blank=True,
+        default=None,
+        null=True,
+        verbose_name=_("Name"),
     )
     participants = models.ManyToManyField(
-        "account.User", related_name="participants", verbose_name=_("Participants")
+        "account.User",
+        related_name="participants",
+        verbose_name=_("Participants"),
     )
     is_public = models.BooleanField(default=False, verbose_name=_("is public"))
 
@@ -200,8 +225,8 @@ class ChatRoom(BaseMixin, ImageMixin):
     @property
     def group_name(self):
         """
-        Returns the Channels Group name that sockets should subscribe to to get sent
-        messages as they are generated.
+        Returns the Channels Group name that sockets should
+        subscribe to to get sent messages as they are generated.
         """
         return "room-%s" % self.id
 
@@ -212,7 +237,10 @@ class ChatRole(BaseMixin):
     MODERATOR = 0
     PARTICIPANT = 1
 
-    ROLE_CHOICES = ((MODERATOR, _("Moderator")), (PARTICIPANT, _("Participant")))
+    ROLE_CHOICES = (
+        (MODERATOR, _("Moderator")),
+        (PARTICIPANT, _("Participant")),
+    )
 
     user = models.ForeignKey(
         "account.User",

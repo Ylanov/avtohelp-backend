@@ -1,6 +1,6 @@
 start: migrate collectstatic
 
-code-style: black flake8 isort pep8
+code-style: black flake8 isort
 
 run-gunicorn:
 	cd src/ && gunicorn --workers 4 --bind 0.0.0.0:8000 roadhelpbackend.wsgi:application
@@ -41,7 +41,7 @@ apply-migrations:
 runserver:
 	cd src/ && python3 manage.py runserver 0.0.0.0:8000
 black:
-	python3 -m black src/
+	python3 -m black --line-length 79 src/
 
 notebook:
 	cd src/ && python3 manage.py shell_plus --notebook

@@ -36,7 +36,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
             ],
             options={
@@ -66,9 +68,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
             ],
         ),
         migrations.CreateModel(
@@ -93,9 +100,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
             ],
             options={
                 "verbose_name": "Car brand",
@@ -124,13 +136,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
                 (
                     "mark",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="car.CarMark"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="car.CarMark",
                     ),
                 ),
             ],
@@ -161,12 +179,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
                 (
                     "description",
-                    models.CharField(max_length=255, verbose_name="Description"),
+                    models.CharField(
+                        max_length=255, verbose_name="Description"
+                    ),
                 ),
                 (
                     "location",
@@ -212,9 +237,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
             ],
             options={
                 "verbose_name": "Service category",
@@ -225,21 +255,24 @@ class Migration(migrations.Migration):
             model_name="carservice",
             name="category",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="car.CarServiceCategory"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="car.CarServiceCategory",
             ),
         ),
         migrations.AddField(
             model_name="car",
             name="car_model",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="car.CarModel"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="car.CarModel",
             ),
         ),
         migrations.AddField(
             model_name="car",
             name="mark",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="car.CarMark"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="car.CarMark",
             ),
         ),
     ]

@@ -5,7 +5,7 @@ from .news import (
     NewsletterLike,
 )
 from .other import UserVerificationConfiguration
-from .push import (
+from .push import (  # noqa
     PushNotification,
     PushNotificationConfiguration,
     PushNotificationSchedule,

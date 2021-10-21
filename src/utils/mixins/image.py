@@ -64,7 +64,9 @@ class ImageMixin(models.Model):
         """Get full image url"""
         if self.image and exists(self.image.path):
             if thumbnail_key:
-                return request.build_absolute_uri(self.image[thumbnail_key].url)
+                return request.build_absolute_uri(
+                    self.image[thumbnail_key].url
+                )
             return request.build_absolute_uri(self.image.url)
         else:
             return None

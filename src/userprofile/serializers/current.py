@@ -52,7 +52,9 @@ class FCMDeviceSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(FCMDeviceSerializer, self).__init__(*args, **kwargs)
-        self.fields["type"].help_text = 'Should be one of ["%s"]' % '", "'.join(
+        self.fields[
+            "type"
+        ].help_text = 'Should be one of ["%s"]' % '", "'.join(
             [i for i in self.fields["type"].choices]
         )
 
@@ -101,7 +103,9 @@ class ProfileCarDetailSerializer(serializers.ModelSerializer):
 class ProfileViewSerializer(serializers.ModelSerializer):
     """Profile serializer for Requests"""
 
-    profile_car = ProfileCarDetailSerializer(source="user.profilecar_set.first")
+    profile_car = ProfileCarDetailSerializer(
+        source="user.profilecar_set.first"
+    )
 
     class Meta:
         """Meta class"""
@@ -211,11 +215,15 @@ class ProfileCarCreateSerializer(serializers.ModelSerializer):
     color = serializers.PrimaryKeyRelatedField(
         queryset=car_models.CarColor.objects.all(), write_only=True
     )
-    car = serializers.PrimaryKeyRelatedField(queryset=car_models.Car.objects.all())
+    car = serializers.PrimaryKeyRelatedField(
+        queryset=car_models.Car.objects.all()
+    )
 
     # RESPONSE
     color_name = serializers.CharField(source="color.name", read_only=True)
-    car_detail = car_serializers.CarDetailSerializer(source="car", read_only=True)
+    car_detail = car_serializers.CarDetailSerializer(
+        source="car", read_only=True
+    )
 
     class Meta:
         """meta model"""
@@ -279,7 +287,9 @@ class ProfileCarListSerializer(serializers.ModelSerializer):
 
     # RESPONSE
     color_name = serializers.CharField(source="color.name", read_only=True)
-    car_detail = car_serializers.CarDetailSerializer(source="car", read_only=True)
+    car_detail = car_serializers.CarDetailSerializer(
+        source="car", read_only=True
+    )
 
     class Meta:
         """meta model"""
@@ -323,7 +333,9 @@ class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
 
     def get_tiny(self, obj):
         """Get image with size tiny"""
-        return obj.get_full_image_url(self.context.get("request"), thumbnail_key="tiny")
+        return obj.get_full_image_url(
+            self.context.get("request"), thumbnail_key="tiny"
+        )
 
     def get_small(self, obj):
         """Get image with size small"""
@@ -345,7 +357,9 @@ class ProfileGalleryDetailSerializer(serializers.ModelSerializer):
 
     def get_big(self, obj):
         """Get image with size big"""
-        return obj.get_full_image_url(self.context.get("request"), thumbnail_key="big")
+        return obj.get_full_image_url(
+            self.context.get("request"), thumbnail_key="big"
+        )
 
     def get_large(self, obj):
         """Get image with size large"""
@@ -366,7 +380,9 @@ class ProfileGalleryCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Override create method"""
         validated_data["profile"] = self.context.get("request").user.profile
-        return super(ProfileGalleryCreateSerializer, self).create(validated_data)
+        return super(ProfileGalleryCreateSerializer, self).create(
+            validated_data
+        )
 
 
 class ProfileGalleryListSerializer(serializers.ModelSerializer):
@@ -474,11 +490,13 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     def get_person(self, obj):
         if obj.owner == self.context.get("request").user:
             return ProfileBaseSerializer(
-                obj.invited.profile, context={"request": self.context.get("request")}
+                obj.invited.profile,
+                context={"request": self.context.get("request")},
             ).data
         else:
             return ProfileBaseSerializer(
-                obj.owner.profile, context={"request": self.context.get("request")}
+                obj.owner.profile,
+                context={"request": self.context.get("request")},
             ).data
 
 
@@ -488,7 +506,8 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
     # REQUEST
     # Profile of invited user
     profile = serializers.PrimaryKeyRelatedField(
-        queryset=models.Profile.objects.filter(user__is_active=True), write_only=True
+        queryset=models.Profile.objects.filter(user__is_active=True),
+        write_only=True,
     )
 
     # RESPONSE
@@ -511,8 +530,12 @@ class FriendRequestCreateSerializer(serializers.ModelSerializer):
             raise api_exceptions.EqualIDError()
 
         # Check if friend list isn't existed
-        if models.FriendList.objects.by_users(attrs["owner"], attrs["invited"]):
-            raise api_exceptions.AlreadyFriends(attrs["owner"], attrs["invited"])
+        if models.FriendList.objects.by_users(
+            attrs["owner"], attrs["invited"]
+        ):
+            raise api_exceptions.AlreadyFriends(
+                attrs["owner"], attrs["invited"]
+            )
 
         # Check if friend request isn't exists
         if models.FriendRequest.objects.from_me_to_user(
@@ -579,11 +602,13 @@ class ProfileFriendListSerializer(serializers.ModelSerializer):
         """Serializer method for get friend profile"""
         if obj.owner == self.context.get("request").user:
             return ProfileBaseSerializer(
-                obj.friend.profile, context={"request": self.context.get("request")}
+                obj.friend.profile,
+                context={"request": self.context.get("request")},
             ).data
         else:
             return ProfileBaseSerializer(
-                obj.owner.profile, context={"request": self.context.get("request")}
+                obj.owner.profile,
+                context={"request": self.context.get("request")},
             ).data
 
 
@@ -599,7 +624,9 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
     )
 
     # RESPONSE
-    profile_id = serializers.IntegerField(source="foe.profile.id", read_only=True)
+    profile_id = serializers.IntegerField(
+        source="foe.profile.id", read_only=True
+    )
 
     class Meta:
         """Meta class"""
@@ -619,7 +646,9 @@ class BlackListCreateSerializer(serializers.ModelSerializer):
             owner=attrs["owner"], user=attrs["foe"]
         )
         if in_pending:
-            raise api_exceptions.AlreadyBlacked(owner=attrs["owner"], user=attrs["foe"])
+            raise api_exceptions.AlreadyBlacked(
+                owner=attrs["owner"], user=attrs["foe"]
+            )
         return attrs
 
     def create(self, validated_data):
@@ -649,9 +678,11 @@ class BlackListDetailSerializer(serializers.ModelSerializer):
     def get_person(self, obj):
         if obj.owner == self.context.get("request").user:
             return ProfileBaseSerializer(
-                obj.foe.profile, context={"request": self.context.get("request")}
+                obj.foe.profile,
+                context={"request": self.context.get("request")},
             ).data
         else:
             return ProfileBaseSerializer(
-                obj.owner.profile, context={"request": self.context.get("request")}
+                obj.owner.profile,
+                context={"request": self.context.get("request")},
             ).data

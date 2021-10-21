@@ -22,17 +22,26 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelOptions(
             name="chatrole",
-            options={"verbose_name": "Chat role", "verbose_name_plural": "Chat roles"},
+            options={
+                "verbose_name": "Chat role",
+                "verbose_name_plural": "Chat roles",
+            },
         ),
         migrations.AlterModelOptions(
             name="chatroom",
-            options={"verbose_name": "Chat room", "verbose_name_plural": "Chat rooms"},
+            options={
+                "verbose_name": "Chat room",
+                "verbose_name_plural": "Chat rooms",
+            },
         ),
         migrations.AddField(
             model_name="chatmessage",
             name="timestamp",
             field=models.DateTimeField(
-                blank=True, default=None, null=True, verbose_name="Recording date"
+                blank=True,
+                default=None,
+                null=True,
+                verbose_name="Recording date",
             ),
         ),
         migrations.AlterField(
@@ -87,7 +96,11 @@ class Migration(migrations.Migration):
             model_name="chatroom",
             name="name",
             field=models.CharField(
-                blank=True, default=None, max_length=24, null=True, verbose_name="Name"
+                blank=True,
+                default=None,
+                max_length=24,
+                null=True,
+                verbose_name="Name",
             ),
         ),
         migrations.AlterField(

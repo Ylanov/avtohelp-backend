@@ -21,3 +21,11 @@ ignore =
     F405,
     # redefinition of unused
     F811
+    F401
+    E131
+    E126
+    E122
+    W293
+    W291
+    W504
+

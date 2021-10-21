@@ -46,11 +46,17 @@ env = environ.Env(
     DEFAULT_REQUEST_RADIUS=(int, 100000),
     FCM_SERVER_KEY=(
         str,
-        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM",
+        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM",  # noqa
     ),
     OTP_SERVICE=(str, "https://api.new-tel.net"),
-    OTP_SERVER_KEY=(str, "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714"),
-    OTP_SIGNATURE_KEY=(str, "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2"),
+    OTP_SERVER_KEY=(
+        str,
+        "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714",
+    ),
+    OTP_SIGNATURE_KEY=(
+        str,
+        "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2",
+    ),
     LIMIT_UNREAD_MESSAGES=(int, 3),
     MESSAGES_UPDATE_PERIOD=(int, 15),
     SESSION_SAVE_EVERY_REQUEST=(bool, True),
@@ -162,19 +168,19 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa
         "OPTIONS": {
             "min_length": 9,
         },
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa
     },
 ]
 
@@ -218,18 +224,22 @@ REST_DATE_FORMAT = "%d-%m-%Y"
 
 # REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",  # noqa
     "PAGE_SIZE": env("PAGE_SIZE"),
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
     "DEFAULT_VERSION": (AVAILABLE_VERSIONS["current"],),
     "ALLOWED_VERSIONS": AVAILABLE_VERSIONS.values(),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "EXCEPTION_HANDLER": "utils.api_exceptions.roadhelper_exception_handler",
 }
 
@@ -258,7 +268,9 @@ SMS_BLOCKING_PERIOD = env("SMS_BLOCKING_PERIOD")  # 24 hours in seconds
 NEWSLETTER_USERPROFILE_ID = env("NEWSLETTER_USERPROFILE_ID")
 
 # CHAT
-NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = env("NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS")
+NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = env(
+    "NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS"
+)
 
 
 # ASSISTANCE REQUESTS
@@ -320,5 +332,7 @@ THUMBNAIL_PROCESSORS = (
     "image_cropping.thumbnail_processors.crop_corners",
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+IMAGE_CROPPING_BACKEND = (
+    "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+)
 IMAGE_CROPPING_BACKEND_PARAMS = {}
