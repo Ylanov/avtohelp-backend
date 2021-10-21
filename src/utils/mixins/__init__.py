@@ -1,3 +1,5 @@
+# type: ignore
+
 from .authorization import AuthorizationMixin
 from .base import (
     BaseMixin,

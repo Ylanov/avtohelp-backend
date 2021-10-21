@@ -1,3 +1,5 @@
+# type: ignore
+
 from .blacklist import BlackList
 from .fcm_device import FCMDevice
 from .profile import (

@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.db.models import (

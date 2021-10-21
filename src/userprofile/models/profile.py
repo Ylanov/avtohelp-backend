@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.conf import settings
 from django.contrib.gis.db.models import (
     Manager as GeoManager,

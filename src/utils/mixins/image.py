@@ -1,5 +1,6 @@
+# type: ignore
+
 import random
-import re
 from os.path import exists
 
 from django.conf import settings
@@ -8,9 +9,7 @@ from django.utils import timezone
 from django.utils.html import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
-from rest_framework.exceptions import ValidationError
 
-# from account import models as account_models
 
 
 def generate_image_name():
