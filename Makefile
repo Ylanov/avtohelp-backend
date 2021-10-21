@@ -2,7 +2,7 @@ start: migrate collectstatic
 
 code-style: black flake8 isort pep8
 
-run-ginicorn:
+run-gunicorn:
 	cd src/ && gunicorn --workers 4 --bind 0.0.0.0:8000 roadhelpbackend.wsgi:application
 
 pytest:
