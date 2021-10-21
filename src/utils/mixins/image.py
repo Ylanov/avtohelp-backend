@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from easy_thumbnails.fields import ThumbnailerImageField
 
 
-
 def generate_image_name():
     """Generate code method."""
     return "%06d" % random.randint(0, 999999)

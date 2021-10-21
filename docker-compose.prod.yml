@@ -1,4 +1,4 @@
-version: '3'
+version: '3.6'
 services:
   worker:
     image: registry.gitlab.com/agencypro/roadhelpbackend:2021.10.20.14.06
@@ -10,14 +10,19 @@ services:
       - DB_HOSTNAME=db
       - DB_PORT=5432
       - DB_PASSWORD=postgres
+    network_mode: host
   road_helper:
-    image: registry.gitlab.com/agencypro/roadhelpbackend:2021.10.20.14.06
+    build:
+      context: .
+      network: host
     command: make start && make make run-gunicorn
+    network_mode: "host"
     environment:
       - DB_NAME=postgres
       - DB_USERNAME=postgres
       - DB_HOSTNAME=db
       - DB_PORT=5432
       - DB_PASSWORD=postgres
+      - TIME_ZONE=Europe/Moscow
     ports:
       - "8000:8000"
