@@ -66,7 +66,6 @@ EXTERNAL_APPS = [
     "inline_actions",
     "django_object_actions",
     "multiselectfield",
-    # "online_users",
     "colorful",
 ]
 
@@ -151,12 +150,12 @@ LOCALE_PATHS = (PROJECT_ROOT / "locale",)
 
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = PROJECT_ROOT / "media"
+MEDIA_ROOT = PROJECT_ROOT / "media/"
 MEDIA_URL = "/media/"
 
-STATIC_ROOT = "static"
+STATIC_ROOT = PROJECT_ROOT / "static"
 
-STATICFILES_DIRS = (PROJECT_ROOT / "static",)
+# STATICFILES_DIRS = (PROJECT_ROOT / "static",)
 
 DEBUG = True
 

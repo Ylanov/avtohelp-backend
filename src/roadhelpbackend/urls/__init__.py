@@ -6,8 +6,6 @@ from rest_framework_swagger.views import get_swagger_view
 
 from base.views import common as base_views
 
-# from userprofile.views import FCMDeviceViewSet
-
 from . import current, future
 
 api_schema_view = get_swagger_view(title="Road Helper API")
@@ -20,7 +18,8 @@ urlpatterns = [
     path(f"api/v{current_version}/", include(current, namespace=f"{current_version}")),
     path(f"api/v{future_version}/", include(future, namespace=f"{future_version}")),
     path("version/", include("versioning.urls")),
-    # path("device", FCMDeviceViewSet.as_view(), name="fcm_device_create"),
     path("swagger/", api_schema_view),
     path("documentation/", include("documentation.urls", namespace="documentation")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
