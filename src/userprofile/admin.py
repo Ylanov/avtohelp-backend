@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.contrib import (
     admin,
     messages,

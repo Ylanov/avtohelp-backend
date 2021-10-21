@@ -1,5 +1,4 @@
-# todo: delete after testing
-from os import environ
+# type: ignore
 
 from django.conf import settings
 from django.utils import timezone
