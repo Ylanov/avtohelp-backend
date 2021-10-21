@@ -38,7 +38,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "issue",
@@ -50,7 +52,10 @@ class Migration(migrations.Migration):
                         verbose_name="Issue",
                     ),
                 ),
-                ("description", models.TextField(verbose_name="Description")),
+                (
+                    "description",
+                    models.TextField(verbose_name="Description"),
+                ),
                 (
                     "location",
                     django.contrib.gis.db.models.fields.PointField(

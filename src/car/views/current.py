@@ -23,7 +23,9 @@ class CarViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = serializers.CarDetailSerializer
     filter_class = filters.CarListFilterSet
-    queryset = models.Car.objects.select_related("mark", "car_model__mark").all()
+    queryset = models.Car.objects.select_related(
+        "mark", "car_model__mark"
+    ).all()
     pagination_class = None
     permission_classes = (AllowAny,)
 

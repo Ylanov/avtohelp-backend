@@ -59,7 +59,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 user_id=self.scope["user"].id, room_id=room_id
             )
 
-    ##### Command helper methods called by receive_json
+    # Command helper methods called by receive_json
 
     async def join_room(self, room_id):
         """
@@ -72,7 +72,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         # The logged-in user is in our scope thanks to the authentication
         # ASGI middleware
-        room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+        room = await utils_methods.by_user_and_room_id(
+            self.scope["user"], room_id
+        )
 
         # Store that we're in the room
         self.rooms.add(room_id)
@@ -88,7 +90,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 reader_id=self.scope["user"].id, room_id=room_id
             )
         else:
-            celery_tasks.read_messages(reader_id=self.scope["user"].id, room_id=room_id)
+            celery_tasks.read_messages(
+                reader_id=self.scope["user"].id, room_id=room_id
+            )
 
         # Add them to the group so they get room messages
         await self.channel_layer.group_add(
@@ -113,7 +117,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         """
         # The logged-in user is in our scope thanks to the authentication
         # ASGI middleware
-        room = await utils_methods.by_user_and_room_id(self.scope["user"], room_id)
+        room = await utils_methods.by_user_and_room_id(
+            self.scope["user"], room_id
+        )
         # Send a leave message if it's turned on
         if settings.NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS:
             await self.channel_layer.group_send(
@@ -196,7 +202,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                 message_list=messages, reader_id=self.scope["user"].id
             )
 
-    ##### Handlers for messages sent over the channel layer
+    # Handlers for messages sent over the channel layer
 
     # These helper methods are named by the types we send - so chat.join
     # becomes chat_join

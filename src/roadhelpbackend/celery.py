@@ -42,10 +42,6 @@ def setup_periodic_tasks(sender, **kwargs):
         sig=check_verification_sms_relevance.s(),
         name="Check verification SMS relevance",
     )
-    # Unused
-    # sender.add_periodic_task(crontab(minute=settings.MESSAGES_UPDATE_PERIOD),
-    #                          notify_unread_messages.s(),
-    #                          name='Notify users about unread messages')
 
 
 @app.task
@@ -53,7 +49,9 @@ def check_verification_sms_relevance():
     """Check verification SMS relevance"""
     from authorization import models as auth_models
 
-    for sms_code in auth_models.SMSCode.objects.filter(status=auth_models.SMSCode.SENT):
+    for sms_code in auth_models.SMSCode.objects.filter(
+        status=auth_models.SMSCode.SENT
+    ):
         delta = sms_code.created + timezone.timedelta(
             seconds=settings.SMS_BLOCKING_PERIOD
         )
@@ -92,9 +90,6 @@ def send_verification_sms(sms_code_id):
     if settings.USE_SMS is True and sms.user.phone != settings.APPROVE_ACCOUNT:
         # send actual sms if its allowed by server configuration
         try:
-            # get config
-            # phone_verify_settings = UserVerificationConfiguration.get_solo()
-
             logger.info("DEBUG: sms.mode=%s" % sms.mode)
 
             # check verification mode is CALL PHONE
@@ -106,7 +101,7 @@ def send_verification_sms(sms_code_id):
                 # send sms
                 sms.send_sms()
                 logger.info("SMS: sending try, ID=%d" % sms.id)
-        except:
+        except (Exception,):
             logger.error("SMS: sending failed, ID=%d" % sms.id)
     else:
         # or fake it
@@ -133,8 +128,10 @@ def not_completed_authorization(user_id):
     try:
         reset_attempts(user_id=user_id)
         auth_models.SMSCode.objects.decline_all_by_user(user_id=user_id)
-    except:
-        logger.info(f"ERROR: authorization was not completed for user {user_id}")
+    except (Exception,):
+        logger.info(
+            f"ERROR: authorization was not completed for user {user_id}"
+        )
 
 
 @app.task
@@ -145,12 +142,13 @@ def success_authorization(user_id, sms_code_id):
     try:
         reset_attempts(user_id=user_id)
         change_smscode_status(
-            sms_code_id=sms_code_id, status=auth_models.SMSCode.ACTIVATED
+            sms_code_id=sms_code_id,
+            status=auth_models.SMSCode.ACTIVATED,
         )
         auth_models.SMSCode.objects.decline_all_by_user(user=user_id)
-    except:
+    except (Exception,):
         logger.info(
-            f"ERROR: success authorization was not completed for user {user_id}"
+            f"ERROR: success authorization was not completed for user {user_id}"  # noqa
         )
 
 
@@ -189,7 +187,7 @@ def notify_friend_request(invited_id):
             notification.save()
             logger.info(f'User notified: {result.get("success")}')
         else:
-            logger.info(f"Error was occurred when sending PUSH-notifications")
+            logger.info("Error was occurred when sending PUSH-notifications")
 
 
 @app.task
@@ -243,7 +241,7 @@ def notify_chat_participants(sender_id, room_id, participants):
                 logger.info(f'Users notified: {result.get("success")}')
             else:
                 logger.info(
-                    f'Error was occurred when sending PUSH-notifications. Failed: {result.get("failure")}'
+                    f'Error was occurred when sending PUSH-notifications. Failed: {result.get("failure")}'  # noqa
                 )
 
 
@@ -264,30 +262,32 @@ def notify_assistance_request(request_id):
     
     Filter devices by active state
     .annotate_device_geo_position_relevance()
-    annotate field that geo position updated not earlier than value that set in singleton object
+    annotate field that geo position updated not earlier 
+    than value that set in singleton object
     
     .annotate_device_distance_from_assistance_request(assistance_request=request)
-    annotate field distance, that evaluate by this func Distance('profilelocation', assistance_request.location)
+    annotate field distance, that evaluate by 
+    this func Distance('profilelocation', assistance_request.location)
     
     .filter(distance__lte=singleton.radius)
-    filter on it and check if annotated field value (annotated distance) is less or equal than radius in 
-    singleton object 
+    filter on it and check if annotated field value (annotated distance) 
+    is less or equal than radius in singleton object 
     """
     devices = (
         FCMDevice.objects.filter(active=True)
         .annotate_device_geo_position_relevance()
         .filter(geo_position_is_valid=True)
-        .annotate_device_distance_from_assistance_request(assistance_request=request)
+        .annotate_device_distance_from_assistance_request(
+            assistance_request=request
+        )
         .filter(distance__lte=singleton.radius)
         .exclude(user=request.user)
     )
 
     # send bulk push message for filtered users
     if devices.exists():
-        notification = (
-            base_models.PushNotification.objects.make_assistance_request_notification(
-                user=devices.first().user
-            )
+        notification = base_models.PushNotification.objects.make_assistance_request_notification(  # noqa
+            user=devices.first().user
         )
         raw_result = devices.send_message(
             **notification.get_push_dict(request_id=request_id)
@@ -303,7 +303,7 @@ def notify_assistance_request(request_id):
             notification.save()
             logger.info(f'Users notified: {result.get("success")}')
         else:
-            logger.info(f"Error was occurred when sending PUSH-notifications")
+            logger.info("Error was occurred when sending PUSH-notifications")
 
 
 @app.task
@@ -312,13 +312,17 @@ def read_messages(reader_id, room_id):
     from chat import models as chat_models
 
     qs = (
-        chat_models.ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
+        chat_models.ChatMessage.objects.exclude(
+            chatreadmessage__user_id=reader_id
+        )
         .exclude(sender_id=reader_id)
         .filter(room_id=room_id)
     )
     if qs.exists():
         for message in qs:
-            chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
+            chat_models.ChatReadMessage.objects.read(
+                user_id=reader_id, message=message
+            )
 
 
 @app.task
@@ -327,13 +331,17 @@ def read_message(message_list, reader_id):
     from chat import models as chat_models
 
     qs = (
-        chat_models.ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
+        chat_models.ChatMessage.objects.exclude(
+            chatreadmessage__user_id=reader_id
+        )
         .exclude(sender_id=reader_id)
         .filter(id__in=message_list)
     )
     if qs.exists():
         for message in qs:
-            chat_models.ChatReadMessage.objects.read(user_id=reader_id, message=message)
+            chat_models.ChatReadMessage.objects.read(
+                user_id=reader_id, message=message
+            )
 
 
 @app.task
@@ -346,10 +354,8 @@ def notify_new_newsletter(newsletter_id):
 
     # send bulk push message for filtered users
     if devices.exists():
-        notification = (
-            base_models.PushNotification.objects.make_new_newsletter_notification(
-                user=devices.first().user, newsletter=newsletter_id
-            )
+        notification = base_models.PushNotification.objects.make_new_newsletter_notification(  # noqa
+            user=devices.first().user, newsletter=newsletter_id
         )
         raw_result = devices.send_message(
             **notification.get_push_dict(model_id=newsletter_id)
@@ -363,10 +369,12 @@ def notify_new_newsletter(newsletter_id):
             notification.status = True
             notification.sent_count = result.get("success")
             notification.save()
-            logger.info(f'User notified for New Newsletter: {result.get("success")}')
+            logger.info(
+                f'User notified for New Newsletter: {result.get("success")}'
+            )
         else:
             logger.info(
-                f"Error was occurred when sending PUSH-notifications for New Newsletter."
+                "Error was occurred when sending PUSH-notifications for New Newsletter."  # noqa
             )
 
 
@@ -376,18 +384,18 @@ def notify_new_newsletter_like(newsletter_like_id):
     from base import models as base_models
     from userprofile.models import FCMDevice
 
-    like = base_models.NewsletterLike.objects.filter(id=newsletter_like_id).first()
+    like = base_models.NewsletterLike.objects.filter(
+        id=newsletter_like_id
+    ).first()
     initiator = like.owner
     user = like.newsletter.author
 
     if user == initiator:
         return None
 
-    if user != None and initiator != None:
-        notification = (
-            base_models.PushNotification.objects.make_newsletter_like_notification(
-                user=user, initiator=initiator
-            )
+    if user is not None and initiator is not None:
+        notification = base_models.PushNotification.objects.make_newsletter_like_notification(  # noqa
+            user=user, initiator=initiator
         )
         devices = FCMDevice.objects.filter(user_id=user.id)
         if devices.exists():
@@ -405,7 +413,9 @@ def notify_new_newsletter_like(newsletter_like_id):
                 notification.save()
                 logger.info(f'User notified: {result.get("success")}')
             else:
-                logger.info(f"Error was occurred when sending PUSH-notifications")
+                logger.info(
+                    "Error was occurred when sending PUSH-notifications"
+                )
 
 
 @app.task
@@ -423,11 +433,9 @@ def notify_new_newsletter_comment(newsletter_comment_id):
     if user == initiator:
         return None
 
-    if user != None and initiator != None:
-        notification = (
-            base_models.PushNotification.objects.make_newsletter_comment_notification(
-                user=user, initiator=initiator
-            )
+    if user is not None and initiator is not None:
+        notification = base_models.PushNotification.objects.make_newsletter_comment_notification(  # noqa
+            user=user, initiator=initiator
         )
         devices = FCMDevice.objects.filter(user_id=user.id)
         if devices.exists():
@@ -445,44 +453,6 @@ def notify_new_newsletter_comment(newsletter_comment_id):
                 notification.save()
                 logger.info(f'User notified: {result.get("success")}')
             else:
-                logger.info(f"Error was occurred when sending PUSH-notifications")
-
-
-# Unused
-# @app.task
-# def notify_unread_messages():
-#     """Notify users about unread messages"""
-#     from base import models as base_models
-#     from chat import models as chat_models
-#     from fcm_django.models import FCMDevice
-#
-#     rooms = chat_models.ChatRoom.objects.all()
-#     for room in rooms:
-#         notify = list()
-#         for participant in room.participants.all():
-#             message_count = room.chatmessage_set.exclude(sender=participant).count()
-#             read_messages = chat_models.ChatReadMessage.objects.filter(user=participant).count()
-#             if (message_count - read_messages) > settings.LIMIT_UNREAD_MESSAGES:
-#                 notify.append(participant)
-#             # for message in room.chatmessage_set.all():
-#             #     qs = chat_models.ChatReadMessage.objects.filter(message=message, user=participant)
-#             #     if not qs.exists():
-#             #         notify.append(participant)
-#         if notify:
-#             for user in notify:
-#                 notification = base_models.PushNotification.objects.create(
-#                     user=user,
-#                     title=_('Unread messages'),
-#                     description=_('You have unread messages')
-#                 )
-#                 devices = FCMDevice.objects.filter(user=user)
-#                 if devices.exists():
-#                     count = devices.send_message(**notification.get_push_dict())
-#                     if count.get('success') > 0:
-#                         notification.status = True
-#                         notification.save()
-#                         logger.info(f'Users notified: {count.get("success")}')
-#                     else:
-#                         logger.info(
-#                             f'Error was occurred when sending PUSH-notifications. Failed: {count.get("failure")}')
-#         notify.clear()
+                logger.info(
+                    "Error was occurred when sending PUSH-notifications"
+                )

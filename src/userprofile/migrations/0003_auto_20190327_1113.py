@@ -37,7 +37,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "image",

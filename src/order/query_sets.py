@@ -38,13 +38,15 @@ class AssistanceRequestQuerySet(QuerySet):
 
     def ordinary(self, user):
         """
-        Queryset that EXCLUDE requests in which user is owner of blacklist or he is a foe and excluded himself
+        Queryset that EXCLUDE requests in which user is owner
+        of blacklist or he sis a foe and excluded himself
         :param user:
         :type user: object
         :return: AssistanceRequestQuerySet
         """
         return self.exclude(
-            Q(user__blacklist_owner__foe=user) | Q(user__blacked_user__owner=user)
+            Q(user__blacklist_owner__foe=user)
+            | Q(user__blacked_user__owner=user)
         )
 
     def annotate_distance(
@@ -63,18 +65,26 @@ class AssistanceRequestQuerySet(QuerySet):
         point parameter is Point object
         """
         if raw_coordinates:
-            x, y = raw_coordinates.split(",")[0], raw_coordinates.split(",")[1]
+            x, y = (
+                raw_coordinates.split(",")[0],
+                raw_coordinates.split(",")[1],
+            )
             return self.annotate(
-                distance=Distance("location", Point(float(x), float(y), srid=4326))
+                distance=Distance(
+                    "location", Point(float(x), float(y), srid=4326)
+                )
             )
         elif latitude and longitude:
             return self.annotate(
                 distance=Distance(
-                    "location", Point(float(latitude), float(longitude), srid=4326)
+                    "location",
+                    Point(float(latitude), float(longitude), srid=4326),
                 )
             )
         elif point:
-            return self.annotate(distance=Distance("location", point, srid=4326))
+            return self.annotate(
+                distance=Distance("location", point, srid=4326)
+            )
         else:
             return self
 

@@ -30,34 +30,18 @@ class ChatRoomAdminModel(admin.ModelAdmin):
     filter_horizontal = ("participants",)
     fieldsets = (
         (_("Info"), {"fields": ("id", "created", "modified")}),
-        (_("Room's data"), {"fields": ("name", "participants", "is_public", "image")}),
+        (
+            _("Room's data"),
+            {
+                "fields": (
+                    "name",
+                    "participants",
+                    "is_public",
+                    "image",
+                )
+            },
+        ),
     )
-
-    # def save_model(self, request, obj, form, change):
-    #     """Override save action"""
-    #     # Private chat
-    #     if not form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
-    #         super().save_model(request, obj, form, change)
-    #
-    #     if form.data.get('is_public') and not form.data.get('name') and int(form.data.get('participants')) == 2:
-    #         messages.error(request, _('Private room can not be public.'))
-    #
-    #     if not form.data.get('is_public') and form.data.get('name') and int(form.data.get('participants')) == 2:
-    #         messages.error(request, _('Private room can not have room name.'))
-    #
-    #     if not form.data.get('is_public') and not form.data.get('name') and (int(form.data.get('participants')) > 2 or
-    #                                                                          int(form.data.get('participants')) < 2):
-    #         messages.error(request, _('Private room can not contain more or less than two users.'))
-    #
-    #     # Public chat
-    #     if form.data.get('is_public') and form.data.get('name'):
-    #         super().save_model(request, obj, form, change)
-    #
-    #     if not form.data.get('is_public') and form.data.get('name'):
-    #         messages.error(request, _('Public room can not have correct flag.'))
-    #
-    #     if form.data.get('is_public') and not form.data.get('name'):
-    #         messages.error(request, _('Public room can contain room name'))
 
 
 class ChatMessageAdminModel(admin.ModelAdmin):
@@ -75,7 +59,10 @@ class ChatMessageAdminModel(admin.ModelAdmin):
     ordering = ("-timestamp", "id")
     fieldsets = (
         (_("Info"), {"fields": ("id", "created", "modified")}),
-        (_("Room's data"), {"fields": ("get_room_id", "get_room_link")}),
+        (
+            _("Room's data"),
+            {"fields": ("get_room_id", "get_room_link")},
+        ),
         (_("Message"), {"fields": ("message",)}),
     )
 
@@ -83,7 +70,8 @@ class ChatMessageAdminModel(admin.ModelAdmin):
         """Get user for list_fields"""
         url = reverse(
             "admin:{}_{}_change".format(
-                instance.room._meta.app_label, instance.room._meta.model_name
+                instance.room._meta.app_label,
+                instance.room._meta.model_name,
             ),
             args=(instance.room.id,),
         )
@@ -115,11 +103,20 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
         "get_message_link",
         "get_message_text",
     )
-    list_display = ("id", "created", "modified", "user", "get_message_link")
+    list_display = (
+        "id",
+        "created",
+        "modified",
+        "user",
+        "get_message_link",
+    )
     fieldsets = (
         (_("Info"), {"fields": ("id", "message")}),
         (_("Date's"), {"fields": ("created", "modified")}),
-        (_("Message's data"), {"fields": ("get_message_link", "get_message_text")}),
+        (
+            _("Message's data"),
+            {"fields": ("get_message_link", "get_message_text")},
+        ),
         (_("Sender"), {"fields": ("user",)}),
     )
 
@@ -127,7 +124,8 @@ class ChatReadMessageAdminModel(admin.ModelAdmin):
         """Get user for list_fields"""
         url = reverse(
             "admin:{}_{}_change".format(
-                instance.message._meta.app_label, instance.message._meta.model_name
+                instance.message._meta.app_label,
+                instance.message._meta.model_name,
             ),
             args=(instance.message.id,),
         )

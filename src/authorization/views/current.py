@@ -10,7 +10,9 @@ from authorization.serializers import current as serializers
 from utils import views as view_mixins
 
 
-class PhoneVerificationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIView):
+class PhoneVerificationView(
+    view_mixins.AuthorizationViewMixin, generics.CreateAPIView
+):
     """
     View for verify user phone number
     Request: {"phone": "+79000000000"}
@@ -21,7 +23,9 @@ class PhoneVerificationView(view_mixins.AuthorizationViewMixin, generics.CreateA
     serializer_class = serializers.PhoneVerificationSerializer
 
 
-class AuthorizationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIView):
+class AuthorizationView(
+    view_mixins.AuthorizationViewMixin, generics.CreateAPIView
+):
     """
     View for verify user phone
     Request: {"phone": "+79000000000", "code": "1234"}
@@ -35,7 +39,9 @@ class AuthorizationView(view_mixins.AuthorizationViewMixin, generics.CreateAPIVi
 class LogoutView(views.APIView):
     """
     An endpoint for logout.
-    Logout authorized user by recreating token (delete existed token and create a new one)
+    Logout authorized user by recreating token(
+        delete existed token and create a new one
+        )
     :return: None
     """
 

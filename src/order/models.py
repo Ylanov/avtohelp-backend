@@ -29,22 +29,35 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     """Assistance request model"""
 
     user = models.ForeignKey(
-        "account.User", verbose_name=_("User"), on_delete=models.CASCADE
+        "account.User",
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
     )
     issue = models.CharField(
-        max_length=255, verbose_name=_("Issue"), blank=True, null=True, default=None
+        max_length=255,
+        verbose_name=_("Issue"),
+        blank=True,
+        null=True,
+        default=None,
     )
     description = models.TextField(verbose_name=_("Description"))
-    location = gis_models.PointField(_("Location"), blank=True, null=True, default=None)
+    location = gis_models.PointField(
+        _("Location"), blank=True, null=True, default=None
+    )
 
     lng = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
     lat = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
 
     status = models.PositiveSmallIntegerField(
-        verbose_name=_("Status"), default=AVAILABLE, choices=STATUS_CHOICES
+        verbose_name=_("Status"),
+        default=AVAILABLE,
+        choices=STATUS_CHOICES,
     )
     contact_phone = PhoneNumberField(
-        verbose_name=_("User contact phone"), blank=True, null=True, default=None
+        verbose_name=_("User contact phone"),
+        blank=True,
+        null=True,
+        default=None,
     )
     text_address = models.CharField(
         max_length=255,
@@ -54,7 +67,9 @@ class AssistanceRequest(BaseMixin, ImageMixin):
         default=None,
     )
 
-    objects = AssistanceRequestManager.from_queryset(AssistanceRequestQuerySet)()
+    objects = AssistanceRequestManager.from_queryset(
+        AssistanceRequestQuerySet
+    )()
 
     gis = GeoManager()
 
@@ -69,7 +84,9 @@ class AssistanceRequest(BaseMixin, ImageMixin):
                 lambda: tasks.notify_assistance_request.delay(self.id)
             )
         else:
-            transaction.on_commit(lambda: tasks.notify_assistance_request(self.id))
+            transaction.on_commit(
+                lambda: tasks.notify_assistance_request(self.id)
+            )
 
 
 class AssistanceRequestUserRead(BaseMixin):
@@ -81,6 +98,8 @@ class AssistanceRequestUserRead(BaseMixin):
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
-        "account.User", verbose_name=_("User"), on_delete=models.CASCADE
+        "account.User",
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
     )
     objects = AssistanceRequestUserReadManager()

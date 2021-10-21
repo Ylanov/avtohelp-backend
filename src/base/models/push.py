@@ -36,12 +36,18 @@ class PushNotification(BaseMixin):
     )
 
     title = models.CharField(max_length=255, verbose_name=_("Title"))
-    description = models.CharField(max_length=255, verbose_name=_("Description"))
+    description = models.CharField(
+        max_length=255, verbose_name=_("Description")
+    )
     event = models.PositiveSmallIntegerField(
-        choices=EVENT_CHOICES, default=INITIALIZE, verbose_name=_("Event")
+        choices=EVENT_CHOICES,
+        default=INITIALIZE,
+        verbose_name=_("Event"),
     )
     user = models.ForeignKey(
-        "account.User", verbose_name=_("User"), on_delete=models.CASCADE
+        "account.User",
+        verbose_name=_("User"),
+        on_delete=models.CASCADE,
     )
     status = models.BooleanField(
         default=False, null=True, blank=True, verbose_name=_("Status")
@@ -113,7 +119,8 @@ class PushNotificationConfiguration(SingletonModel):
         help_text=_("Profile geo-position lifetime"),
     )
     notification_schedule = models.ManyToManyField(
-        PushNotificationSchedule, verbose_name=_("Notification schedule")
+        PushNotificationSchedule,
+        verbose_name=_("Notification schedule"),
     )
 
     class Meta:

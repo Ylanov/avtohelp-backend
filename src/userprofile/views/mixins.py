@@ -18,7 +18,9 @@ class ProfileMixin:
 class ProfileBlackListMixin:
     """ProfileBlackLists mixin"""
 
-    queryset = BlackList.objects.select_related("owner__profile", "foe__profile")
+    queryset = BlackList.objects.select_related(
+        "owner__profile", "foe__profile"
+    )
 
 
 class ProfileCarMixin:

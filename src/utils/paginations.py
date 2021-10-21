@@ -61,7 +61,9 @@ class ChatCursorPagination(ProjectCursorPagination):
         if reverse:
             queryset = queryset.order_by(*_reverse_ordering(self.ordering))
         else:
-            queryset = queryset.order_by(F(*self.ordering).desc(nulls_last=True))
+            queryset = queryset.order_by(
+                F(*self.ordering).desc(nulls_last=True)
+            )
 
         # If we have a cursor with a fixed position then filter by that.
         if current_position is not None:
@@ -77,10 +79,11 @@ class ChatCursorPagination(ProjectCursorPagination):
 
             queryset = queryset.filter(**kwargs)
 
-        # If we have an offset cursor then offset the entire page by that amount.
-        # We also always fetch an extra item in order to determine if there is a
-        # page following on from this one.
-        results = list(queryset[offset : offset + self.page_size + 1])
+        # If we have an offset cursor then offset the entire
+        # page by that amount.
+        # We also always fetch an extra item in order to determine
+        # if there is a page following on from this one.
+        results = list(queryset[offset : offset + self.page_size + 1])  # noqa
         self.page = list(results[: self.page_size])
 
         # Determine the position of the final item following the page.
@@ -94,8 +97,9 @@ class ChatCursorPagination(ProjectCursorPagination):
             following_position = None
 
         if reverse:
-            # If we have a reverse queryset, then the query ordering was in reverse
-            # so we need to reverse the items again before returning them to the user.
+            # If we have a reverse queryset, then the query
+            # ordering was in reverse so we need to reverse
+            # the items again before returning them to the user.
             self.page = list(reversed(self.page))
 
             # Determine next and previous positions for reverse cursors.

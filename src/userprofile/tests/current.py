@@ -53,15 +53,23 @@ class TestProfile(APITestCase):
         self.nissan = CarMark.objects.create(name="Nissan")
 
         # Create car models
-        self.toyota_model = CarModel.objects.create(name="Supra", mark=self.toyota)
-        self.nissan_model = CarModel.objects.create(name="350Z", mark=self.nissan)
+        self.toyota_model = CarModel.objects.create(
+            name="Supra", mark=self.toyota
+        )
+        self.nissan_model = CarModel.objects.create(
+            name="350Z", mark=self.nissan
+        )
 
         # Create car colors
         self.color_1 = CarColor.objects.create(name="White")
 
         # Create user cars
-        self.car_1 = Car.objects.create(mark=self.toyota, car_model=self.toyota_model)
-        self.car_2 = Car.objects.create(mark=self.nissan, car_model=self.nissan_model)
+        self.car_1 = Car.objects.create(
+            mark=self.toyota, car_model=self.toyota_model
+        )
+        self.car_2 = Car.objects.create(
+            mark=self.nissan, car_model=self.nissan_model
+        )
         self.car_user_1 = ProfileCar.objects.create(
             owner=self.user_1,
             car=self.car_1,
@@ -130,7 +138,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         u_1 = User.objects.make(phone="+79000000002")
-        u_1.profile.first_name, u_1.profile.last_name = "Test", "Testovich"
+        u_1.profile.first_name, u_1.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         u_1.profile.save()
 
         # Authorize user 1
@@ -160,11 +171,17 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_2 in BlackList
@@ -190,18 +207,26 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(
             owner=self.user_1, invited=user_2, approved=True
         )
-        FriendList.objects.create(owner=self.user_1, friend=user_2, request=request)
+        FriendList.objects.create(
+            owner=self.user_1, friend=user_2, request=request
+        )
 
         api_path = "%s:userprofile:profile-list" % self.VERSION
         response = self.client.get(reverse(api_path), data={"friend": True})
@@ -228,18 +253,26 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_2 in FriendList
         request = FriendRequest.objects.create(
             owner=self.user_1, invited=user_2, approved=True
         )
-        FriendList.objects.create(owner=self.user_1, friend=user_2, request=request)
+        FriendList.objects.create(
+            owner=self.user_1, friend=user_2, request=request
+        )
 
         api_path = "%s:userprofile:profile-list" % self.VERSION
         response = self.client.get(reverse(api_path), data={"friend": False})
@@ -252,7 +285,10 @@ class TestProfile(APITestCase):
             .exclude(user=self.user_1)
             .count(),
         )
-        self.assertEqual(response.data.get("results")[0].get("id"), user_3.profile.id)
+        self.assertEqual(
+            response.data.get("results")[0].get("id"),
+            user_3.profile.id,
+        )
 
     def test_profiles_list_5(self):
         """
@@ -269,17 +305,21 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
-        user_3 = User.objects.make(phone="+79000000003")
-        user_4 = User.objects.make(phone="+79000000004")
+        User.objects.make(phone="+79000000003")
+        User.objects.make(phone="+79000000004")
 
         api_path = "%s:userprofile:profile-list" % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data.get("results")), Profile.objects.valid().count()
+            len(response.data.get("results")),
+            Profile.objects.valid().count(),
         )
         self.assertEqual(response.data.get("results")[0].get("id"), user_2.id)
 
@@ -292,11 +332,16 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         api_path = "%s:userprofile:profile-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": user_2.profile.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": user_2.profile.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("id"), user_2.profile.id)
 
@@ -335,15 +380,23 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+        request = FriendRequest.objects.create(
+            owner=self.user_1, invited=user_2
+        )
 
         api_path = "%s:userprofile:my-friendrequest-list" % self.VERSION
         # Check count of friend requests from inviter
@@ -366,23 +419,35 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
         request = FriendRequest.objects.create(
             owner=self.user_1, invited=user_2, approved=True
         )
-        FriendList.objects.create(owner=self.user_1, friend=user_3, request=request)
+        FriendList.objects.create(
+            owner=self.user_1, friend=user_3, request=request
+        )
 
         api_path = "%s:userprofile:my-friendrequest-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": request.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": request.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get("person").get("id"), user_2.profile.id)
+        self.assertEqual(
+            response.data.get("person").get("id"), user_2.profile.id
+        )
 
     def test_friend_request_to_user(self):
         """
@@ -394,22 +459,33 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
-        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+        FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1, approved=False
+        )
+        FriendRequest.objects.create(
+            owner=user_3, invited=self.user_1, approved=True
+        )
 
         api_path = "%s:userprofile:friendrequest-list" % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendRequest.objects.not_approved().count()
+            response.data.get("count"),
+            FriendRequest.objects.not_approved().count(),
         )
 
         # Check friend requests as invited persons
@@ -421,7 +497,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendRequest.objects.to_me(user_2).count()
+            response.data.get("count"),
+            FriendRequest.objects.to_me(user_2).count(),
         )
 
         # Authorize user_3
@@ -432,7 +509,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendRequest.objects.to_me(user_3).count()
+            response.data.get("count"),
+            FriendRequest.objects.to_me(user_3).count(),
         )
 
     def test_friend_request_to_user_2(self):
@@ -445,22 +523,33 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=True)
-        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+        FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1, approved=True
+        )
+        FriendRequest.objects.create(
+            owner=user_3, invited=self.user_1, approved=True
+        )
 
         api_path = "%s:userprofile:friendrequest-list" % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendRequest.objects.not_approved().count()
+            response.data.get("count"),
+            FriendRequest.objects.not_approved().count(),
         )
 
     def test_friend_request_to_user_3(self):
@@ -473,22 +562,33 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
-        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=False)
+        FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1, approved=False
+        )
+        FriendRequest.objects.create(
+            owner=user_3, invited=self.user_1, approved=False
+        )
 
         api_path = "%s:userprofile:friendrequest-list" % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendRequest.objects.not_approved().count()
+            response.data.get("count"),
+            FriendRequest.objects.not_approved().count(),
         )
 
     def test_friend_request_to_user_4(self):
@@ -501,16 +601,26 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
-        FriendRequest.objects.create(owner=user_3, invited=self.user_1, approved=True)
+        FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1, approved=False
+        )
+        FriendRequest.objects.create(
+            owner=user_3, invited=self.user_1, approved=True
+        )
 
         api_path = "%s:userprofile:friendrequest-list" % self.VERSION
         response = self.client.get(
@@ -535,16 +645,26 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Put user_3 in FriendList
-        FriendRequest.objects.create(owner=self.user_1, invited=user_2, approved=False)
-        FriendRequest.objects.create(owner=self.user_1, invited=user_3, approved=True)
+        FriendRequest.objects.create(
+            owner=self.user_1, invited=user_2, approved=False
+        )
+        FriendRequest.objects.create(
+            owner=self.user_1, invited=user_3, approved=True
+        )
 
         api_path = "%s:userprofile:my-friendrequest-list" % self.VERSION
         response = self.client.get(
@@ -569,16 +689,25 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Put user_3 in FriendList
-        request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
+        request = FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1
+        )
 
         api_path = "%s:userprofile:friendrequest-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": request.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": request.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get("person").get("id"), user_2.profile.id)
+        self.assertEqual(
+            response.data.get("person").get("id"), user_2.profile.id
+        )
 
     def test_friend_request_to_user_approve(self):
         """
@@ -590,13 +719,20 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
-        request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
+        request = FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1
+        )
 
         api_path = "%s:userprofile:friendrequest-approve" % self.VERSION
-        response = self.client.patch(reverse(api_path, kwargs={"pk": request.id}))
+        response = self.client.patch(
+            reverse(api_path, kwargs={"pk": request.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("approved"), True)
 
@@ -610,13 +746,20 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
-        request = FriendRequest.objects.create(owner=self.user_1, invited=user_2)
+        request = FriendRequest.objects.create(
+            owner=self.user_1, invited=user_2
+        )
 
         api_path = "%s:userprofile:my-friendrequest-delete" % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={"pk": request.id}))
+        response = self.client.delete(
+            reverse(api_path, kwargs={"pk": request.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_delete_incoming_request(self):
@@ -629,13 +772,20 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
-        request = FriendRequest.objects.create(owner=user_2, invited=self.user_1)
+        request = FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1
+        )
 
         api_path = "%s:userprofile:friendrequest-delete" % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={"pk": request.id}))
+        response = self.client.delete(
+            reverse(api_path, kwargs={"pk": request.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_friend_list(self):
@@ -646,15 +796,23 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Create friend request for user_3
-        FriendRequest.objects.create(owner=user_2, invited=self.user_1, approved=False)
+        FriendRequest.objects.create(
+            owner=user_2, invited=self.user_1, approved=False
+        )
         friend_request = FriendRequest.objects.create(
             owner=user_3, invited=self.user_1, approved=True
         )
@@ -668,7 +826,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(self.user_1).count()
+            response.data.get("count"),
+            FriendList.objects.common(self.user_1).count(),
         )
 
     def test_friend_list_1(self):
@@ -679,11 +838,17 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         user_3 = User.objects.make(phone="+79000000003")
-        user_3.profile.first_name, user_3.profile.last_name = "Test", "Testovich"
+        user_3.profile.first_name, user_3.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_3.profile.save()
 
         # Create friend request for user_3
@@ -700,7 +865,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(self.user_1).count()
+            response.data.get("count"),
+            FriendList.objects.common(self.user_1).count(),
         )
 
     def test_friend_list_3(self):
@@ -711,7 +877,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Create friend request for user_2
@@ -730,7 +899,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(self.user_1).count()
+            response.data.get("count"),
+            FriendList.objects.common(self.user_1).count(),
         )
 
         # Check friends count as user_2
@@ -742,7 +912,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(user_2).count()
+            response.data.get("count"),
+            FriendList.objects.common(user_2).count(),
         )
 
     def test_remove_friend_from_friendlist(self):
@@ -753,14 +924,17 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Put user_2 to friends
         friend_request = FriendRequest.objects.create(
             owner=self.user_1, invited=user_2, approved=True
         )
-        friend = FriendList.objects.create(
+        FriendList.objects.create(
             owner=self.user_1, friend=user_2, request=friend_request
         )
 
@@ -778,19 +952,24 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Put user_2 to friends
         friend_request = FriendRequest.objects.create(
             owner=self.user_1, invited=user_2, approved=True
         )
-        friend = FriendList.objects.create(
+        FriendList.objects.create(
             owner=self.user_1, friend=user_2, request=friend_request
         )
 
         api_path = "%s:userprofile:friendlist-delete" % self.VERSION
-        response = self.client.delete(reverse(api_path, kwargs={"profile_id": 420}))
+        response = self.client.delete(
+            reverse(api_path, kwargs={"profile_id": 420})
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_blacklist_requests(self):
@@ -803,7 +982,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Before request
@@ -829,14 +1011,19 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Put user_2 in BlackList
         black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
 
         api_path = "%s:userprofile:blacklistrequest-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": black_list.pk}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": black_list.pk})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("id"), black_list.id)
 
@@ -850,11 +1037,14 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Put user_2 in BlackList
-        black_list = BlackList.objects.create(owner=self.user_1, foe=user_2)
+        BlackList.objects.create(owner=self.user_1, foe=user_2)
 
         api_path = "%s:userprofile:blacklistrequest-delete" % self.VERSION
         response = self.client.delete(
@@ -872,7 +1062,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Before request
@@ -893,7 +1086,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         api_path = "%s:userprofile:friendrequest-create" % self.VERSION
@@ -908,7 +1104,9 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         api_path = "%s:userprofile:friendrequest-approve" % self.VERSION
-        response = self.client.patch(reverse(api_path, kwargs={"pk": request_id}))
+        response = self.client.patch(
+            reverse(api_path, kwargs={"pk": request_id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Check count of friends
@@ -916,7 +1114,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(user_2).count()
+            response.data.get("count"),
+            FriendList.objects.common(user_2).count(),
         )
 
         # Check count of friends
@@ -929,7 +1128,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(self.user_1).count()
+            response.data.get("count"),
+            FriendList.objects.common(self.user_1).count(),
         )
 
     def test_add_to_friend_1(self):
@@ -940,14 +1140,16 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         api_path = "%s:userprofile:friendrequest-create" % self.VERSION
         response = self.client.post(
             reverse(api_path), data={"profile": user_2.profile.id}
         )
-        request_id = response.data.get("id")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Authorize user_2
@@ -956,9 +1158,9 @@ class TestProfile(APITestCase):
 
         api_path = "%s:userprofile:friendrequest-create" % self.VERSION
         response = self.client.post(
-            reverse(api_path), data={"profile": self.user_1.profile.id}
+            reverse(api_path),
+            data={"profile": self.user_1.profile.id},
         )
-        request_id = response.data.get("id")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # Check count of friends
@@ -966,7 +1168,8 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), FriendList.objects.common(user_2).count()
+            response.data.get("count"),
+            FriendList.objects.common(user_2).count(),
         )
 
     def test_profile_cars(self):
@@ -1028,7 +1231,9 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         api_path = "%s:userprofile:profile-car-detail" % self.VERSION
-        response = self.client.patch(reverse(api_path, kwargs={"pk": car_2.id}))
+        response = self.client.patch(
+            reverse(api_path, kwargs={"pk": car_2.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.data.get("license_plate"),
@@ -1079,7 +1284,9 @@ class TestProfile(APITestCase):
         api_path = "%s:userprofile:profile-gallery-list" % self.VERSION
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data.get("count"), ProfileGallery.objects.count())
+        self.assertEqual(
+            response.data.get("count"), ProfileGallery.objects.count()
+        )
 
     def test_profile_gallery_1(self):
         """Common test for retrieving list of profile gallery images"""
@@ -1098,7 +1305,10 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Create images for gallery
@@ -1114,14 +1324,17 @@ class TestProfile(APITestCase):
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            response.data.get("count"), ProfileGallery.objects.all().count()
+            response.data.get("count"),
+            ProfileGallery.objects.all().count(),
         )
 
     def test_profile_gallery_detail(self):
         """Common test for retrieving detail of profile gallery object"""
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
 
@@ -1130,7 +1343,9 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         api_path = "%s:userprofile:profile-gallery-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": profile_image.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": profile_image.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("id"), profile_image.id)
 
@@ -1139,11 +1354,16 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
 
@@ -1152,19 +1372,25 @@ class TestProfile(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         api_path = "%s:userprofile:profile-gallery-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": profile_image.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": profile_image.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_profile_gallery_detail_2(self):
         """Common test for retrieving detail of profile gallery object"""
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
 
         api_path = "%s:userprofile:profile-gallery-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": profile_image.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": profile_image.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_profile_gallery_detail_3(self):
@@ -1187,7 +1413,9 @@ class TestProfile(APITestCase):
         """Common test delete profile gallery object"""
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
         gallery_count_old = ProfileGallery.objects.by_user(self.user_1).count()
@@ -1202,7 +1430,8 @@ class TestProfile(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertNotEqual(
-            gallery_count_old, ProfileGallery.objects.by_user(self.user_1).count()
+            gallery_count_old,
+            ProfileGallery.objects.by_user(self.user_1).count(),
         )
 
     def test_profile_gallery_delete_1(self):
@@ -1210,11 +1439,16 @@ class TestProfile(APITestCase):
 
         # Create additional user
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
 
@@ -1232,7 +1466,9 @@ class TestProfile(APITestCase):
         """Common test delete profile gallery object"""
 
         # Create images for gallery
-        profile_image = ProfileGallery.objects.create(profile=self.user_1.profile)
+        profile_image = ProfileGallery.objects.create(
+            profile=self.user_1.profile
+        )
         ProfileGallery.objects.create(profile=self.user_1.profile)
         ProfileGallery.objects.create(profile=self.user_1.profile)
 
@@ -1250,7 +1486,10 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Added user_2 to friend list
@@ -1262,7 +1501,9 @@ class TestProfile(APITestCase):
         )
 
         api_path = "%s:userprofile:profile-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": user_2.profile.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": user_2.profile.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("friend"), True)
 
@@ -1270,7 +1511,10 @@ class TestProfile(APITestCase):
         """Test case for correct value of annotated field friend"""
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Authorize user_1
@@ -1300,14 +1544,19 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Added user_2 to black list
         BlackList.objects.create(owner=self.user_1, foe=user_2)
 
         api_path = "%s:userprofile:profile-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": user_2.profile.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": user_2.profile.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("foe"), True)
 
@@ -1315,7 +1564,10 @@ class TestProfile(APITestCase):
         """Test case for correct value of annotated field foe"""
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Authorize user_1
@@ -1340,14 +1592,19 @@ class TestProfile(APITestCase):
 
         # Create additional users
         user_2 = User.objects.make(phone="+79000000002")
-        user_2.profile.first_name, user_2.profile.last_name = "Test", "Testovich"
+        user_2.profile.first_name, user_2.profile.last_name = (
+            "Test",
+            "Testovich",
+        )
         user_2.profile.save()
 
         # Create friend request for user_2
         FriendRequest.objects.create(owner=self.user_1, invited=user_2)
 
         api_path = "%s:userprofile:profile-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": user_2.profile.id}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": user_2.profile.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("friend_request"), True)
 
@@ -1373,7 +1630,9 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             len(response.data.get("results")),
-            Profile.objects.annotate_online_status().filter(online=True).count(),
+            Profile.objects.annotate_online_status()
+            .filter(online=True)
+            .count(),
         )
 
     def test_update_profile_location(self):
@@ -1392,8 +1651,10 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertDictEqual(response.data, data)
         self.assertEqual(
-            response.data.get("geo_lat"), self.user_1.profilelocation.location.x
+            response.data.get("geo_lat"),
+            self.user_1.profilelocation.location.x,
         )
         self.assertEqual(
-            response.data.get("geo_lon"), self.user_1.profilelocation.location.y
+            response.data.get("geo_lon"),
+            self.user_1.profilelocation.location.y,
         )
