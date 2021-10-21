@@ -36,7 +36,9 @@ class UserQuerySet(models.QuerySet):
         return self.annotate(
             geo_position_is_valid=models.Case(
                 #  Check if geo position is not Null
-                models.When(profilelocation__location__isnull=False, then=True),
+                models.When(
+                    profilelocation__location__isnull=False, then=True
+                ),
                 #  Check modified date
                 models.When(
                     profilelocation__modified__lte=(
@@ -62,7 +64,8 @@ class UserQuerySet(models.QuerySet):
                 models.When(
                     geo_position_is_valid=True,
                     then=Distance(
-                        "profilelocation__location", assistance_request.location
+                        "profilelocation__location",
+                        assistance_request.location,
                     ),
                 )
             )
@@ -113,9 +116,15 @@ class User(AbstractUser, BaseMixin):
         error_messages={"unique": _("A user with that phone already exists.")},
     )
     username = models.CharField(
-        _("username"), max_length=255, null=True, blank=True, default=None
+        _("username"),
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
     )
-    email = models.EmailField(_("email address"), blank=True, null=True, default=None)
+    email = models.EmailField(
+        _("email address"), blank=True, null=True, default=None
+    )
 
     USERNAME_FIELD = "phone"
     REQUIRED_FIELDS = ("username", "email")
@@ -134,7 +143,9 @@ class User(AbstractUser, BaseMixin):
 
     def logout(self):
         """Regenerate auth token method"""
-        FCMDevice = apps.get_model(app_label="userprofile", model_name="FCMDevice")
+        FCMDevice = apps.get_model(
+            app_label="userprofile", model_name="FCMDevice"
+        )
 
         FCMDevice.objects.filter(user_id=self.id).delete()
 
@@ -165,7 +176,8 @@ class User(AbstractUser, BaseMixin):
         """Return user profile car license plate"""
         return (
             f"{self.profilecar_set.first().license_plate}"
-            if self.profilecar_set.first() and self.profilecar_set.first().license_plate
+            if self.profilecar_set.first()
+            and self.profilecar_set.first().license_plate
             else ""
         )
 
@@ -191,7 +203,7 @@ class User(AbstractUser, BaseMixin):
         delta = timezone.now() - timezone.timedelta(hours=99, minutes=0)
         if (
             self.get_location_update_datetime
-            and self.get_location_update_datetime >= delta
+            and self.get_location_update_datetime >= delta  # noqa
         ):
             return True
         else:

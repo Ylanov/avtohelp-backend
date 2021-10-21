@@ -25,7 +25,8 @@ class Migration(migrations.Migration):
                 (
                     "mode",
                     models.CharField(
-                        choices=[("0", "SMS"), ("1", "Phone call")], max_length=2
+                        choices=[("0", "SMS"), ("1", "Phone call")],
+                        max_length=2,
                     ),
                 ),
             ],

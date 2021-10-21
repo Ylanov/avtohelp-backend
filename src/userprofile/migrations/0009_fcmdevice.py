@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        blank=True, max_length=255, null=True, verbose_name="Name"
+                        blank=True,
+                        max_length=255,
+                        null=True,
+                        verbose_name="Name",
                     ),
                 ),
                 (
@@ -42,7 +45,9 @@ class Migration(migrations.Migration):
                 (
                     "date_created",
                     models.DateTimeField(
-                        auto_now_add=True, null=True, verbose_name="Creation date"
+                        auto_now_add=True,
+                        null=True,
+                        verbose_name="Creation date",
                     ),
                 ),
                 (

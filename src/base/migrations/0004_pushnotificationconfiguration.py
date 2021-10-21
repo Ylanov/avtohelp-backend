@@ -22,7 +22,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("radius", models.FloatField(blank=True, default=5000, null=True)),
+                (
+                    "radius",
+                    models.FloatField(blank=True, default=5000, null=True),
+                ),
                 (
                     "geo_position_lifetime",
                     models.TimeField(

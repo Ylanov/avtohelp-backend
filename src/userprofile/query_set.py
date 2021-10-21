@@ -37,11 +37,16 @@ class FCMDeviceQuerySet(fcm_models.FCMDeviceQuerySet):
             )
         )
 
-    def annotate_device_distance_from_assistance_request(self, assistance_request):
-        """Annotate distance between user device location and assistance request"""
+    def annotate_device_distance_from_assistance_request(
+        self, assistance_request
+    ):
+        """
+        Annotate distance between user device location and assistance request
+        """
         return self.annotate(
             distance=Distance(
-                "user__profilelocation__location", assistance_request.location
+                "user__profilelocation__location",
+                assistance_request.location,
             )
         )
 
@@ -51,7 +56,8 @@ class ProfileQuerySet(models.QuerySet):
 
     def friendly(self, user):
         """
-        Queryset that EXCLUDE profiles in which user is owner of blacklist or he is a foe and excluded himself
+        Queryset that EXCLUDE profiles in which user is owner of blacklist
+        or he is a foe and excluded himself
         :param user:
         :type user: object
         :return: ProfileQuerySet
@@ -88,7 +94,8 @@ class ProfileQuerySet(models.QuerySet):
         return self.annotate(
             online=models.Case(
                 models.When(
-                    models.Q(user__onlineuseractivity__user__isnull=False), then=True
+                    models.Q(user__onlineuseractivity__user__isnull=False),
+                    then=True,
                 ),
                 default=False,
                 output_field=models.BooleanField(default=False),
@@ -107,7 +114,9 @@ class ProfileQuerySet(models.QuerySet):
                 models.When(
                     models.Q(
                         user_id__in=models.Subquery(
-                            FriendList.objects.common(user).values("friend__id")
+                            FriendList.objects.common(user).values(
+                                "friend__id"
+                            )
                         )
                     )
                     | models.Q(
@@ -217,7 +226,8 @@ class FriendRequestQuerySet(models.QuerySet):
     def common_by_user(self, user):
         """My requests to add SOMEONE in my friend list"""
         return self.filter(
-            models.Q(owner=user) | models.Q(invited=user) & models.Q(approved=False)
+            models.Q(owner=user)
+            | models.Q(invited=user) & models.Q(approved=False)
         )
 
     def approved(self):
@@ -245,9 +255,9 @@ class FriendListQuerySet(models.QuerySet):
 
     def common(self, user):
         """Get user friends"""
-        return self.filter(models.Q(owner=user) | models.Q(friend=user)).filter(
-            friend__profile__last_name__isnull=False
-        )
+        return self.filter(
+            models.Q(owner=user) | models.Q(friend=user)
+        ).filter(friend__profile__last_name__isnull=False)
 
     def by_profiles(self, owner, friend):
         """Get user friend by profiles"""
@@ -270,7 +280,8 @@ class FriendListQuerySet(models.QuerySet):
     def are_friends(self, owner, user):
         """Check if user is already a friend"""
         if self.filter(
-            models.Q(owner=owner, friend=user) | models.Q(owner=user, friend=owner)
+            models.Q(owner=owner, friend=user)
+            | models.Q(owner=user, friend=owner)
         ).exists():
             return True
         else:

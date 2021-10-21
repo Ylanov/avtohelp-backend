@@ -38,7 +38,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "phone",
@@ -59,7 +61,10 @@ class Migration(migrations.Migration):
                         default=0,
                     ),
                 ),
-                ("code", models.CharField(max_length=4, verbose_name="Code")),
+                (
+                    "code",
+                    models.CharField(max_length=4, verbose_name="Code"),
+                ),
                 (
                     "user",
                     models.ForeignKey(
@@ -99,11 +104,15 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "attempts",
-                    models.PositiveSmallIntegerField(blank=True, default=0, null=True),
+                    models.PositiveSmallIntegerField(
+                        blank=True, default=0, null=True
+                    ),
                 ),
                 (
                     "attempt_timestamp",

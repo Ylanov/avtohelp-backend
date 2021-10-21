@@ -7,7 +7,15 @@ from . import models
 class SMSCodeModelAdmin(admin.ModelAdmin):
     """Custom admin page for SMSCode"""
 
-    readonly_fields = ("id", "user", "code", "status", "phone", "created", "modified")
+    readonly_fields = (
+        "id",
+        "user",
+        "code",
+        "status",
+        "phone",
+        "created",
+        "modified",
+    )
     list_display = readonly_fields
     list_filter = ("status", "created")
     fieldsets = (

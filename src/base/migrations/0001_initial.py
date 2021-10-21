@@ -37,11 +37,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="Title")),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="Title"),
+                ),
                 ("text", models.TextField(verbose_name="Text")),
-                ("publish", models.BooleanField(default=False, verbose_name="Publish")),
+                (
+                    "publish",
+                    models.BooleanField(default=False, verbose_name="Publish"),
+                ),
                 (
                     "publish_date",
                     models.DateTimeField(
@@ -77,12 +85,19 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("title", models.CharField(max_length=255, verbose_name="Title")),
+                (
+                    "title",
+                    models.CharField(max_length=255, verbose_name="Title"),
+                ),
                 (
                     "description",
-                    models.CharField(max_length=255, verbose_name="Description"),
+                    models.CharField(
+                        max_length=255, verbose_name="Description"
+                    ),
                 ),
                 (
                     "event",
@@ -99,13 +114,18 @@ class Migration(migrations.Migration):
                 (
                     "status",
                     models.BooleanField(
-                        blank=True, default=False, null=True, verbose_name="Status"
+                        blank=True,
+                        default=False,
+                        null=True,
+                        verbose_name="Status",
                     ),
                 ),
                 (
                     "sent_count",
                     models.PositiveIntegerField(
-                        blank=True, default=0, verbose_name="Sent notifications count"
+                        blank=True,
+                        default=0,
+                        verbose_name="Sent notifications count",
                     ),
                 ),
                 (

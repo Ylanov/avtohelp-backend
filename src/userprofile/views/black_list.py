@@ -60,6 +60,7 @@ class BlackListDestroyView(ProfileBlackListMixin, generics.DestroyAPIView):
         """Override get_object method"""
         return get_object_or_404(
             BlackList.objects.by_profiles(
-                owner=self.request.user.profile, foe=self.kwargs.get("profile_id")
+                owner=self.request.user.profile,
+                foe=self.kwargs.get("profile_id"),
             )
         )

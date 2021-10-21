@@ -150,8 +150,12 @@ class SMSCode(BaseMixin):
     )
 
     mode = models.PositiveSmallIntegerField(default=SMS, choices=MODE_CHOICES)
-    status = models.PositiveSmallIntegerField(default=WAITING, choices=STATUS_CHOICES)
-    code = models.CharField(max_length=settings.SMS_CODE_LENGTH, verbose_name=_("Code"))
+    status = models.PositiveSmallIntegerField(
+        default=WAITING, choices=STATUS_CHOICES
+    )
+    code = models.CharField(
+        max_length=settings.SMS_CODE_LENGTH, verbose_name=_("Code")
+    )
 
     objects = SMSCodeManager.from_queryset(SMSCodeQuerySet)()
 
@@ -241,14 +245,18 @@ class SMSCode(BaseMixin):
     def datetime_before_resend(self):
         """Datetime before for re-request sms code"""
         last_sms_datetime = SMSCode.objects.order_by("created").last().created
-        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_SEND_DELAY)
+        timedelta_datetime = timezone.timedelta(
+            seconds=settings.SMS_SEND_DELAY
+        )
         return last_sms_datetime + timedelta_datetime
 
     @property
     def datetime_before_unlock(self):
         """Datetime before for unlock"""
         last_sms_datetime = SMSCode.objects.order_by("created").last().created
-        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
+        timedelta_datetime = timezone.timedelta(
+            seconds=settings.SMS_BLOCKING_PERIOD
+        )
         return last_sms_datetime + timedelta_datetime
 
     @property
@@ -280,7 +288,9 @@ class UserLock(BaseMixin):
     """Model for keep not valid login attempts."""
 
     user = models.OneToOneField("account.User", on_delete=models.CASCADE)
-    attempts = models.PositiveSmallIntegerField(blank=True, null=True, default=0)
+    attempts = models.PositiveSmallIntegerField(
+        blank=True, null=True, default=0
+    )
     attempt_timestamp = models.DateTimeField(
         blank=True,
         null=True,
@@ -311,7 +321,9 @@ class UserLock(BaseMixin):
     def datetime_before_unlock(self):
         """Datetime before for unlock"""
         last_attempt_datetime = self.modified
-        timedelta_datetime = timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
+        timedelta_datetime = timezone.timedelta(
+            seconds=settings.SMS_BLOCKING_PERIOD
+        )
         return last_attempt_datetime + timedelta_datetime
 
     @property

@@ -24,15 +24,21 @@ class CarListFilterSet(django_filters.FilterSet):
         if value:
             qs = queryset.filter(mark__name=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(mark__name__icontains=value).distinct("id")
+                qs = queryset.filter(mark__name__icontains=value).distinct(
+                    "id"
+                )
             return qs
         return queryset
 
     def by_model_name(self, queryset, name, value):
         if value:
-            qs = queryset.filter(car_model__name__contains=value).distinct("id")
+            qs = queryset.filter(car_model__name__contains=value).distinct(
+                "id"
+            )
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(car_model__name__icontains=value).distinct("id")
+                qs = queryset.filter(
+                    car_model__name__icontains=value
+                ).distinct("id")
             return qs
         return queryset
 
@@ -75,7 +81,9 @@ class CarMarkListFilterSet(django_filters.FilterSet):
         if value:
             qs = queryset.filter(carmodel__name__contains=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(carmodel__name__icontains=value).distinct("id")
+                qs = queryset.filter(carmodel__name__icontains=value).distinct(
+                    "id"
+                )
             return qs
         return queryset
 
@@ -104,7 +112,9 @@ class CarModelListFilterSet(django_filters.FilterSet):
         if value:
             qs = queryset.filter(mark__name=value).distinct("id")
             if not qs.exists() or len(value) > 3:
-                qs = queryset.filter(mark__name__icontains=value).distinct("id")
+                qs = queryset.filter(mark__name__icontains=value).distinct(
+                    "id"
+                )
             return qs
         return queryset
 
@@ -127,7 +137,9 @@ class CenterFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
             radius = int(value[2])
 
             center = Point(x=center_x, y=center_y, srid=4326)
-            return qs.filter(location__distance_lte=(center, Distance(m=radius)))
+            return qs.filter(
+                location__distance_lte=(center, Distance(m=radius))
+            )
         return qs
 
 
@@ -142,4 +154,9 @@ class ServiceStationsFilterSet(django_filters.FilterSet):
         """Meta class"""
 
         model = models.CarService
-        fields = ["category_id", "from_center", "distance", "icon_exists"]
+        fields = [
+            "category_id",
+            "from_center",
+            "distance",
+            "icon_exists",
+        ]

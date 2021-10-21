@@ -27,7 +27,8 @@ class Migration(migrations.Migration):
             model_name="pushnotificationconfiguration",
             name="notification_schedule",
             field=models.ManyToManyField(
-                to="base.PushNotificationSchedule", verbose_name="Notification schedule"
+                to="base.PushNotificationSchedule",
+                verbose_name="Notification schedule",
             ),
         ),
         migrations.AlterField(

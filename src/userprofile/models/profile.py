@@ -30,16 +30,31 @@ class Profile(BaseMixin, ImageMixin):
 
     user = models.OneToOneField("account.User", on_delete=models.PROTECT)
     first_name = models.CharField(
-        max_length=255, null=True, blank=True, default=None, verbose_name=_("Name")
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("Name"),
     )
     last_name = models.CharField(
-        max_length=255, null=True, blank=True, default=None, verbose_name=_("Last name")
+        max_length=255,
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("Last name"),
     )
     city = models.ForeignKey(
-        "catalog.City", on_delete=models.CASCADE, blank=True, null=True, default=None
+        "catalog.City",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        default=None,
     )
     is_verified = models.BooleanField(
-        default=False, null=True, blank=True, verbose_name=_("Verified user")
+        default=False,
+        null=True,
+        blank=True,
+        verbose_name=_("Verified user"),
     )
 
     objects = ProfileQuerySet.as_manager()
@@ -54,7 +69,7 @@ class Profile(BaseMixin, ImageMixin):
         """Get str representation of user car"""
         profile_car = self.user.profilecar_set.first()
         return (
-            f"{profile_car.car.mark} {profile_car.car.car_model} {profile_car.color}"
+            f"{profile_car.car.mark} {profile_car.car.car_model} {profile_car.color}"  # noqa
             if profile_car
             else None
         )
@@ -64,7 +79,9 @@ class ProfileLocation(BaseMixin):
     """Profile location"""
 
     user = models.OneToOneField("account.User", on_delete=models.PROTECT)
-    location = PointField(_("Location"), blank=True, null=True, default=Point(0, 0))
+    location = PointField(
+        _("Location"), blank=True, null=True, default=Point(0, 0)
+    )
 
     lng = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
     lat = models.DecimalField(max_digits=9, decimal_places=6, default=0.0)
@@ -104,7 +121,9 @@ class FriendRequest(BaseMixin):
     """Friend request model"""
 
     owner = models.ForeignKey(
-        "account.User", verbose_name=_("Owner"), on_delete=models.CASCADE
+        "account.User",
+        verbose_name=_("Owner"),
+        on_delete=models.CASCADE,
     )
     invited = models.ForeignKey(
         "account.User",

@@ -13,6 +13,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="newsletter",
             name="recommendation",
-            field=models.BooleanField(default=False, verbose_name="Recommendation"),
+            field=models.BooleanField(
+                default=False, verbose_name="Recommendation"
+            ),
         ),
     ]

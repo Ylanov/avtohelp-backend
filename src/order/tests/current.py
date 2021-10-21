@@ -124,7 +124,9 @@ class TestOrder(APITestCase):
         Result: [AssistanceRequest(user_1), AssistanceRequest(user_3),]
         """
         # Put user_2 in BlackList
-        profile_models.BlackList.objects.create(owner=self.user_1, foe=self.user_2)
+        profile_models.BlackList.objects.create(
+            owner=self.user_1, foe=self.user_2
+        )
 
         api_path = "%s:order:request-list" % self.VERSION
         query = {"coordinates": "45.049340, 38.960508, 5500"}
@@ -137,10 +139,15 @@ class TestOrder(APITestCase):
         Test list of created assurance requests
         Users: user_1, user_2, user_3
         Blacked users: user_2
-        Assistance requests: AssistanceRequest(user_1),
-                             AssistanceRequest(user_2),
-                             AssistanceRequest(user_3)
-        Result: [AssistanceRequest(user_1), AssistanceRequest(user_2), AssistanceRequest(user_3),]
+        Assistance requests:
+            AssistanceRequest(user_1),
+            AssistanceRequest(user_2),
+            AssistanceRequest(user_3)
+        Result: [
+            AssistanceRequest(user_1),
+            AssistanceRequest(user_2),
+            AssistanceRequest(user_3),
+            ]
         """
         api_path = "%s:order:request-list" % self.VERSION
         query = {"coordinates": "45.049340, 38.960508, 5500"}
@@ -151,7 +158,9 @@ class TestOrder(APITestCase):
 
     def test_service_list_query(self):
         """Test service list query - from center & position"""
-        query = {"coordinates": ["45.061016, 38.944007, 5500"]}  # latitude, longitude
+        query = {
+            "coordinates": ["45.061016, 38.944007, 5500"]
+        }  # latitude, longitude
         api_path = "%s:order:request-list" % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -159,12 +168,16 @@ class TestOrder(APITestCase):
     def test_service_list_query_1(self):
         """Test service list query - filter by distance"""
         query = {
-            "coordinates": ["45.061016, 38.944007, 5500"],  # latitude, longitude
+            "coordinates": [
+                "45.061016, 38.944007, 5500"
+            ],  # latitude, longitude
         }
         api_path = "%s:order:request-list" % self.VERSION
         response = self.client.get(reverse(api_path), data=query)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data[0].get("distance"), 0.0)  # output in meters
+        self.assertEqual(
+            response.data[0].get("distance"), 0.0
+        )  # output in meters
         self.assertEqual(
             response.data[1].get("distance"), 880.77758879
         )  # output in meters
@@ -204,7 +217,9 @@ class TestOrder(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         # Put user_2 in BlackList
-        profile_models.BlackList.objects.create(owner=self.user_1, foe=self.user_2)
+        profile_models.BlackList.objects.create(
+            owner=self.user_1, foe=self.user_2
+        )
 
         api_path = "%s:order:requests-count" % self.VERSION
 
@@ -217,16 +232,22 @@ class TestOrder(APITestCase):
 
         api_path = "%s:order:request-detail" % self.VERSION
         assistance_request = models.AssistanceRequest.objects.create(
-            user=self.user_1, issue="Issue 1", description="Issue description"
+            user=self.user_1,
+            issue="Issue 1",
+            description="Issue description",
         )
         response = self.client.get(
             reverse(api_path, kwargs={"pk": assistance_request.pk})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_sent_notification_by_distance_and_location_relevance(self):
+    def test_sent_notification_by_distance_and_location_relevance(
+        self,
+    ):
         """Test sent notification by distance and location relevance"""
-        self.user_2.profilelocation.location = Point(x=45.04934, y=38.960508, srid=4326)
+        self.user_2.profilelocation.location = Point(
+            x=45.04934, y=38.960508, srid=4326
+        )
         self.user_2.profilelocation.save()
         assistance_request = models.AssistanceRequest.objects.create(
             user=self.user_2,
@@ -251,21 +272,28 @@ class TestOrder(APITestCase):
 
         api_path = "%s:order:request-delete" % self.VERSION
         assistance_request = models.AssistanceRequest.objects.create(
-            user=self.user_1, issue="Issue 1", description="Issue description"
+            user=self.user_1,
+            issue="Issue 1",
+            description="Issue description",
         )
         response = self.client.delete(
             reverse(api_path, kwargs={"pk": assistance_request.id})
         )
         assistance_request.refresh_from_db()
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(assistance_request.status, models.AssistanceRequest.CANCELED)
+        self.assertEqual(
+            assistance_request.status,
+            models.AssistanceRequest.CANCELED,
+        )
 
     def test_delete_assistance_request_1(self):
         """Test non existed delete assurance requests"""
 
         api_path = "%s:order:request-delete" % self.VERSION
         models.AssistanceRequest.objects.create(
-            user=self.user_1, issue="Issue 1", description="Issue description"
+            user=self.user_1,
+            issue="Issue 1",
+            description="Issue description",
         )
         response = self.client.delete(reverse(api_path, kwargs={"pk": 420}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

@@ -23,7 +23,13 @@ class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
     # class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
 
-    readonly_fields = ("id", "created", "modified", "recommendation", "author")
+    readonly_fields = (
+        "id",
+        "created",
+        "modified",
+        "recommendation",
+        "author",
+    )
     list_display = (
         "id",
         "text",

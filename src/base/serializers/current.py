@@ -4,7 +4,6 @@ from django.conf import settings
 from image_cropping.utils import get_backend
 from rest_framework import serializers
 
-from account import models as account_models
 from base import models
 from userprofile import models as userprofile_models
 from userprofile.serializers import current as profile_serializers
@@ -18,7 +17,13 @@ class NewsListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.Newsletter
-        fields = ("id", "created", "title", "short_description", "publish_date")
+        fields = (
+            "id",
+            "created",
+            "title",
+            "short_description",
+            "publish_date",
+        )
 
 
 class NewsletterCommentListSerializer(serializers.ModelSerializer):
@@ -77,7 +82,9 @@ class NewsDetailSerializer(serializers.ModelSerializer):
             profile_id = settings.NEWSLETTER_USERPROFILE_ID
 
         try:
-            profile = userprofile_models.Profile.objects.filter(id=profile_id).get()
+            profile = userprofile_models.Profile.objects.filter(
+                id=profile_id
+            ).get()
         except (Exception,):
             pass
 
@@ -142,7 +149,9 @@ class NewsDetailSerializer(serializers.ModelSerializer):
     def get_i_like(self, news):
         user = self.context["request"].user
         return (
-            models.NewsletterLike.objects.filter(newsletter=news, owner=user).first()
+            models.NewsletterLike.objects.filter(
+                newsletter=news, owner=user
+            ).first()
             is not None
         )
 
@@ -167,7 +176,9 @@ class NewsToggleLikeSerializer(serializers.ModelSerializer):
         )
 
         if like is None:
-            like = models.NewsletterLike.objects.create(newsletter=news, owner=user)
+            like = models.NewsletterLike.objects.create(
+                newsletter=news, owner=user
+            )
             return True
         else:
             like.delete()
@@ -181,7 +192,14 @@ class NewsletterCommentCreateSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.NewsletterComment
-        fields = ("id", "created", "modified", "newsletter_id", "author_id", "text")
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "newsletter_id",
+            "author_id",
+            "text",
+        )
 
     def validate(self, attrs):
         """Override validate method"""
@@ -213,7 +231,14 @@ class NewsletterCommentUpdateSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.NewsletterComment
-        fields = ("id", "created", "modified", "newsletter_id", "author_id", "text")
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "newsletter_id",
+            "author_id",
+            "text",
+        )
 
     def update(self, instance, validated_data):
         """Override update method"""
@@ -347,7 +372,14 @@ class NotificationListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.PushNotification
-        fields = ("id", "created", "user", "event", "status", "sent_count")
+        fields = (
+            "id",
+            "created",
+            "user",
+            "event",
+            "status",
+            "sent_count",
+        )
 
 
 class NotificationDetailSerializer(serializers.ModelSerializer):
