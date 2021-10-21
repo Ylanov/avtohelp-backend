@@ -21,7 +21,7 @@ env = environ.Env(
     REDIS_PORT=(str, "REDIS_PORT"),
     REDIS_DB=(str, "REDIS_DB"),
     CELERY_BROKER_URL=(str, "CELERY_BROKER_URL"),
-    TIME_ZONE=(str, "TIME_ZONE"),
+    TIME_ZONE=(str, "europe/moscow"),
     USE_TZ=(bool, True),
     USE_I18N=(bool, True),
     USE_L10N=(bool, True),
@@ -44,7 +44,10 @@ env = environ.Env(
     NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS=(bool, True),
     REQUEST_RELEVANCE=(int, 30),
     DEFAULT_REQUEST_RADIUS=(int, 100000),
-    FCM_SERVER_KEY=(str, "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"),
+    FCM_SERVER_KEY=(
+        str,
+        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM",
+    ),
     OTP_SERVICE=(str, "https://api.new-tel.net"),
     OTP_SERVER_KEY=(str, "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714"),
     OTP_SIGNATURE_KEY=(str, "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2"),
@@ -266,9 +269,7 @@ DEFAULT_REQUEST_RADIUS = env("DEFAULT_REQUEST_RADIUS")  # in meters
 # PUSH-NOTIFICATIONS
 # Django FCM (Firebase push notifications)
 FCM_DJANGO_SETTINGS = {
-    "FCM_SERVER_KEY": (
-        env("FCM_SERVER_KEY")
-    ),
+    "FCM_SERVER_KEY": (env("FCM_SERVER_KEY")),
 }
 
 

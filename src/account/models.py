@@ -15,9 +15,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from utils.mixins import BaseMixin
 
-# from base.models import PushNotificationConfiguration
-
-
 # Logging error messages
 logger = logging.getLogger("ACCOUNT")
 
