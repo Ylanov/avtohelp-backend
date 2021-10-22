@@ -2,8 +2,8 @@
 version:
   docker_ce: 20.10.7
 
-DOCKER_IMAGE_NAME: "roadhelpbackend_road_helper"
-VERSION: "latest"
+DOCKER_IMAGE_NAME: "registry.gitlab.com/agencypro/roadhelpbackend"
+VERSION: "2021.10.20.13.41"
 
 minio_client:
   url: "https://dl.min.io/client/mc/release/linux-amd64/mc"

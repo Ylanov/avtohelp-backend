@@ -26,6 +26,7 @@
     - "gnupg2"
     - "pass"
     - "docker"
+    - "redis-server"
   when: action == "install"
 
 - name: gnupg2 pass
@@ -37,7 +38,7 @@
   when: action == "release"
 
 - name: pull new images
-  shell: docker pull registry.gitlab.com/agencypro/roadhelpbackend:2021.10.20.13.41
+  shell: docker pull {{ DOCKER_IMAGE_NAME }}:{{ VERSION }}
   when: action == "release"
 
 - name: templating docker-compose

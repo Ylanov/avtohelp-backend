@@ -49,3 +49,6 @@ black:
 
 notebook:
 	cd src/ && python3 manage.py shell_plus --notebook
+
+dj-test:
+	cd src/ && python3 manage.py test
