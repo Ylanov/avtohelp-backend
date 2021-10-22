@@ -1,0 +1,35 @@
+version: '3.6'
+services:
+  base: &app-base
+    image: {{ DOCKER_IMAGE_NAME }}:{{ VERSION }}
+    networks:
+      - service-network
+    environment:
+      - DB_NAME=postgres
+      - DB_USERNAME=postgres
+      - DB_HOST=192.168.0.110
+      - DB_PORT=5432
+      - DB_PASSWORD=postgres
+      - TIME_ZONE=Europe/Moscow
+      - DEBUG=true
+  api:
+    <<: *app-base
+    command:
+      [
+          "/bin/bash",
+          "-c",
+          "make start && make run-gunicorn",
+      ]
+    ports:
+      - "8000:8000"
+  celery:
+    <<: *app-base
+    command:
+      [
+          "/bin/bash",
+          "-c",
+          "make celery",
+      ]
+
+networks:
+  service-network:

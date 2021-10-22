@@ -2,6 +2,7 @@ stages:
   - build
   - release
   - deploy
+  - tests
 
 variables:
   KANIKO_VERSION: "debug-v1.3.0"
@@ -43,15 +44,45 @@ release:
   tags:
     - docker
 
-pull-new-master-image:
-  stage: deploy
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - docker pull $DOCKER_IMAGE_NAME:$VERSION
+
+.unit_tests: &_unit_tests
+  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
+  stage: tests
   only:
-    - master
+    - dev
+  allow_failure: true
   tags:
-    - shell
+    - docker
+
+run-django-test:
+  extends: .unit_tests
+  services:
+    - name: postgis/postgis:10-3.0
+      alias: postgres
+  variables:
+    POSTGRES_DB: "roadhelper"
+    POSTGRES_USER: "roadhelper"
+    POSTGRES_PASSWORD: "roadhelper"
+    DB_HOST: "postgres"
+  script:
+    - make dj-test
+
+black:
+  extends: .unit_tests
+  script:
+    - make black
+
+mypy:
+  extends: .unit_tests
+  script:
+    - make mypy
+
+isort:
+  extends: .unit_tests
+  script:
+    - make isort
+
+flake8:
+  extends: .unit_tests
+  script:
+    - make flake8
