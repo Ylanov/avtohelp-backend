@@ -1,3 +1,6 @@
+include:
+- template: Security/SAST.gitlab-ci.yml
+
 stages:
   - build
   - release
@@ -96,3 +99,6 @@ flake8:
   allow_failure: true
   tags:
     - docker
+
+sast:
+  stage: tests
