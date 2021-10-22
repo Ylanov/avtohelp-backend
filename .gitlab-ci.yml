@@ -48,7 +48,7 @@ run-django-test:
   image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
   stage: tests
   services:
-    - name: postgres:10
+    - name: postgis/postgis:10
       alias: postgres
   variables:
     POSTGRES_DB: "roadhelper"
@@ -56,7 +56,6 @@ run-django-test:
     POSTGRES_PASSWORD: "roadhelper"
     DB_HOST: "postgres"
   script:
-    - apt-get install postgresql-11-postgis-2.5-scripts
     - make dj-test
   allow_failure: true
   tags:
