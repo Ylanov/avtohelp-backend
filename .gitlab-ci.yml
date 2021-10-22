@@ -48,7 +48,7 @@ run-django-test:
   image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
   stage: tests
   services:
-    - name: postgis/postgis:10
+    - name: postgis/postgis:10-3.0
       alias: postgres
   variables:
     POSTGRES_DB: "roadhelper"
