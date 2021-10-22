@@ -32,8 +32,17 @@
   shell: gpg2 --full-generate-key
   when: action == "gnupg2"
 
+- name: docker login
+  shell: docker login -u {{ docker.user}} -p {{ docker.token }} {{ docker.registry }}
+  when: action == "release"
+
+- name: pull new images
+  shell: docker pull registry.gitlab.com/agencypro/roadhelpbackend:2021.10.20.13.41
+  when: action == "release"
+
 - name: templating docker-compose
   template:
     src: docker-compose.prod.yml.j2
     dest: ~/docker-compose.prod.yml
   when: action == "release"
+

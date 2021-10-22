@@ -13,3 +13,8 @@ minio_client:
 pg_repack:
   url: "https://api.pgxn.org/dist/pg_repack/1.4.2/pg_repack-1.4.2.zip"
   dest: /home/root/
+
+docker:
+  registry: "registry.gitlab.com"
+  user: "deploy"
+  token: "aofLPv_Rc_z2pm9e5N7z"
