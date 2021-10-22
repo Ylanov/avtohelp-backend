@@ -1,0 +1,20 @@
+---
+version:
+  docker_ce: 20.10.7
+
+DOCKER_IMAGE_NAME: "registry.gitlab.com/agencypro/roadhelpbackend"
+VERSION: "2021.10.20.13.41"
+
+minio_client:
+  url: "https://dl.min.io/client/mc/release/linux-amd64/mc"
+  path: /usr/local/bin
+  name: minioclient
+
+pg_repack:
+  url: "https://api.pgxn.org/dist/pg_repack/1.4.2/pg_repack-1.4.2.zip"
+  dest: /home/root/
+
+docker:
+  registry: "registry.gitlab.com"
+  user: "deploy"
+  token: "aofLPv_Rc_z2pm9e5N7z"

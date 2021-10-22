@@ -1,9 +1,13 @@
 import os
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
-import environ
 from pathlib import Path
 
 from easy_thumbnails.conf import Settings as thumbnail_settings
+
+from .env_settings import env
 
 BASE_DIR = Path(__file__).resolve().parent
 SETTINGS_FOLDER = Path(__file__)
@@ -13,58 +17,7 @@ PROJECT_ROOT = SOURCE_FOLDER.parent.parent
 
 PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "media"))
 
-env = environ.Env(
-    DEBUG=(bool, True),
-    REDIS_URL=(str, "REDIS_URL"),
-    REDIS_LOCATION=(str, "REDIS_LOCATION"),
-    REDIS_PASSWORD=(str, "REDIS_PASSWORD"),
-    REDIS_PORT=(str, "REDIS_PORT"),
-    REDIS_DB=(str, "REDIS_DB"),
-    CELERY_BROKER_URL=(str, "CELERY_BROKER_URL"),
-    TIME_ZONE=(str, "europe/moscow"),
-    USE_TZ=(bool, True),
-    USE_I18N=(bool, True),
-    USE_L10N=(bool, True),
-    USE_CELERY=(bool, False),
-    SECRET_KEY=(str, "SECRET_KEY"),
-    SENTRY_DSN=(str, "SENTRY_DSN"),
-    SMS_SERVICE=(str, "http://smsc.ru/sys/send.php"),
-    SMS_LOGIN=(str, "ilyaarzumanyan92"),
-    SMS_PASSWORD=(str, "93Damybee281"),
-    SMS_SENDER=(str, "RoadHelper"),
-    APPROVE_ACCOUNT=(str, "+79000000000"),
-    TEST_SMS_CODE=(bool, False),
-    USE_SMS=(bool, False),
-    PAGE_SIZE=(int, 15),
-    SMS_SEND_DELAY=(int, 60),
-    SMS_CODE_LENGTH=(int, 5),
-    SMS_INPUT_ATTEMPTS=(int, 2),
-    SMS_BLOCKING_PERIOD=(int, 86400),
-    NEWSLETTER_USERPROFILE_ID=(int, 1),
-    NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS=(bool, True),
-    REQUEST_RELEVANCE=(int, 30),
-    DEFAULT_REQUEST_RADIUS=(int, 100000),
-    FCM_SERVER_KEY=(
-        str,
-        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM",  # noqa
-    ),
-    OTP_SERVICE=(str, "https://api.new-tel.net"),
-    OTP_SERVER_KEY=(
-        str,
-        "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714",
-    ),
-    OTP_SIGNATURE_KEY=(
-        str,
-        "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2",
-    ),
-    LIMIT_UNREAD_MESSAGES=(int, 3),
-    MESSAGES_UPDATE_PERIOD=(int, 15),
-    SESSION_SAVE_EVERY_REQUEST=(bool, True),
-    DATA_UPLOAD_MAX_MEMORY_SIZE=(int, 104857600),
-    FILE_UPLOAD_PERMISSIONS=(int, 0o644),
-)
-
-SECRET_KEY = "^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1"
+SECRET_KEY = env("SECRET_KEY")
 
 USE_SMS = env("USE_SMS")
 TEST_SMS_CODE = env("TEST_SMS_CODE")
@@ -158,10 +111,10 @@ ASGI_APPLICATION = "roadhelpbackend.routing.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "roadhelper",
-        "USER": "roadhelper",
-        "PASSWORD": "roadhelper",
-        "HOST": "127.0.0.1",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
         "PORT": 5432,
     }
 }
@@ -205,13 +158,16 @@ MEDIA_URL = "/media/"
 
 STATIC_ROOT = PROJECT_ROOT / "static"
 
-# STATICFILES_DIRS = (PROJECT_ROOT / "static",)
-
 DEBUG = True
 
 # Celery settings
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 USE_CELERY = env("USE_CELERY")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_BROKER_URL")
+CELERY_TIMEZONE = env("TIME_ZONE")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -291,12 +247,6 @@ SMS_LOGIN = env("SMS_LOGIN")
 SMS_PASSWORD = env("SMS_PASSWORD")
 SMS_SENDER = env("SMS_SENDER")
 
-# STORE URL FOR MOBILE APPLICATION
-# set urls in file: media/static/js/device.js
-# comment this lines
-# STORE_APPLE = 'https://apps.apple.com/ru/app/id1419101818'
-# STORE_GOOGLE = 'https://play.google.com/store/apps/details?id=ru.autohelp'
-
 OTP_SERVICE = env("OTP_SERVICE")
 OTP_SERVER_KEY = env("OTP_SERVER_KEY")
 OTP_SIGNATURE_KEY = env("OTP_SIGNATURE_KEY")
@@ -336,3 +286,31 @@ IMAGE_CROPPING_BACKEND = (
     "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
 )
 IMAGE_CROPPING_BACKEND_PARAMS = {}
+
+
+# Integration with Sentry
+sentry_sdk.init(
+    dsn=env("SENTRY_DSN"),
+    integrations=[DjangoIntegration(), CeleryIntegration()],
+)
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"{env('REDIS_URL')}:{env('REDIS_PORT')}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(env("REDIS_URL"), env("REDIS_PORT"))],
+        },
+    },
+}

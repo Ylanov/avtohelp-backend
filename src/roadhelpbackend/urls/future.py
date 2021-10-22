@@ -1,4 +1,4 @@
 app_name = "future"
 
 
-urlpatterns = [] # type: ignore
+urlpatterns = []  # type: ignore
