@@ -54,8 +54,8 @@ release:
   only:
     - dev
   allow_failure: true
-    tags:
-      - docker
+  tags:
+    - docker
 
 run-django-test:
   extends: .unit_tests
