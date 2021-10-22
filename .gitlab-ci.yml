@@ -56,18 +56,44 @@ run-django-test:
     POSTGRES_PASSWORD: "roadhelper"
     DB_HOST: "postgres"
   script:
-    - poetry install
+    - apt-get install postgresql-11-postgis-2.5-scripts
     - make dj-test
   allow_failure: true
   tags:
     - docker
 
-check-code-style:
+black:
   image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
   stage: tests
   script:
-    - poetry install
-    - make code-style
+    - make black
+  allow_failure: true
+  tags:
+    - docker
+
+mypy:
+  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
+  stage: tests
+  script:
+    - make mypy
+  allow_failure: true
+  tags:
+    - docker
+
+isort:
+  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
+  stage: tests
+  script:
+    - make isort
+  allow_failure: true
+  tags:
+    - docker
+
+flake8:
+  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
+  stage: tests
+  script:
+    - make flake8
   allow_failure: true
   tags:
     - docker
