@@ -47,9 +47,18 @@ release:
   tags:
     - docker
 
-run-django-test:
+
+.unit_tests: &_unit_tests
   image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
   stage: tests
+  only:
+    - dev
+  allow_failure: true
+    tags:
+      - docker
+
+run-django-test:
+  extends: .unit_tests
   services:
     - name: postgis/postgis:10-3.0
       alias: postgres
@@ -60,47 +69,26 @@ run-django-test:
     DB_HOST: "postgres"
   script:
     - make dj-test
-  allow_failure: true
-  tags:
-    - docker
 
 black:
-  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
-  stage: tests
+  extends: .unit_tests
   script:
     - make black
-  allow_failure: true
-  tags:
-    - docker
 
 mypy:
-  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
-  stage: tests
+  extends: .unit_tests
   script:
     - make mypy
-  allow_failure: true
-  tags:
-    - docker
 
 isort:
-  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
-  stage: tests
+  extends: .unit_tests
   script:
     - make isort
-  allow_failure: true
-  tags:
-    - docker
 
 flake8:
-  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
-  stage: tests
+  extends: .unit_tests
   script:
     - make flake8
-  allow_failure: true
-  tags:
-    - docker
 
 sast:
-  stage: tests
-  tags:
-    - docker
+  extends: .unit_tests
