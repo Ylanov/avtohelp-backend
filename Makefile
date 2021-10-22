@@ -21,7 +21,8 @@ isort:
 	python3 -m isort --filter-files src/
 
 build:
-	docker build -t roadhelpbackend_road_helper:latest .
+	docker build -t registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based .
+	docker push registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
 
 migrate:
 	cd src/ && python3 manage.py migrate --noinput

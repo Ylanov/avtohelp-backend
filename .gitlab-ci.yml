@@ -2,6 +2,7 @@ stages:
   - build
   - release
   - deploy
+  - tests
 
 variables:
   KANIKO_VERSION: "debug-v1.3.0"
@@ -42,3 +43,15 @@ release:
     - master
   tags:
     - docker
+
+run-django-test:
+  image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
+  stage: tests
+  services:
+    - postgres:12.2
+  variables:
+    POSTGRES_DB: "roadhelper"
+    POSTGRES_USER: "roadhelper"
+    POSTGRES_PASSWORD: "roadhelper"
+  script:
+    - make dj-test
