@@ -86,3 +86,10 @@ flake8:
   extends: .unit_tests
   script:
     - make flake8
+
+deploy-to-prod:
+  script: make deploy
+  environment:
+    name: production
+  tags:
+    - shell

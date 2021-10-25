@@ -55,7 +55,7 @@ dj-test:
 	cd src/ && python3 manage.py test
 
 release:
-	ansible-playbook --inventory=deploy/inventory/prod deploy/roles/roadhelper.yml \
+	ansible-playbook --inventory=deploy/inventory/local-prod deploy/roles/roadhelper.yml \
 		--ssh-common-args='-o StrictHostKeyChecking=no' \
 		-u root \
 		-e "action='release'" \
