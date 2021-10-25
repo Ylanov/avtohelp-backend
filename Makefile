@@ -57,7 +57,7 @@ dj-test:
 release:
 	ansible-playbook --inventory=deploy/inventory/local-prod deploy/roles/roadhelper.yml \
 		--ssh-common-args='-o StrictHostKeyChecking=no' \
-		-u root \
+		-u gitlab-runner \
 		-e "action='release'" \
 		-e "roadhelpbackend_settings.DEBUG='${DEBUG}'" \
 		-e "roadhelpbackend_settings.REDIS_URL='${REDIS_URL}'" \
