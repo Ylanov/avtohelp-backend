@@ -6,7 +6,7 @@ services:
       - service-network
     environment:
     {% for item_k in roadhelpbackend_settings %}{% for k, v in item_k.items() %}
-    - {{ k }}="{{ v }}"
+    - {{ k }}={{ v }}
     {% endfor %}{% endfor %}
 
   api:
