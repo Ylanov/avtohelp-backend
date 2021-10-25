@@ -99,4 +99,4 @@ release:
 		-e "roadhelpbackend_settings.MESSAGES_UPDATE_PERIOD='${MESSAGES_UPDATE_PERIOD}'" \
 		-e "roadhelpbackend_settings.SESSION_SAVE_EVERY_REQUEST='${SESSION_SAVE_EVERY_REQUEST}'" \
 		-e "roadhelpbackend_settings.DATA_UPLOAD_MAX_MEMORY_SIZE='${DATA_UPLOAD_MAX_MEMORY_SIZE}'" \
-		-e "roadhelpbackend_settings.FILE_UPLOAD_PERMISSIONS='${FILE_UPLOAD_PERMISSIONS}'" \
+		-e "roadhelpbackend_settings.FILE_UPLOAD_PERMISSIONS='${FILE_UPLOAD_PERMISSIONS}'"
