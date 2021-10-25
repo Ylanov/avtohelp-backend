@@ -91,7 +91,6 @@ flake8:
 deploy-to-prod:
   stage: deploy
   script:
-    - echo "${SMS_BLOCKING_PERIOD}"
     - make release
   environment:
     name: production
