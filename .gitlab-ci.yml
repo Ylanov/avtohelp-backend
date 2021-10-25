@@ -94,7 +94,8 @@ deploy-to-prod:
     name: production
   tags:
     - shell
-  script: ansible-playbook --inventory=deploy/inventory/local-prod deploy/roles/roadhelper.yml \
+  script:
+    - ansible-playbook --inventory=deploy/inventory/local-prod deploy/roles/roadhelper.yml \
 		--ssh-common-args='-o StrictHostKeyChecking=no' \
 		-u gitlab-runner \
 		-e "action='release'" \
