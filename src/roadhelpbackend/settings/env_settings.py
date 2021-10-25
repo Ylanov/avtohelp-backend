@@ -3,16 +3,13 @@ import environ
 env = environ.Env(
     DEBUG=(bool, True),
     REDIS_URL=(str, "REDIS_URL"),
-    REDIS_LOCATION=(str, "REDIS_LOCATION"),
-    REDIS_PASSWORD=(str, "REDIS_PASSWORD"),
     REDIS_PORT=(str, "REDIS_PORT"),
-
+    REDIS_DB=(str, "REDIS_DB"),
     DB_HOST=(str, "127.0.0.1"),
     DB_NAME=(str, "roadhelper"),
     DB_PORT=(int, 5432),
     DB_USER=(str, "roadhelper"),
     DB_PASSWORD=(str, "roadhelper"),
-    REDIS_DB=(str, "REDIS_DB"),
     CELERY_BROKER_URL=(str, "CELERY_BROKER_URL"),
     TIME_ZONE=(str, "Europe/Moscow"),
     USE_TZ=(bool, True),

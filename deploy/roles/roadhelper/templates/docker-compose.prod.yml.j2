@@ -1,17 +1,14 @@
-version: '3.6'
+version: '3'
 services:
   base: &app-base
     image: {{ DOCKER_IMAGE_NAME }}:{{ VERSION }}
     networks:
       - service-network
     environment:
-      - DB_NAME=postgres
-      - DB_USERNAME=postgres
-      - DB_HOST=192.168.0.110
-      - DB_PORT=5432
-      - DB_PASSWORD=postgres
-      - TIME_ZONE=Europe/Moscow
-      - DEBUG=true
+    {% for item_k in roadhelpbackend_settings %}{% for k, v in item_k.items() %}
+    - {{ k }}="{{ v }}"
+    {% endfor %}{% endfor %}
+
   api:
     <<: *app-base
     command:
