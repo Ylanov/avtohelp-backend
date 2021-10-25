@@ -89,7 +89,7 @@ flake8:
 
 deploy-to-prod:
   stage: deploy
-  script: make deploy
+  script: make release
   environment:
     name: production
   tags:
