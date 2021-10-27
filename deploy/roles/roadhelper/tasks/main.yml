@@ -45,6 +45,7 @@
 - name: stop old-containerss
   shell: docker-compose -f ~/docker-compose.prod.yml stop api celery
   when: action == "release"
+  ignore_errors: yes
 
 - name: templating docker-compose
   template:
@@ -52,7 +53,9 @@
     dest: ~/docker-compose.prod.yml
   when: action == "release"
   with_dict: "{{ roadhelpbackend_settings }}"
+  ignore_errors: yes
 
 - name: start new-containerss
   shell: docker-compose -f ~/docker-compose.prod.yml up -d api celery
   when: action == "release"
+  ignore_errors: yes
