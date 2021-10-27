@@ -96,3 +96,5 @@ deploy-to-prod:
     name: production
   tags:
     - shell
+  only:
+    - master
