@@ -26,10 +26,6 @@ urlpatterns = (
         ),
         path("version/", include("versioning.urls")),
         path("swagger/", api_schema_view),
-        path(
-            "documentation/",
-            include("documentation.urls", namespace="documentation"),
-        ),
     ]
     + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
