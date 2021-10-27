@@ -18,6 +18,13 @@ build_main_image:
   stage: build_main
   script:
     - make build
+  only:
+    refs:
+      - master
+      - dev
+    changes:
+      - poetry.lock
+      - pyproject.toml
   tags:
     - shell
 
