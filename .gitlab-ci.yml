@@ -66,7 +66,10 @@ release:
   image: registry.gitlab.com/agencypro/roadhelpbackend:python-3.7.2-based
   stage: tests
   only:
-    - dev
+    refs:
+      - dev
+    changes:
+      - src/**
   allow_failure: true
   tags:
     - docker
