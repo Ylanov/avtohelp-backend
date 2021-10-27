@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.contrib.gis.geos.point import Point
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers

@@ -8,8 +8,16 @@ urlpatterns = [
     path("device", FCMDeviceViewSet.as_view(), name="device"),
     # Profiles
     path("profiles", ProfileListView.as_view(), name="profile-list"),
-    path("profiles/<int:pk>", ProfileDetailView.as_view(), name="profile-detail"),
-    path("profile/detail", MyProfileDetailView.as_view(), name="my-profile-detail"),
+    path(
+        "profiles/<int:pk>",
+        ProfileDetailView.as_view(),
+        name="profile-detail",
+    ),
+    path(
+        "profile/detail",
+        MyProfileDetailView.as_view(),
+        name="my-profile-detail",
+    ),
     path(
         "profile/change_avatar",
         ProfileChangeAvatarView.as_view(),
@@ -21,7 +29,11 @@ urlpatterns = [
         name="update-profile-location",
     ),
     # Profile car
-    path("profile/cars", ProfileCarListView.as_view(), name="profile-car-list"),
+    path(
+        "profile/cars",
+        ProfileCarListView.as_view(),
+        name="profile-car-list",
+    ),
     path(
         "profile/cars/<int:pk>",
         ProfileCarDetailView.as_view(),
@@ -59,7 +71,11 @@ urlpatterns = [
         name="profile-gallery-delete",
     ),
     #   Friend-list
-    path("profile/friends", ProfileFriendListView.as_view(), name="friendlist-list"),
+    path(
+        "profile/friends",
+        ProfileFriendListView.as_view(),
+        name="friendlist-list",
+    ),
     path(
         "profile/friends/add",
         FriendRequestCreateView.as_view(),
@@ -127,5 +143,9 @@ urlpatterns = [
         name="blacklistrequest-delete",
     ),
     # User counter
-    path("profiles/count", ProfileCountView.as_view(), name="profile-count"),
+    path(
+        "profiles/count",
+        ProfileCountView.as_view(),
+        name="profile-count",
+    ),
 ]

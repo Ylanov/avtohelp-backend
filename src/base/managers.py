@@ -1,3 +1,5 @@
+# type: ignore
+
 import logging
 
 from django.db import models
@@ -12,7 +14,9 @@ logger = logging.getLogger("app")
 class PushNotificationManager(models.Manager):
     """PushNotification manager"""
 
-    def make_friend_request_notification(self, user: (str, int, object)) -> object:
+    def make_friend_request_notification(
+        self, user: (str, int, object)
+    ) -> object:
         """Make common notification for friend request"""
         user_id = user.id if isinstance(user, User) else user
         if User.objects.filter(id=user_id).exists():
@@ -25,7 +29,9 @@ class PushNotificationManager(models.Manager):
             obj.save()
             return obj
 
-    def make_assistance_request_notification(self, user: (str, int, object)) -> object:
+    def make_assistance_request_notification(
+        self, user: (str, int, object)
+    ) -> object:
         """Make common notification for assistance request"""
         user_id = user.id if isinstance(user, User) else user
         if User.objects.filter(id=user_id).exists():

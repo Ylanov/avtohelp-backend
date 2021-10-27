@@ -1,0 +1,63 @@
+---
+version:
+  docker_ce: 20.10.7
+
+DOCKER_IMAGE_NAME: "registry.gitlab.com/agencypro/roadhelpbackend"
+VERSION: "latest"
+
+minio_client:
+  url: "https://dl.min.io/client/mc/release/linux-amd64/mc"
+  path: /usr/local/bin
+  name: minioclient
+
+pg_repack:
+  url: "https://api.pgxn.org/dist/pg_repack/1.4.2/pg_repack-1.4.2.zip"
+  dest: /home/root/
+
+docker:
+  registry: "registry.gitlab.com"
+  user: "deploy"
+  token: "aofLPv_Rc_z2pm9e5N7z"
+
+roadhelpbackend_settings:
+  - DEBUG: "{{ DEBUG | default('True') | bool }}"
+  - REDIS_URL: "{{ REDIS_URL | default('localhost') }}"
+  - REDIS_PORT: "{{ REDIS_PORT | default(6380) | int }}"
+  - REDIS_DB: "{{ REDIS_DB | default(0) | int }}"
+  - DB_NAME: "{{ DB_NAME | default('roadhelper') }}"
+  - DB_USERNAME: "{{ DB_USERNAME | default('roadhelper') }}"
+  - DB_HOST: "{{ DB_HOST | default('localhost') }}"
+  - DB_PORT: "{{ DB_PORT | default(5432) | int }}"
+  - DB_PASSWORD: "{{ DB_PASSWORD | default('password') }}"
+  - CELERY_BROKER_URL: "{{ CELERY_BROKER_URL | default('localhost') }}"
+  - TIME_ZONE: "{{ TIME_ZONE | default('Europe/Moscow') }}"
+  - USE_TZ: "{{ USE_TZ | default('True') | bool }}"
+  - USE_I18N: "{{ USE_I18N | default('True') | bool }}"
+  - USE_L10N: "{{ USE_L10N | default('True') | bool }}"
+  - USE_CELERY: "{{ USE_CELERY | default('True') | bool }}"
+  - SECRET_KEY: "{{ SECRET_KEY | default('') }}"
+  - SENTRY_DSN: "{{ SENTRY_DSN | default('') }}"
+  - SMS_SERVICE: "{{ SMS_SERVICE | default('') }}"
+  - SMS_PASSWORD: "{{ SMS_PASSWORD | default('') }}"
+  - SMS_SENDER: "{{ SMS_SENDER | default('') }}"
+  - APPROVE_ACCOUNT: "{{ APPROVE_ACCOUNT | default('') }}"
+  - TEST_SMS_CODE: "{{ TEST_SMS_CODE | default('False') | bool }}"
+  - USE_SMS: "{{ USE_SMS | default('True') | bool }}"
+  - PAGE_SIZE: "{{ PAGE_SIZE | default(15) | int }}"
+  - SMS_SEND_DELAY: "{{ SMS_SEND_DELAY | default(60) | int }}"
+  - SMS_CODE_LENGTH: "{{ SMS_CODE_LENGTH | default(5) | int }}"
+  - SMS_INPUT_ATTEMPTS: "{{ SMS_INPUT_ATTEMPTS | default(2) | int }}"
+  - SMS_BLOCKING_PERIOD: "{{ SMS_BLOCKING_PERIOD | default(86400) | int }}"
+  - NEWSLETTER_USERPROFILE_ID: "{{ NEWSLETTER_USERPROFILE_ID | default(1) | int }}"
+  - NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS: "{{ NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS | default('True') | bool }}"
+  - REQUEST_RELEVANCE: "{{ REQUEST_RELEVANCE | default(30) | int }}"
+  - DEFAULT_REQUEST_RADIUS: "{{ DEFAULT_REQUEST_RADIUS | default(100000) | int }}"
+  - FCM_SERVER_KEY: "{{ FCM_SERVER_KEY | default('') }}"
+  - OTP_SERVICE: "{{ OTP_SERVICE | default('') }}"
+  - OTP_SERVER_KEY: "{{ OTP_SERVER_KEY | default('') }}"
+  - OTP_SIGNATURE_KEY: "{{ OTP_SIGNATURE_KEY | default('') }}"
+  - LIMIT_UNREAD_MESSAGES: "{{ LIMIT_UNREAD_MESSAGES | default(3) | int  }}"
+  - MESSAGES_UPDATE_PERIOD: "{{ MESSAGES_UPDATE_PERIOD | default(15) | int }}"
+  - SESSION_SAVE_EVERY_REQUEST: "{{ SESSION_SAVE_EVERY_REQUEST | default('True') | bool }}"
+  - DATA_UPLOAD_MAX_MEMORY_SIZE: "{{ DATA_UPLOAD_MAX_MEMORY_SIZE | default(s104857600) | int }}"
+  - FILE_UPLOAD_PERMISSIONS: "{{ FILE_UPLOAD_PERMISSIONS | default('0o644') }}"

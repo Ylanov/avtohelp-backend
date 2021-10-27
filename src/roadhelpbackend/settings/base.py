@@ -1,9 +1,13 @@
 import os
-import sys
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 
 from pathlib import Path
 
 from easy_thumbnails.conf import Settings as thumbnail_settings
+
+from .env_settings import env
 
 BASE_DIR = Path(__file__).resolve().parent
 SETTINGS_FOLDER = Path(__file__)
@@ -13,11 +17,11 @@ PROJECT_ROOT = SOURCE_FOLDER.parent.parent
 
 PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "media"))
 
-SECRET_KEY = "^t87c7f_vti$%_&dwb69kc22$bvh$-$rog9_b(9*r6^6o!^tp1"
+SECRET_KEY = env("SECRET_KEY")
 
-USE_SMS = True  # Actual sms sending switcher
-TEST_SMS_CODE = False
-APPROVE_ACCOUNT = "+79000000000"
+USE_SMS = env("USE_SMS")
+TEST_SMS_CODE = env("TEST_SMS_CODE")
+APPROVE_ACCOUNT = env("APPROVE_ACCOUNT")
 
 ALLOWED_HOSTS = [
     "0.0.0.0",
@@ -66,7 +70,6 @@ EXTERNAL_APPS = [
     "inline_actions",
     "django_object_actions",
     "multiselectfield",
-    # "online_users",
     "colorful",
 ]
 
@@ -80,7 +83,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "online_users.middleware.OnlineNowMiddleware",
 ]
 
 ROOT_URLCONF = "roadhelpbackend.urls"
@@ -104,35 +106,34 @@ TEMPLATES = [
 ]
 
 
-# WSGI_APPLICATION = 'project.wsgi.application'
 ASGI_APPLICATION = "roadhelpbackend.routing.application"
 
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": "roadhelper",
-        "USER": "roadhelper",
-        "PASSWORD": "roadhelper",
-        "HOST": "127.0.0.1",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
         "PORT": 5432,
     }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa
         "OPTIONS": {
             "min_length": 9,
         },
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",  # noqa
     },
     {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa
     },
 ]
 
@@ -142,27 +143,31 @@ LOGOUT_URL = "admin:logout"
 
 
 LANGUAGE_CODE = "ru"
-TIME_ZONE = "UTC"
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
+TIME_ZONE = env("TIME_ZONE")
+
+USE_I18N = env("USE_I18N")
+USE_L10N = env("USE_L10N")
+USE_TZ = env("USE_TZ")
 
 LOCALE_PATHS = (PROJECT_ROOT / "locale",)
 
 STATIC_URL = "/static/"
 
-MEDIA_ROOT = PROJECT_ROOT / "media"
+MEDIA_ROOT = PROJECT_ROOT / "media/"
 MEDIA_URL = "/media/"
 
-STATIC_ROOT = "static"
-
-STATICFILES_DIRS = (PROJECT_ROOT / "static",)
+STATIC_ROOT = PROJECT_ROOT / "static"
 
 DEBUG = True
 
 # Celery settings
-CELERY_BROKER_URL = "redis://base:6379/13"
-USE_CELERY = False
+USE_CELERY = env("USE_CELERY")
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = env("CELERY_BROKER_URL")
+CELERY_TIMEZONE = env("TIME_ZONE")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -175,18 +180,22 @@ REST_DATE_FORMAT = "%d-%m-%Y"
 
 # REST Framework
 REST_FRAMEWORK = {
-    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 15,
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",  # noqa
+    "PAGE_SIZE": env("PAGE_SIZE"),
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
     "DEFAULT_VERSION": (AVAILABLE_VERSIONS["current"],),
     "ALLOWED_VERSIONS": AVAILABLE_VERSIONS.values(),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "EXCEPTION_HANDLER": "utils.api_exceptions.roadhelper_exception_handler",
 }
 
@@ -206,55 +215,49 @@ CORS_ALLOW_CREDENTIALS = False
 
 
 # SMS
-SMS_SEND_DELAY = 60  # seconds
-SMS_CODE_LENGTH = 5  # characters
-SMS_INPUT_ATTEMPTS = 2  # count of attempts
-SMS_BLOCKING_PERIOD = 86400  # 24 hours in seconds
+SMS_SEND_DELAY = env("SMS_SEND_DELAY")  # seconds
+SMS_CODE_LENGTH = env("SMS_CODE_LENGTH")  # characters
+SMS_INPUT_ATTEMPTS = env("SMS_INPUT_ATTEMPTS")  # count of attempts
+SMS_BLOCKING_PERIOD = env("SMS_BLOCKING_PERIOD")  # 24 hours in seconds
 
 
-NEWSLETTER_USERPROFILE_ID = 1
+NEWSLETTER_USERPROFILE_ID = env("NEWSLETTER_USERPROFILE_ID")
 
 # CHAT
-NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = True
+NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = env(
+    "NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS"
+)
 
 
 # ASSISTANCE REQUESTS
-REQUEST_RELEVANCE = 30  # minutes
-DEFAULT_REQUEST_RADIUS = 100000  # in meters
+REQUEST_RELEVANCE = env("REQUEST_RELEVANCE")  # minutes
+DEFAULT_REQUEST_RADIUS = env("DEFAULT_REQUEST_RADIUS")  # in meters
 
 
 # PUSH-NOTIFICATIONS
 # Django FCM (Firebase push notifications)
 FCM_DJANGO_SETTINGS = {
-    "FCM_SERVER_KEY": (
-        "AAAAjcLTzLw:APA91bGE_GYkVBsKZs5S1NH3ZLmeaT7RA0-MT1a6NzeGNjUoP3rfULN2gP1zd2gsnpFVVbQjlm5EV9godH5RNarcAhxahpb9i4p2rKNa40TTT5JtrxraR0y3FZ6JlfE2Z1KTY-lWw9cM"
-    ),
+    "FCM_SERVER_KEY": (env("FCM_SERVER_KEY")),
 }
 
 
 # SMSC Settings
-SMS_SERVICE = "http://smsc.ru/sys/send.php"
-SMS_LOGIN = "ilyaarzumanyan92"
-SMS_PASSWORD = "93Damybee281"
-SMS_SENDER = "RoadHelper"
+SMS_SERVICE = env("SMS_SERVICE")
+SMS_LOGIN = env("SMS_LOGIN")
+SMS_PASSWORD = env("SMS_PASSWORD")
+SMS_SENDER = env("SMS_SENDER")
 
-# STORE URL FOR MOBILE APPLICATION
-# set urls in file: media/static/js/device.js
-# comment this lines
-# STORE_APPLE = 'https://apps.apple.com/ru/app/id1419101818'
-# STORE_GOOGLE = 'https://play.google.com/store/apps/details?id=ru.autohelp'
-
-OTP_SERVICE = "https://api.new-tel.net"
-OTP_SERVER_KEY = "f30a901fc45f7f082628a719f64d54ca486b7b3d0cf57714"
-OTP_SIGNATURE_KEY = "ed839ad2c73e071886e0752a563f8e2dfafc7c1ce7f717d2"
+OTP_SERVICE = env("OTP_SERVICE")
+OTP_SERVER_KEY = env("OTP_SERVER_KEY")
+OTP_SIGNATURE_KEY = env("OTP_SIGNATURE_KEY")
 
 # Message PUSH-notifications
-LIMIT_UNREAD_MESSAGES = 3
-MESSAGES_UPDATE_PERIOD = 15
+LIMIT_UNREAD_MESSAGES = env("LIMIT_UNREAD_MESSAGES")
+MESSAGES_UPDATE_PERIOD = env("MESSAGES_UPDATE_PERIOD")
 
 
 # Save the session to the database on every single request
-SESSION_SAVE_EVERY_REQUEST = True
+SESSION_SAVE_EVERY_REQUEST = env("SESSION_SAVE_EVERY_REQUEST")
 
 
 # Django Rest Swagger
@@ -272,13 +275,42 @@ SWAGGER_SETTINGS = {
 }
 
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 104857600  # 100Mb
+DATA_UPLOAD_MAX_MEMORY_SIZE = env("DATA_UPLOAD_MAX_MEMORY_SIZE")
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 THUMBNAIL_PROCESSORS = (
     "image_cropping.thumbnail_processors.crop_corners",
 ) + thumbnail_settings.THUMBNAIL_PROCESSORS
 
-IMAGE_CROPPING_BACKEND = "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+IMAGE_CROPPING_BACKEND = (
+    "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
+)
 IMAGE_CROPPING_BACKEND_PARAMS = {}
-# IMAGE_CROPPING_THUMB_SIZE = (600, 600)
+
+
+# Integration with Sentry
+sentry_sdk.init(
+    dsn=env("SENTRY_DSN"),
+    integrations=[DjangoIntegration(), CeleryIntegration()],
+)
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"{env('REDIS_URL')}:{env('REDIS_PORT')}",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "IGNORE_EXCEPTIONS": True,
+        },
+    }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [(env("REDIS_URL"), env("REDIS_PORT"))],
+        },
+    },
+}

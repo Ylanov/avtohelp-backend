@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.contrib import (
     admin,
     messages,
@@ -39,11 +41,26 @@ class ProfileModelAdmin(admin.ModelAdmin):
         "user__profile__last_name",
         "user__profilecar__license_plate",
     )
-    list_display = ("id", "user", "first_name", "last_name", "created", "modified")
+    list_display = (
+        "id",
+        "user",
+        "first_name",
+        "last_name",
+        "created",
+        "modified",
+    )
     fieldsets = (
         (
             _("User's data"),
-            {"fields": ("user", "first_name", "last_name", "image", "is_verified")},
+            {
+                "fields": (
+                    "user",
+                    "first_name",
+                    "last_name",
+                    "image",
+                    "is_verified",
+                )
+            },
         ),
         (_("Location"), {"fields": ("city",)}),
         (_("Info"), {"fields": ("created", "modified")}),
@@ -108,7 +125,11 @@ class DeviceAdmin(admin.ModelAdmin):
     raw_id_fields = ("user",)
 
     if hasattr(User, "USERNAME_FIELD"):
-        search_fields = ("name", "device_id", "user__%s" % (User.USERNAME_FIELD))
+        search_fields = (
+            "name",
+            "device_id",
+            "user__%s" % (User.USERNAME_FIELD),
+        )
     else:
         search_fields = ("name", "device_id")
 
@@ -185,7 +206,9 @@ class DeviceAdmin(admin.ModelAdmin):
     def send_bulk_data_message(self, request, queryset):
         self.send_messages(request, queryset, True, True)
 
-    send_bulk_data_message.short_description = _("Send test data message in bulk")
+    send_bulk_data_message.short_description = _(
+        "Send test data message in bulk"
+    )
 
     def enable(self, request, queryset):
         queryset.update(active=True)

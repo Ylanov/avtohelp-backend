@@ -19,7 +19,7 @@ COPY Makefile /app/
 COPY poetry.lock pyproject.toml /app/
 
 RUN cd app/ && poetry config virtualenvs.create false \
-  && poetry install --no-dev
+  && poetry install
 
 COPY src /app/src/
 

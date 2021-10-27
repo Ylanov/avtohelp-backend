@@ -1,3 +1,5 @@
+# type: ignore
+
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
@@ -7,7 +9,13 @@ from .models import User
 class UserAdminModel(admin.ModelAdmin):
     """Custom admin page for User"""
 
-    readonly_fields = ("id", "profile", "phone", "created", "modified")
+    readonly_fields = (
+        "id",
+        "profile",
+        "phone",
+        "created",
+        "modified",
+    )
     search_fields = ("phone",)
     list_display = ("id", "profile", "phone", "created", "modified")
     actions = ("block_user",)
@@ -39,7 +47,10 @@ class UserAdminModel(admin.ModelAdmin):
                                        User\'s %s was already disabled.
                                     """
             )
-            % (selected_users.difference(disabled_users) or 0, disabled_users or 0),
+            % (
+                selected_users.difference(disabled_users) or 0,
+                disabled_users or 0,
+            ),
         )
 
     block_user.short_description = _("Mark selected users as disabled")

@@ -23,7 +23,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("url", models.URLField(blank=True, default=None, null=True)),
+                (
+                    "url",
+                    models.URLField(blank=True, default=None, null=True),
+                ),
             ],
             options={
                 "verbose_name": "Remote Server",
@@ -51,7 +54,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "version",
@@ -62,7 +67,10 @@ class Migration(migrations.Migration):
                         verbose_name="Version",
                     ),
                 ),
-                ("active", models.BooleanField(default=False, verbose_name="Active")),
+                (
+                    "active",
+                    models.BooleanField(default=False, verbose_name="Active"),
+                ),
             ],
             options={
                 "verbose_name": "Version",

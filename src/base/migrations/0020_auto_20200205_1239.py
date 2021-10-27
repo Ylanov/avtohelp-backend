@@ -39,12 +39,16 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "text",
                     models.CharField(
-                        default="", max_length=1024, verbose_name="Text comment"
+                        default="",
+                        max_length=1024,
+                        verbose_name="Text comment",
                     ),
                 ),
                 (
@@ -89,7 +93,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="newsletter",
             name="text",
-            field=models.TextField(blank=True, default="", verbose_name="Text"),
+            field=models.TextField(
+                blank=True, default="", verbose_name="Text"
+            ),
         ),
         migrations.CreateModel(
             name="NewsletterLike",
@@ -113,7 +119,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "newsletter",
@@ -157,7 +165,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "comment",
@@ -183,7 +193,8 @@ class Migration(migrations.Migration):
             model_name="newslettercomment",
             name="newsletter",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="base.Newsletter"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="base.Newsletter",
             ),
         ),
     ]

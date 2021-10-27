@@ -106,7 +106,9 @@ class CarServiceCategorySerializer(serializers.ModelSerializer):
         return obj.get_full_image_url(request=self.context.get("request"))
 
 
-class ServiceListSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
+class ServiceListSerializer(
+    serializers.ModelSerializer, GeoLocationSerializerMixin
+):
     """Service list serializer"""
 
     distance = serializers.SerializerMethodField()
@@ -133,7 +135,8 @@ class ServiceListSerializer(serializers.ModelSerializer, GeoLocationSerializerMi
     def get_category_detail(self, obj):
         """Method to get category"""
         return CarServiceCategorySerializer(
-            obj.category, context={"request": self.context.get("request")}
+            obj.category,
+            context={"request": self.context.get("request")},
         ).data
 
 
@@ -147,7 +150,9 @@ class ServiceStationsCategoriesSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "image")
 
 
-class ServiceDetailSerializer(serializers.ModelSerializer, GeoLocationSerializerMixin):
+class ServiceDetailSerializer(
+    serializers.ModelSerializer, GeoLocationSerializerMixin
+):
     """Service detail serializer"""
 
     class Meta:

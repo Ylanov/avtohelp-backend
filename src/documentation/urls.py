@@ -6,7 +6,15 @@ from . import views
 app_name = "documentation"
 urlpatterns = [
     # docs
-    path("", views.RoadHelperAPIDocumentation.as_view(), name="documentation-view"),
+    path(
+        "",
+        views.RoadHelperAPIDocumentation.as_view(),
+        name="documentation-view",
+    ),
     # schemas
-    path("schema/", views.RoadHelperAPISchema.as_view(), name="doc-schema"),
+    path(
+        "schema/",
+        views.RoadHelperAPISchema.as_view(),
+        name="doc-schema",
+    ),
 ]

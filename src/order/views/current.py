@@ -1,3 +1,5 @@
+# type: ignore
+
 from rest_framework import (
     generics,
     status,
@@ -81,13 +83,18 @@ class AssistanceRequestCountView(views.APIView):
             )
 
             return Response(
-                {"count": count_request, "unread": count_request - read_request}
+                {
+                    "count": count_request,
+                    "unread": count_request - read_request,
+                }
             )
         else:
             return Response({"count": 0, "unread": 0})
 
 
-class AssistanceRequestCreateView(AssistanceRequestBaseMixin, generics.CreateAPIView):
+class AssistanceRequestCreateView(
+    AssistanceRequestBaseMixin, generics.CreateAPIView
+):
     """
     Create user assistance request
     REQUEST:
@@ -125,7 +132,9 @@ class AssistanceRequestCreateView(AssistanceRequestBaseMixin, generics.CreateAPI
         return super().get_queryset()
 
 
-class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveAPIView):
+class AssistanceRequestDetailView(
+    AssistanceRequestBaseMixin, generics.RetrieveAPIView
+):
     """
     Get detail information of assistance request
     """
@@ -135,7 +144,9 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
     def get_queryset(self):
         """Override get_queryset method"""
         try:
-            request = models.AssistanceRequest.objects.get(pk=self.kwargs["pk"])
+            request = models.AssistanceRequest.objects.get(
+                pk=self.kwargs["pk"]
+            )
             # listing = RealEstateListing.objects.get(slug_url=slug)
         except models.AssistanceRequest.DoesNotExist:
             request = None
@@ -162,7 +173,9 @@ class AssistanceRequestDetailView(AssistanceRequestBaseMixin, generics.RetrieveA
         )
 
 
-class AssistanceRequestUpdateView(AssistanceRequestBaseMixin, generics.UpdateAPIView):
+class AssistanceRequestUpdateView(
+    AssistanceRequestBaseMixin, generics.UpdateAPIView
+):
     """
     Get detail information of assistance request
     """

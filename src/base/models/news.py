@@ -23,7 +23,11 @@ class Newsletter(BaseMixin):
 
     THUMBNAIL_KEY = "news_small"
     title = models.CharField(
-        max_length=255, blank=True, default=None, null=True, verbose_name=_("Title")
+        max_length=255,
+        blank=True,
+        default=None,
+        null=True,
+        verbose_name=_("Title"),
     )
     text = models.TextField(blank=True, default="", verbose_name=_("Text"))
     short_description = models.CharField(
@@ -34,7 +38,9 @@ class Newsletter(BaseMixin):
         verbose_name=_("Short description"),
     )
     publish = models.BooleanField(default=False, verbose_name=_("Publish"))
-    push = models.BooleanField(default=False, verbose_name=_("Push notification"))
+    push = models.BooleanField(
+        default=False, verbose_name=_("Push notification")
+    )
     as_admin = models.BooleanField(
         default=False, verbose_name=_("Publish as administrator")
     )
@@ -42,7 +48,8 @@ class Newsletter(BaseMixin):
         default=False, verbose_name=_("Recommendation")
     )
     publish_date = models.DateTimeField(
-        help_text=_("Uses instead created if set"), verbose_name=_("Publish date")
+        help_text=_("Uses instead created if set"),
+        verbose_name=_("Publish date"),
     )
     author = models.ForeignKey(
         "account.User",
@@ -61,7 +68,9 @@ class Newsletter(BaseMixin):
         default=None,
         verbose_name=_("Image"),
     )
-    cropping = ImageRatioField("image", "600x600", free_crop=True, size_warning=True)
+    cropping = ImageRatioField(
+        "image", "600x600", free_crop=True, size_warning=True
+    )
 
     class Meta:
         """Meta class."""
@@ -76,7 +85,7 @@ class Newsletter(BaseMixin):
         """Sent PUSH-notification to all active users"""
 
         logger.info(
-            f"INFO: Send push notification for all active users. News id: {self.id}"
+            f"INFO: Send push notification for all active users. News id: {self.id}"  # noqa
         )
         if settings.USE_CELERY:
             tasks.notify_new_newsletter.delay(self.id)
@@ -114,7 +123,7 @@ class NewsletterLike(BaseMixin):
         """Sent PUSH-notification to all active users"""
 
         logger.info(
-            f"INFO: Send push notification for author newsletter. NewsletterLike id: {self.id}"
+            f"INFO: Send push notification for author newsletter. NewsletterLike id: {self.id}"  # noqa
         )
         if settings.USE_CELERY:
             tasks.notify_new_newsletter_like.delay(self.id)
@@ -126,7 +135,10 @@ class NewsletterComment(BaseMixin):
     """Comments for Newsletter"""
 
     newsletter = models.ForeignKey(
-        "Newsletter", related_name="comments", on_delete=models.CASCADE, db_index=True
+        "Newsletter",
+        related_name="comments",
+        on_delete=models.CASCADE,
+        db_index=True,
     )
     author = models.ForeignKey("account.User", on_delete=models.PROTECT)
     text = models.CharField(
@@ -150,7 +162,7 @@ class NewsletterComment(BaseMixin):
         """Sent PUSH-notification to all active users"""
 
         logger.info(
-            f"INFO: Send push notification for author newsletter for comment. NewsletterComment id: {self.id}"
+            f"INFO: Send push notification for author newsletter for comment. NewsletterComment id: {self.id}"  # noqa
         )
         if settings.USE_CELERY:
             tasks.notify_new_newsletter_comment.delay(self.id)

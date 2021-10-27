@@ -13,7 +13,9 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="newsletter",
             name="push",
-            field=models.BooleanField(default=False, verbose_name="Push notification"),
+            field=models.BooleanField(
+                default=False, verbose_name="Push notification"
+            ),
         ),
         migrations.AlterField(
             model_name="pushnotification",

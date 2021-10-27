@@ -55,7 +55,8 @@ class FriendListDestroyView(generics.DestroyAPIView):
         """Override get_object method"""
         return get_object_or_404(
             FriendList.objects.by_profiles(
-                self.request.user.profile, self.kwargs.get("profile_id")
+                self.request.user.profile,
+                self.kwargs.get("profile_id"),
             )
         )
 

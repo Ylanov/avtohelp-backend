@@ -33,9 +33,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("name", models.CharField(max_length=255, verbose_name="Name")),
+                (
+                    "name",
+                    models.CharField(max_length=255, verbose_name="Name"),
+                ),
             ],
             options={
                 "verbose_name": "City",

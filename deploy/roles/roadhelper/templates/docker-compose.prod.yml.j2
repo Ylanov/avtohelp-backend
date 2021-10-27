@@ -1,0 +1,32 @@
+version: '3'
+services:
+  base: &app-base
+    image: {{ DOCKER_IMAGE_NAME }}:{{ VERSION }}
+    networks:
+      - service-network
+    environment:
+    {% for item_k in roadhelpbackend_settings %}{% for k, v in item_k.items() %}
+    - {{ k }}={{ v }}
+    {% endfor %}{% endfor %}
+
+  api:
+    <<: *app-base
+    command:
+      [
+          "/bin/bash",
+          "-c",
+          "make start && make run-gunicorn",
+      ]
+    ports:
+      - "8000:8000"
+  celery:
+    <<: *app-base
+    command:
+      [
+          "/bin/bash",
+          "-c",
+          "make celery",
+      ]
+
+networks:
+  service-network:
