@@ -36,8 +36,12 @@ class TestCatalog(APITestCase):
 
     def setUp(self):
         # Create Service Category
-        self.service_cat_1 = CarServiceCategory.objects.create(name="Category 1")
-        self.service_cat_2 = CarServiceCategory.objects.create(name="Category 2")
+        self.service_cat_1 = CarServiceCategory.objects.create(
+            name="Category 1"
+        )
+        self.service_cat_2 = CarServiceCategory.objects.create(
+            name="Category 2"
+        )
 
         # Create service
         self.service_1 = CarService.objects.create(
@@ -72,23 +76,41 @@ class TestCatalog(APITestCase):
         self.car_brands = CarMark.objects.count()
 
         # Create car models
-        self.toyota_model = CarModel.objects.create(name="Supra", mark=self.toyota)
-        self.toyota_model_2 = CarModel.objects.create(name="Carina", mark=self.toyota)
-        self.nissan_model = CarModel.objects.create(name="350Z", mark=self.nissan)
+        self.toyota_model = CarModel.objects.create(
+            name="Supra", mark=self.toyota
+        )
+        self.toyota_model_2 = CarModel.objects.create(
+            name="Carina", mark=self.toyota
+        )
+        self.nissan_model = CarModel.objects.create(
+            name="350Z", mark=self.nissan
+        )
         self.vaz_model = CarModel.objects.create(name="2101", mark=self.vaz)
         self.car_models = CarModel.objects.count()
 
         # Create car colors
-        self.color_1 = CarColor.objects.create(name="White", hex_color="#FFFFFF")
-        self.color_2 = CarColor.objects.create(name="Black", hex_color="#000000")
+        self.color_1 = CarColor.objects.create(
+            name="White", hex_color="#FFFFFF"
+        )
+        self.color_2 = CarColor.objects.create(
+            name="Black", hex_color="#000000"
+        )
         self.color_3 = CarColor.objects.create(name="Green")
         self.cars_colors = CarColor.objects.count()
 
         # Create user cars
-        self.car_1 = Car.objects.create(mark=self.toyota, car_model=self.toyota_model)
-        self.car_2 = Car.objects.create(mark=self.toyota, car_model=self.toyota_model)
-        self.car_3 = Car.objects.create(mark=self.nissan, car_model=self.nissan_model)
-        self.car_4 = Car.objects.create(mark=self.vaz, car_model=self.vaz_model)
+        self.car_1 = Car.objects.create(
+            mark=self.toyota, car_model=self.toyota_model
+        )
+        self.car_2 = Car.objects.create(
+            mark=self.toyota, car_model=self.toyota_model
+        )
+        self.car_3 = Car.objects.create(
+            mark=self.nissan, car_model=self.nissan_model
+        )
+        self.car_4 = Car.objects.create(
+            mark=self.vaz, car_model=self.vaz_model
+        )
         self.car_user_1 = ProfileCar.objects.create(
             owner=self.user_1,
             car=self.car_1,
@@ -100,41 +122,61 @@ class TestCatalog(APITestCase):
     # CAR COLORS
     def test_list_car_colors(self):
         """Test view for getting list of users cars colors"""
-        api_path = "%s:car:carcolor-list" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:car:carcolor-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data), CarColor.objects.filter(hex_color__isnull=False).count()
+            len(response.data),
+            CarColor.objects.filter(hex_color__isnull=False).count(),
         )
 
     def test_list_car_colors_w_filter(self):
-        """Test view for getting list of users cars colors w/ filter by color name"""
-        api_path = "%s:car:carcolor-list" % settings.AVAILABLE_VERSIONS.get("current")
+        """
+        Test view for getting list of users cars colors w/ filter by color name
+        """
+        api_path = "%s:car:carcolor-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(
             reverse(api_path), data={"color_name": self.color_2.name}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data), CarColor.objects.filter(name=self.color_2.name).count()
+            len(response.data),
+            CarColor.objects.filter(name=self.color_2.name).count(),
         )
 
     def test_car_color_detail(self):
         """Test view for getting detail of car color"""
-        api_path = "%s:car:carcolor-detail" % settings.AVAILABLE_VERSIONS.get("current")
-        response = self.client.get(reverse(api_path, kwargs={"pk": self.color_1.pk}))
+        api_path = "%s:car:carcolor-detail" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": self.color_1.pk})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # CAR MARKS
     def test_list_car_marks_w_filters(self):
-        """Test view for getting list of users cars marks with filter by model name"""
-        api_path = "%s:car:carmark-list" % settings.AVAILABLE_VERSIONS.get("current")
+        """
+        Test view for getting list of users cars marks
+        with filter by model name
+        """
+        api_path = "%s:car:carmark-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(
-            reverse(api_path), data={"model_name": self.toyota_model.name}
+            reverse(api_path),
+            data={"model_name": self.toyota_model.name},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             len(response.data),
-            CarMark.objects.filter(carmodel__name=self.toyota_model.name).count(),
+            CarMark.objects.filter(
+                carmodel__name=self.toyota_model.name
+            ).count(),
         )
 
         response = self.client.get(
@@ -142,26 +184,35 @@ class TestCatalog(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data), CarMark.objects.filter(name=self.toyota.name).count()
+            len(response.data),
+            CarMark.objects.filter(name=self.toyota.name).count(),
         )
 
     def test_car_mark_detail(self):
         """Test view for getting detail of car mark"""
-        api_path = "%s:car:carmark-detail" % settings.AVAILABLE_VERSIONS.get("current")
-        response = self.client.get(reverse(api_path, kwargs={"pk": self.toyota.pk}))
+        api_path = "%s:car:carmark-detail" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": self.toyota.pk})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # CAR MODELS
     def test_list_car_models(self):
         """Test view for getting list of users cars model"""
-        api_path = "%s:car:carmodel-list" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:car:carmodel-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.car_models)
 
     def test_list_car_models_w_filters(self):
         """Test view for getting list of users cars model with filters"""
-        api_path = "%s:car:carmodel-list" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:car:carmodel-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(
             reverse(api_path), data={"mark_name": self.toyota.name}
         )
@@ -172,7 +223,8 @@ class TestCatalog(APITestCase):
         )
 
         response = self.client.get(
-            reverse(api_path), data={"model_name": self.toyota_model.name}
+            reverse(api_path),
+            data={"model_name": self.toyota_model.name},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -182,7 +234,9 @@ class TestCatalog(APITestCase):
 
     def test_car_model_detail(self):
         """Test view for getting detail of car model"""
-        api_path = "%s:car:carmodel-detail" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:car:carmodel-detail" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(
             reverse(api_path, kwargs={"pk": self.toyota_model.pk})
         )
@@ -212,11 +266,13 @@ class TestCatalog(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
-            len(response.data), Car.objects.filter(mark__name=self.toyota.name).count()
+            len(response.data),
+            Car.objects.filter(mark__name=self.toyota.name).count(),
         )
 
         response = self.client.get(
-            reverse(api_path), data={"model_name": self.toyota_model.name}
+            reverse(api_path),
+            data={"model_name": self.toyota_model.name},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
@@ -232,7 +288,9 @@ class TestCatalog(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
 
         api_path = "%s:car:car-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": self.car_1.pk}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": self.car_1.pk})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # SERVICES
@@ -265,7 +323,8 @@ class TestCatalog(APITestCase):
     def test_service_list_query_beyond_radius(self):
         """
         Test service list query with query params - from center & position,
-        but radius between user and car service is more than in 'from_center' query parameter
+        but radius between user and car service is more than
+        in 'from_center' query parameter
         """
         query = {
             "from_center": [
@@ -283,19 +342,24 @@ class TestCatalog(APITestCase):
 
         api_path = "%s:car:carservice-list" % self.VERSION
         response = self.client.get(
-            reverse(api_path), data={"category_id": self.service_cat_1.id}
+            reverse(api_path),
+            data={"category_id": self.service_cat_1.id},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             len(response.data),
-            CarService.objects.filter(category_id=self.service_cat_1.id).count(),
+            CarService.objects.filter(
+                category_id=self.service_cat_1.id
+            ).count(),
         )
 
     def test_service_detail(self):
         """Test services detail view"""
 
         api_path = "%s:car:carservice-detail" % self.VERSION
-        response = self.client.get(reverse(api_path, kwargs={"pk": self.service_2.pk}))
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": self.service_2.pk})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     # SERVICE CATEGORIES

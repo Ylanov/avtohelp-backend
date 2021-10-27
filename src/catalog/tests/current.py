@@ -31,13 +31,19 @@ class TestCatalog(APITestCase):
 
     def test_list_cities(self):
         """Test view for getting list of cities"""
-        api_path = "%s:catalog:city-list" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:catalog:city-list" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.get(reverse(api_path))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.cities_count)
 
     def test_city_detail(self):
         """Test view for getting detail of city"""
-        api_path = "%s:catalog:city-detail" % settings.AVAILABLE_VERSIONS.get("current")
-        response = self.client.get(reverse(api_path, kwargs={"pk": self.city_1.id}))
+        api_path = "%s:catalog:city-detail" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
+        response = self.client.get(
+            reverse(api_path, kwargs={"pk": self.city_1.id})
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)

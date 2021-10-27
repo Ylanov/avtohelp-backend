@@ -35,7 +35,8 @@ def generate_sms_code(length=settings.SMS_CODE_LENGTH):
 def get_exception_body(exception):
     if hasattr(exception, "extended_status_code"):
         return dict(
-            detail=exception.default_detail, status_code=exception.extended_status_code
+            detail=exception.default_detail,
+            status_code=exception.extended_status_code,
         )
     return dict(detail=exception.default_detail)
 
@@ -70,7 +71,9 @@ def by_user_and_room_id(user, room_id):
 @database_sync_to_async
 def chat_update_logged_users(user_id, room_id):
     """Store logged users in cache"""
-    logged_users = caches["default"].get_or_set(f"room_{room_id}", set(), timeout=None)
+    logged_users = caches["default"].get_or_set(
+        f"room_{room_id}", set(), timeout=None
+    )
     logged_users.add(user_id)
     caches["default"].set(f"room_{room_id}", logged_users)
 

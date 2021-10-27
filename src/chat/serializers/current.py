@@ -22,7 +22,13 @@ class ChatRoomParticipantsSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = User
-        fields = ("id", "first_name", "last_name", "avatar", "is_verified")
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "avatar",
+            "is_verified",
+        )
 
 
 class ChatMessageListSerializer(serializers.ModelSerializer):
@@ -35,7 +41,15 @@ class ChatMessageListSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.ChatMessage
-        fields = ("id", "created", "modified", "sender", "room_id", "message", "read")
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "sender",
+            "room_id",
+            "message",
+            "read",
+        )
 
 
 class ChatReadMessageSerializer(serializers.ModelSerializer):
@@ -76,7 +90,8 @@ class ChatReadMessageSerializer(serializers.ModelSerializer):
                 self.Meta.model.objects.bulk_create(
                     [
                         self.Meta.model(
-                            user=self.context.get("request").user, message=message
+                            user=self.context.get("request").user,
+                            message=message,
                         )
                     ]
                 )
@@ -92,7 +107,14 @@ class ChatRoomDetailSerializer(serializers.ModelSerializer):
         """Meta class"""
 
         model = models.ChatRoom
-        fields = ("id", "created", "modified", "participants", "name", "image")
+        fields = (
+            "id",
+            "created",
+            "modified",
+            "participants",
+            "name",
+            "image",
+        )
 
 
 class LastChatMessageSerializer(serializers.ModelSerializer):
@@ -163,7 +185,9 @@ class PrivateChatRoomCreateSerializer(serializers.ModelSerializer):
             attrs["initiator"], attrs["participant"]
         )
         if are_foes:
-            raise api_exceptions.AreFoesError(attrs["initiator"], attrs["participant"])
+            raise api_exceptions.AreFoesError(
+                attrs["initiator"], attrs["participant"]
+            )
 
         return attrs
 

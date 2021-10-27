@@ -25,8 +25,12 @@ class GeoPositonMixin(serializers.Serializer):
     For profile models
     """
 
-    geo_lat = serializers.SerializerMethodField(read_only=True, allow_null=True)
-    geo_lon = serializers.SerializerMethodField(read_only=True, allow_null=True)
+    geo_lat = serializers.SerializerMethodField(
+        read_only=True, allow_null=True
+    )
+    geo_lon = serializers.SerializerMethodField(
+        read_only=True, allow_null=True
+    )
 
     def get_geo_lat(self, obj):
         """Point(longitude, latitude)"""

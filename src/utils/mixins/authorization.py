@@ -15,7 +15,9 @@ class AuthorizationMixin(object):
         qs = User.objects.filter(phone=value.as_e164)
         if not qs.exists():
             raise ValidationError(
-                detail={"detail": _("User with this phone number is not found")}
+                detail={
+                    "detail": _("User with this phone number is not found")
+                }
             )
         return value
 

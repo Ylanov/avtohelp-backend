@@ -1,5 +1,10 @@
 # Introduction 
 
+[![pipeline status](https://gitlab.com/Agencypro/roadhelpbackend/badges/dev/pipeline.svg)](https://gitlab.com/Agencypro/roadhelpbackend/-/commits/master)
+
+[![coverage report](https://gitlab.com/Agencypro/roadhelpbackend/badges/master/coverage.svg)](https://gitlab.com/Agencypro/roadhelpbackend/-/commits/master)
+
+
 This is backend application of the roadhelpbackend. 
 
 # Development

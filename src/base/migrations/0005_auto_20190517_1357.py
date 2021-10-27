@@ -33,14 +33,19 @@ class Migration(migrations.Migration):
             model_name="pushnotificationconfiguration",
             name="geo_position_lifetime",
             field=models.TimeField(
-                blank=True, help_text="Profile geo-position lifetime", null=True
+                blank=True,
+                help_text="Profile geo-position lifetime",
+                null=True,
             ),
         ),
         migrations.AlterField(
             model_name="pushnotificationconfiguration",
             name="radius",
             field=models.FloatField(
-                blank=True, default=5000, help_text="Radius in meters", null=True
+                blank=True,
+                default=5000,
+                help_text="Radius in meters",
+                null=True,
             ),
         ),
         migrations.AddField(

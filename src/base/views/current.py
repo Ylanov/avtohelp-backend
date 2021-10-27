@@ -30,7 +30,9 @@ class NewsViewSet(viewsets.ModelViewSet):
     pagination_class = NewsCursorPagination
 
 
-class NotificationViewSet(view_mixins.NotificationViewMixin, viewsets.ModelViewSet):
+class NotificationViewSet(
+    view_mixins.NotificationViewMixin, viewsets.ModelViewSet
+):
     """
     ViewSet for model Notification
     """
@@ -120,45 +122,3 @@ class NewsCommentUpdateView(generics.UpdateAPIView):
 class NewsCommentDeleteView(generics.DestroyAPIView):
     queryset = models.NewsletterComment.objects.all()
     serializer_class = serializers.NewsletterCommentDeleteSerializer
-
-
-# class NewsListView(generics.ListAPIView):
-#     """
-#     News list view
-#     """
-#
-#     permission_classes = (AllowAny,)
-#     model = models.Newsletter
-#     queryset = models.Newsletter.objects.all()
-#     serializer_class = serializers.NewsListSerializer
-#
-#
-# class NewsDetailView(generics.RetrieveAPIView):
-#     """
-#     News detail view
-#     """
-#
-#     permission_classes = (AllowAny,)
-#     model = models.Newsletter
-#     queryset = models.Newsletter.objects.all()
-#     serializer_class = serializers.NewsDetailSerializer
-#
-#
-# class NotificationListView(view_mixins.NotificationViewMixin, generics.ListAPIView):
-#     """
-#     Push-notification list view
-#     """
-#
-#     serializer_class = serializers.NotificationListSerializer
-#
-#     def get_queryset(self):
-#         """Override get_queryset method"""
-#         return self.queryset.filter(user=self.request.user)
-#
-#
-# class NotificationDetailView(view_mixins.NotificationViewMixin, generics.RetrieveAPIView):
-#     """
-#     Push-notification detail view
-#     """
-#
-#     serializer_class = serializers.NotificationDetailSerializer

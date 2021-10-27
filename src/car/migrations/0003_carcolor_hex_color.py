@@ -14,6 +14,8 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="carcolor",
             name="hex_color",
-            field=colorful.fields.RGBColorField(blank=True, default=None, null=True),
+            field=colorful.fields.RGBColorField(
+                blank=True, default=None, null=True
+            ),
         ),
     ]

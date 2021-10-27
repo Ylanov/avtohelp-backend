@@ -1,5 +1,4 @@
-# todo: delete after testing
-from os import environ
+# type: ignore
 
 from django.conf import settings
 from django.utils import timezone
@@ -48,7 +47,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
             if qs.by_date().exists() and qs.count() < 3:
                 raise api_exceptions.TooOftenTriedError(
                     detail={
-                        "detail": api_exceptions.TooOftenTriedError.default_detail,
+                        "detail": api_exceptions.TooOftenTriedError.default_detail,  # noqa
                         "remaining_time": qs.first().remain_before_resend,
                     }
                 )
@@ -70,7 +69,7 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         # todo: remove from prod, this was added temporarily
         if (
             settings.TEST_SMS_CODE
-            or validated_data.get("phone") == settings.APPROVE_ACCOUNT
+            or validated_data.get("phone") == settings.APPROVE_ACCOUNT  # noqa
         ):
             obj = models.SMSCode.objects.make(
                 user=user, code=12345, status=1, **validated_data
@@ -91,7 +90,9 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         configuration = os.environ.get("SETTINGS_CONFIGURATION")
         if (configuration == "local") or (configuration == "development"):
             return {"code": instance.code}
-        return super(PhoneVerificationSerializer, self).to_representation(instance)
+        return super(PhoneVerificationSerializer, self).to_representation(
+            instance
+        )
 
 
 class ProfileMinSerializer(serializers.ModelSerializer):
@@ -162,7 +163,9 @@ class AuthorizationView(serializers.ModelSerializer):
                     )
                 else:
                     if settings.USE_CELERY:
-                        tasks.not_completed_authorization.delay(user_id=user.id)
+                        tasks.not_completed_authorization.delay(
+                            user_id=user.id
+                        )
                     else:
                         tasks.not_completed_authorization(user_id=user.id)
                     raise api_exceptions.TemporaryLockError(
@@ -171,9 +174,13 @@ class AuthorizationView(serializers.ModelSerializer):
             # regular behavior
             else:
                 user_lock.increment_attempts()
+                status_code = (
+                    api_exceptions.CodeIsNotAcceptedError.extended_status_code
+                )  # noqa
                 raise api_exceptions.CodeIsNotAcceptedError(
-                    remaining_attempts=settings.SMS_INPUT_ATTEMPTS - user_lock.attempts,
-                    status_code=api_exceptions.CodeIsNotAcceptedError.extended_status_code,
+                    remaining_attempts=settings.SMS_INPUT_ATTEMPTS
+                    - user_lock.attempts,
+                    status_code=status_code,
                 )
 
     def create(self, validated_data):

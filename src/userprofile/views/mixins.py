@@ -1,3 +1,5 @@
+# type: ignore
+
 from rest_framework import generics
 
 from ..models import (
@@ -18,7 +20,9 @@ class ProfileMixin:
 class ProfileBlackListMixin:
     """ProfileBlackLists mixin"""
 
-    queryset = BlackList.objects.select_related("owner__profile", "foe__profile")
+    queryset = BlackList.objects.select_related(
+        "owner__profile", "foe__profile"
+    )
 
 
 class ProfileCarMixin:

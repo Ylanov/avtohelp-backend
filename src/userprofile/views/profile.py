@@ -31,7 +31,12 @@ class ProfileListView(ProfileMixin, generics.ListAPIView):
         param friend: Search profile by friend status
         type friend: Boolean False
 
-        param search: Search profile by fields - first name, last name, middle name, license plate
+        param search:
+            Search profile by fields
+            - first name
+            - last name
+            - middle name
+            - license plate
         type search: CharField aa000aa 123
     """
 
@@ -82,7 +87,9 @@ class MyProfileDetailView(ProfileMixin, generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         """Override get object method"""
-        return get_object_or_404(self.queryset, pk=self.request.user.profile.pk)
+        return get_object_or_404(
+            self.queryset, pk=self.request.user.profile.pk
+        )
 
 
 class ProfileChangeAvatarView(ProfileMixin, generics.UpdateAPIView):
@@ -109,7 +116,9 @@ class ProfileChangeAvatarView(ProfileMixin, generics.UpdateAPIView):
 
     def get_object(self):
         """Override get object method"""
-        return get_object_or_404(self.queryset, pk=self.request.user.profile.pk)
+        return get_object_or_404(
+            self.queryset, pk=self.request.user.profile.pk
+        )
 
 
 class ProfileDetailView(ProfileMixin, generics.RetrieveAPIView):

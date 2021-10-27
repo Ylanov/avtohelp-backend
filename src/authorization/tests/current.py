@@ -54,11 +54,14 @@ class TestCatalog(TestCase):
         self.client.post(reverse(api_path), data=data)
         response = self.client.post(reverse(api_path), data=data)
         self.assertEqual(
-            response.status_code, custom_statuses.HTTP_420_ENHACE_YOUR_CALM
+            response.status_code,
+            custom_statuses.HTTP_420_ENHACE_YOUR_CALM,
         )
 
     def test_verification_cooldown_delay(self):
-        """Test for verification cooldown when requests sends after some delay"""
+        """
+        Test for verification cooldown when requests sends after some delay
+        """
         data = {"phone": self.phone}
 
         api_path = "%s:authorization:verify" % settings.AVAILABLE_VERSIONS.get(
@@ -83,7 +86,9 @@ class TestCatalog(TestCase):
 
         # authorize
         data = {"phone": self.phone, "code": int(sms_code.code)}
-        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.post(reverse(api_path), data=data)
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -104,7 +109,9 @@ class TestCatalog(TestCase):
 
         # authorize
         data = {"phone": self.phone, "code": sms_code.code}
-        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.post(reverse(api_path), data=data)
         sms_code = SMSCode.objects.filter(phone=self.phone).first()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -122,7 +129,9 @@ class TestCatalog(TestCase):
 
         # authorize
         data = {"phone": self.phone, "code": 1234}
-        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.post(reverse(api_path), data=data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
@@ -142,7 +151,9 @@ class TestCatalog(TestCase):
 
         # authorize
         data = {"phone": self.phone, "code": 1234}
-        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         for i in range(settings.SMS_INPUT_ATTEMPTS):
             self.client.post(reverse(api_path), data=data)
         response = self.client.post(reverse(api_path), data=data)
@@ -163,9 +174,12 @@ class TestCatalog(TestCase):
 
         # authorize
         data = {"phone": "+79998887766", "code": int(sms_code.code)}
-        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get("current")
+        api_path = "%s:authorization:auth" % settings.AVAILABLE_VERSIONS.get(
+            "current"
+        )
         response = self.client.post(reverse(api_path), data=data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(
-            response.data.get("detail"), api_exceptions.UserNotFound.default_detail
+            response.data.get("detail"),
+            api_exceptions.UserNotFound.default_detail,
         )

@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
             model_name="profilecar",
             name="license_plate",
             field=models.CharField(
-                blank=True, default="", max_length=255, verbose_name="License plate"
+                blank=True,
+                default="",
+                max_length=255,
+                verbose_name="License plate",
             ),
         ),
     ]

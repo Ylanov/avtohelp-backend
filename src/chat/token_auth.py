@@ -39,12 +39,18 @@ class TokenAuthMiddleware:
                     i.split("=")[0].lstrip(): i.split("=")[1]
                     for i in headers.get("cookie").split(";")
                 }
-                session = Session.objects.get(session_key=cookie.get("sessionid"))
+                session = Session.objects.get(
+                    session_key=cookie.get("sessionid")
+                )
                 session_data = session.get_decoded()
-                scope["user"] = User.objects.get(id=session_data.get("_auth_user_id"))
-        except:
+                scope["user"] = User.objects.get(
+                    id=session_data.get("_auth_user_id")
+                )
+        except (Exception,):
             scope["user"] = AnonymousUser()
         return self.inner(scope)
 
 
-TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(AuthMiddlewareStack(inner))
+TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(  # noqa
+    AuthMiddlewareStack(inner)
+)

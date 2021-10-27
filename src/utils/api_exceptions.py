@@ -25,7 +25,7 @@ def roadhelper_exception_handler(exc, context):
 
     # Change response data on format - {'detail': 'Error message'}
     if response and hasattr(exc, "default_code"):
-        if exc.default_code is "invalid":
+        if exc.default_code != "invalid":
             response.data = {
                 "field": f"{list(response.data.keys())[0]}",
                 "detail": f"{list(response.data.values())[0][0]}",
@@ -67,7 +67,7 @@ class TooOftenTriedError(exceptions.APIException):
     status_code = HTTP_420_ENHACE_YOUR_CALM
     default_detail = (
         _(
-            "Too often tried to request the code, try to request the code after %s seconds."
+            "Too often tried to request the code, try to request the code after %s seconds."  # noqa
         )
         % settings.SMS_SEND_DELAY
     )
@@ -95,7 +95,8 @@ class UserNotFound(exceptions.APIException):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -109,7 +110,8 @@ class UserIsBlocked(exceptions.APIException):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -131,7 +133,8 @@ class CityNotFound(exceptions.APIException):
 
     def __init__(self, city_id):
         self.default_detail = dict(
-            detail=self.default_detail % city_id, status_code=self.extended_status_code
+            detail=self.default_detail % city_id,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -144,7 +147,8 @@ class CodeIsNotAcceptedError(ValidationErrorMixin):
 
     def __init__(self, remaining_attempts, status_code):
         self.default_detail = dict(
-            remaining_attempts=remaining_attempts, status_code=status_code
+            remaining_attempts=remaining_attempts,
+            status_code=status_code,
         )
         super().__init__()
 
@@ -157,7 +161,8 @@ class CarBrandIsNotFound(ValidationErrorMixin):
 
     def __init__(self, brand_id):
         self.default_detail = dict(
-            detail=self.default_detail % brand_id, status_code=self.extended_status_code
+            detail=self.default_detail % brand_id,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -170,7 +175,8 @@ class CarBrandModelIsNotFound(ValidationErrorMixin):
 
     def __init__(self, model_id):
         self.default_detail = dict(
-            detail=self.default_detail % model_id, status_code=self.extended_status_code
+            detail=self.default_detail % model_id,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -183,7 +189,8 @@ class CarColorNotFound(ValidationErrorMixin):
 
     def __init__(self, color_id):
         self.default_detail = dict(
-            detail=self.default_detail % color_id, status_code=self.extended_status_code
+            detail=self.default_detail % color_id,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -219,7 +226,9 @@ class AlreadyBlacked(ValidationErrorMixin):
 class FriendRequestAlreadyExists(ValidationErrorMixin):
     """Friend request already exists"""
 
-    default_detail = _("Friend request from User %s to User %s, already exists")
+    default_detail = _(
+        "Friend request from User %s to User %s, already exists"
+    )
     extended_status_code = "%s.7" % ValidationErrorMixin.status_code
 
     def __init__(self, owner, invited):
@@ -238,7 +247,8 @@ class EqualIDError(ValidationErrorMixin):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -293,7 +303,8 @@ class CarNotFound(ValidationErrorMixin):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -306,7 +317,8 @@ class QueryParamError(ValidationErrorMixin):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -320,7 +332,8 @@ class NewsletterNotFound(exceptions.APIException):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()
 
@@ -334,6 +347,7 @@ class YouAreNotOwner(exceptions.APIException):
 
     def __init__(self):
         self.default_detail = dict(
-            detail=self.default_detail, status_code=self.extended_status_code
+            detail=self.default_detail,
+            status_code=self.extended_status_code,
         )
         super().__init__()

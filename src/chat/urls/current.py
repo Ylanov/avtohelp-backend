@@ -7,7 +7,11 @@ app_name = "chat"
 
 urlpatterns = [
     path("rooms", views.ChatRoomListView.as_view(), name="room-list"),
-    path("rooms/<int:pk>", views.ChatRoomDetailView.as_view(), name="room-detail"),
+    path(
+        "rooms/<int:pk>",
+        views.ChatRoomDetailView.as_view(),
+        name="room-detail",
+    ),
     path(
         "rooms/private/create",
         views.PrivateChatRoomCreateView.as_view(),

@@ -14,7 +14,10 @@ class Migration(migrations.Migration):
             model_name="profile",
             name="is_verified",
             field=models.BooleanField(
-                blank=True, default=False, null=True, verbose_name="Recommendation"
+                blank=True,
+                default=False,
+                null=True,
+                verbose_name="Recommendation",
             ),
         ),
     ]

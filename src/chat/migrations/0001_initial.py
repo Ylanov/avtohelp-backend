@@ -37,7 +37,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 ("message", models.TextField()),
             ],
@@ -67,13 +69,18 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "role",
                     models.PositiveSmallIntegerField(
                         blank=True,
-                        choices=[(0, "Moderator"), (1, "Participant")],
+                        choices=[
+                            (0, "Moderator"),
+                            (1, "Participant"),
+                        ],
                         default=1,
                         null=True,
                         verbose_name="Role",
@@ -106,19 +113,25 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "name",
                     models.CharField(
-                        blank=True, default=None, max_length=24, null=True
+                        blank=True,
+                        default=None,
+                        max_length=24,
+                        null=True,
                     ),
                 ),
                 ("is_public", models.BooleanField(default=False)),
                 (
                     "participants",
                     models.ManyToManyField(
-                        related_name="participants", to=settings.AUTH_USER_MODEL
+                        related_name="participants",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -148,14 +161,16 @@ class Migration(migrations.Migration):
             model_name="chatmessage",
             name="room",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="chat.ChatRoom"
+                on_delete=django.db.models.deletion.CASCADE,
+                to="chat.ChatRoom",
             ),
         ),
         migrations.AddField(
             model_name="chatmessage",
             name="sender",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
     ]

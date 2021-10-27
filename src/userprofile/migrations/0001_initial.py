@@ -43,7 +43,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "foe",
@@ -91,7 +93,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "friend",
@@ -139,9 +143,14 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
-                ("approved", models.BooleanField(default=False, verbose_name="Status")),
+                (
+                    "approved",
+                    models.BooleanField(default=False, verbose_name="Status"),
+                ),
                 (
                     "invited",
                     models.ForeignKey(
@@ -187,7 +196,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "first_name",
@@ -272,22 +283,28 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "license_plate",
-                    models.CharField(max_length=255, verbose_name="License plate"),
+                    models.CharField(
+                        max_length=255, verbose_name="License plate"
+                    ),
                 ),
                 (
                     "car",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT, to="car.Car"
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="car.Car",
                     ),
                 ),
                 (
                     "color",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="car.CarColor"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="car.CarColor",
                     ),
                 ),
                 (
@@ -325,7 +342,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "modified",
-                    models.DateTimeField(auto_now=True, verbose_name="Date updated"),
+                    models.DateTimeField(
+                        auto_now=True, verbose_name="Date updated"
+                    ),
                 ),
                 (
                     "location",

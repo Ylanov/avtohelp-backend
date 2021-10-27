@@ -64,12 +64,18 @@ class Car(BaseMixin):
 class CarService(NameMixin, BaseMixin):
     """Service model"""
 
-    category = models.ForeignKey("CarServiceCategory", on_delete=models.CASCADE)
-    description = models.CharField(max_length=255, verbose_name=_("Description"))
+    category = models.ForeignKey(
+        "CarServiceCategory", on_delete=models.CASCADE
+    )
+    description = models.CharField(
+        max_length=255, verbose_name=_("Description")
+    )
     location = gis_models.PointField(_("Location"))
     phone = PhoneNumberField(
         verbose_name=_("Service contact phone"),
-        error_messages={"unique": _("A service with that phone already exists.")},
+        error_messages={
+            "unique": _("A service with that phone already exists.")
+        },
     )
 
     objects = CarServiceManager.from_queryset(CarServiceQuerySet)()
