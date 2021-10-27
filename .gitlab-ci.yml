@@ -1,4 +1,5 @@
 stages:
+  - build_main
   - build
   - release
   - deploy
@@ -11,6 +12,24 @@ variables:
 
 before_script:
   - export VERSION="$(date '+%Y.%m.%d.%H.%M')"
+
+
+build_main_image:
+  stage: build_main
+  image:
+    name: gcr.io/kaniko-project/executor:${KANIKO_VERSION}
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64 | tr -d '\n')\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/Dockerfile.based
+      --destination ${DOCKER_IMAGE_NAME}:python-3.7.2-based
+      --cache-ttl=1h
+      --cache=true
+      --cache-repo=${DOCKER_IMAGE_NAME}/cache
+  tags:
+    - docker
 
 build_image:
   stage: build
