@@ -23,6 +23,7 @@ build_image:
       --context $CI_PROJECT_DIR
       --dockerfile $CI_PROJECT_DIR/Dockerfile
       --destination ${DOCKER_IMAGE_NAME}:${VERSION}
+      --destination ${DOCKER_IMAGE_NAME}:latest
       --cache-ttl=1h
       --cache=true
       --cache-repo=${DOCKER_IMAGE_NAME}/cache
@@ -86,3 +87,14 @@ flake8:
   extends: .unit_tests
   script:
     - make flake8
+
+deploy-to-prod:
+  stage: deploy
+  script:
+    - make release
+  environment:
+    name: production
+  tags:
+    - shell
+  only:
+    - master

@@ -1,6 +1,6 @@
 - hosts: "{{ variable_host | default('all') }}"
-  become: yes
   serial: 1
-  remote_user: "{{ r_user | default('root') }}"
   roles:
     - roadhelper
+  vars:
+    ansible_connection: local

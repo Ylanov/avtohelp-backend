@@ -2,7 +2,8 @@
 .idea/
 /bin/
 /migrations/
-/scripts/
+
+deploy/
 
 __pycache__/
 *.py[cod]
