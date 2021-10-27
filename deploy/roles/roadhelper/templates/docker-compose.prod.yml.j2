@@ -2,8 +2,7 @@ version: '3'
 services:
   base: &app-base
     image: {{ DOCKER_IMAGE_NAME }}:{{ VERSION }}
-    networks:
-      - service-network
+    network_mode: host
     environment:
     {% for item_k in roadhelpbackend_settings %}{% for k, v in item_k.items() %}
     - {{ k }}={{ v }}
@@ -27,6 +26,3 @@ services:
           "-c",
           "make celery",
       ]
-
-networks:
-  service-network:
