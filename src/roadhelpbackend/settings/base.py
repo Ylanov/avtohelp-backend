@@ -115,7 +115,7 @@ DATABASES = {
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
-        "PORT": 5432,
+        "PORT": env("DB_PORT"),
     }
 }
 
@@ -159,15 +159,6 @@ MEDIA_URL = "/media/"
 STATIC_ROOT = PROJECT_ROOT / "static"
 
 DEBUG = True
-
-# Celery settings
-USE_CELERY = env("USE_CELERY")
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = env("CELERY_BROKER_URL")
-CELERY_TIMEZONE = env("TIME_ZONE")
-CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -294,11 +285,12 @@ sentry_sdk.init(
     integrations=[DjangoIntegration(), CeleryIntegration()],
 )
 
+REDIS_DSN = f"redis://:@{env('REDIS_URL')}:{env('REDIS_PORT')}"
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{env('REDIS_URL')}:{env('REDIS_PORT')}",
+        "LOCATION": f"{REDIS_DSN}/{env('REDIS_DB')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -310,7 +302,19 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(env("REDIS_URL"), env("REDIS_PORT"))],
+            "hosts": [
+                REDIS_DSN,
+            ],
         },
     },
 }
+
+# Celery settings
+CELERY_BROKER_URL = f"{REDIS_DSN}/{env('REDIS_DB')}"
+CELERY_RESULT_BACKEND = f"{REDIS_DSN}/{env('REDIS_DB')}"
+
+USE_CELERY = env("USE_CELERY")
+CELERY_TIMEZONE = env("TIME_ZONE")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
