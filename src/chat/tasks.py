@@ -2,7 +2,11 @@ import logging
 
 from account import models as account_models
 from base.models import PushNotification
-from chat.models import ChatMessage, ChatReadMessage, ChatRoom
+from chat.models import (
+    ChatMessage,
+    ChatReadMessage,
+    ChatRoom,
+)
 from roadhelpbackend.celery import app
 from userprofile.models import FCMDevice
 
@@ -13,17 +17,13 @@ logger = logging.getLogger("CELERY")
 def read_messages(reader_id, room_id):
     """Set read flag is true by user"""
     qs = (
-        ChatMessage.objects.exclude(
-            chatreadmessage__user_id=reader_id
-        )
+        ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
         .exclude(sender_id=reader_id)
         .filter(room_id=room_id)
     )
     if qs.exists():
         for message in qs:
-            ChatReadMessage.objects.read(
-                user_id=reader_id, message=message
-            )
+            ChatReadMessage.objects.read(user_id=reader_id, message=message)
 
 
 @app.task
@@ -31,17 +31,13 @@ def read_message(message_list, reader_id):
     """Set read flag is true by user"""
 
     qs = (
-        ChatMessage.objects.exclude(
-            chatreadmessage__user_id=reader_id
-        )
+        ChatMessage.objects.exclude(chatreadmessage__user_id=reader_id)
         .exclude(sender_id=reader_id)
         .filter(id__in=message_list)
     )
     if qs.exists():
         for message in qs:
-            ChatReadMessage.objects.read(
-                user_id=reader_id, message=message
-            )
+            ChatReadMessage.objects.read(user_id=reader_id, message=message)
 
 
 @app.task
@@ -64,10 +60,8 @@ def notify_chat_participants(sender_id, room_id, participants):
         )
 
         # Check if user is online
-        notification = (
-            PushNotification.objects.make_new_message_notification(
-                user=user_id, sender=sender
-            )
+        notification = PushNotification.objects.make_new_message_notification(
+            user=user_id, sender=sender
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
         if devices.exists():

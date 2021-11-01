@@ -8,7 +8,6 @@ from image_cropping import (
     ImageRatioField,
 )
 
-from roadhelpbackend import celery as tasks
 from utils.mixins import (
     BaseMixin,
     image_path,
@@ -87,10 +86,11 @@ class Newsletter(BaseMixin):
         logger.info(
             f"INFO: Send push notification for all active users. News id: {self.id}"  # noqa
         )
+        from ..tasks import notify_new_newsletter
         if settings.USE_CELERY:
-            tasks.notify_new_newsletter.delay(self.id)
+            notify_new_newsletter.delay(self.id)
         else:
-            tasks.notify_new_newsletter(self.id)
+            notify_new_newsletter(self.id)
 
     def get_image(self, key=None):
         """Get thumbnailed image file."""
@@ -125,10 +125,11 @@ class NewsletterLike(BaseMixin):
         logger.info(
             f"INFO: Send push notification for author newsletter. NewsletterLike id: {self.id}"  # noqa
         )
+        from ..tasks import notify_new_newsletter_like
         if settings.USE_CELERY:
-            tasks.notify_new_newsletter_like.delay(self.id)
+            notify_new_newsletter_like.delay(self.id)
         else:
-            tasks.notify_new_newsletter_like(self.id)
+            notify_new_newsletter_like(self.id)
 
 
 class NewsletterComment(BaseMixin):
@@ -164,10 +165,12 @@ class NewsletterComment(BaseMixin):
         logger.info(
             f"INFO: Send push notification for author newsletter for comment. NewsletterComment id: {self.id}"  # noqa
         )
+
+        from ..tasks import notify_new_newsletter_comment
         if settings.USE_CELERY:
-            tasks.notify_new_newsletter_comment.delay(self.id)
+            notify_new_newsletter_comment.delay(self.id)
         else:
-            tasks.notify_new_newsletter_comment(self.id)
+            notify_new_newsletter_comment(self.id)
 
 
 class NewsletterCommentLike(BaseMixin):
