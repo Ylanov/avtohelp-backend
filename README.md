@@ -69,9 +69,9 @@ For prepare dev-env
 docker-compose -f docker-compose.local-db.yml up -d
 ```
 
-## Admin url
-```
-Django-admin url http://127.0.0.1:8000/admin/
+-> http://127.0.0.1:8000/admin/
+* login - +79000000000
+* password - password
 
 * login - +79000000000
 * password - password
