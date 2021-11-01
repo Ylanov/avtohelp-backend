@@ -28,12 +28,17 @@ before start
 mac-os
 ```
 brew install gdal
+brew install docker-compose
 ```
+
+Install docker for mac os -> [link](https://docs.docker.com/desktop/mac/install/) 
 
 linux
 
 ```
 sudo apt-get install gdal-bin
+sudo apt-get install docker-compose docker
+
 ```
 
 For both platforms
@@ -53,6 +58,17 @@ For remove some dependency
 poetry remove <dependency-name>
 ```
 
+🏃‍For running django-app / django-api
+```
+make runserver (dev-server) (for unix-like OS)
+make run-gunicorn (throw gunicorn)
+```
+
+For prepare dev-env
+```
+docker-compose -f docker-compose.local-db.yml up -d
+```
+
 ## Admin url
 ```
 Django-admin url http://127.0.0.1:8000/admin/
@@ -60,6 +76,9 @@ Django-admin url http://127.0.0.1:8000/admin/
 * login - +79000000000
 * password - password
 ```
+
+[Swagger-Docs](127.0.0.1:8000/swagger/)
+
 ## Environment
 
 Requirements:
@@ -72,11 +91,11 @@ Requirements:
 ## Base settings
 | Env-name      | Type | Default value|
 | ----------- | ----------- | ----------- |
-| DEBUG      | Title       |       |
-| REDIS_URL   | Text        |       |
-| REDIS_PORT   | Text        |       |
-| REDIS_DB   | Text        |       |
-| DB_HOST   | Text        |       |
+| DEBUG      | Title       |   True    |
+| REDIS_URL   | Text        |  localhost     |
+| REDIS_PORT   | Text        |  6379     |
+| REDIS_DB   | Text        |   0    |
+| DB_HOST   | Text        |   postgres (docker) or localhost    |
 | DB_NAME   | Text        |       |
 | DB_PORT   | Text        |       |
 | DB_USER   | Text        |       |
