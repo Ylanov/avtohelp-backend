@@ -21,11 +21,6 @@ LOGGING = {
             "level": "ERROR",
             "propagate": True,
         },
-        "django.db.backends": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
         "ORDER": {
             "handlers": ["console"],
             "level": "DEBUG",
@@ -35,12 +30,12 @@ LOGGING = {
             "level": "DEBUG",
         },
         "app": {
-            "handlers": ["file"],
+            "handlers": ["console"],
             "level": "DEBUG",
             "propagate": True,
         },
         "ACCOUNT": {
-            "handlers": ["file"],
+            "handlers": ["console"],
             "level": "DEBUG",
             "propagate": True,
         },
