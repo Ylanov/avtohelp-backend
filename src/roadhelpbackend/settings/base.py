@@ -30,50 +30,6 @@ ALLOWED_HOSTS = [
     "roadhelper.spider.ru",
 ]
 
-CONTRIB_APPS = [
-    "bootstrap_admin",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-    "django.contrib.gis",
-]
-
-PROJECT_APPS = [
-    "authorization.apps.AuthorizationConfig",
-    "account.apps.AccountConfig",
-    "utils.apps.UtilsConfig",
-    "versioning.apps.VersioningConfig",
-    "userprofile.apps.UserprofileConfig",
-    "catalog.apps.CatalogConfig",
-    "base.apps.BaseConfig",
-    "order.apps.OrderConfig",
-    "car.apps.CarConfig",
-    "chat.apps.ChatConfig",
-]
-
-EXTERNAL_APPS = [
-    "rest_framework",
-    "rest_framework_gis",
-    "rest_framework.authtoken",
-    "rest_framework_swagger",
-    "channels",
-    "solo",
-    "django_filters",
-    "phonenumber_field",
-    "easy_thumbnails",
-    "image_cropping",
-    "fcm_django",
-    "easy_select2",
-    "inline_actions",
-    "django_object_actions",
-    "multiselectfield",
-    "colorful",
-]
-
-INSTALLED_APPS = CONTRIB_APPS + EXTERNAL_APPS + PROJECT_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -115,7 +71,7 @@ DATABASES = {
         "USER": env("DB_USER"),
         "PASSWORD": env("DB_PASSWORD"),
         "HOST": env("DB_HOST"),
-        "PORT": 5432,
+        "PORT": env("DB_PORT"),
     }
 }
 
@@ -158,16 +114,16 @@ MEDIA_URL = "/media/"
 
 STATIC_ROOT = PROJECT_ROOT / "static"
 
-DEBUG = True
+LANGUAGE_PATHS = [
+    PROJECT_ROOT / "locale",
+]
+LANGUAGES = [
+    ('ru', 'Russian'),
+    ('en', 'English')
+]
 
-# Celery settings
-USE_CELERY = env("USE_CELERY")
-CELERY_BROKER_URL = env("CELERY_BROKER_URL")
-CELERY_RESULT_BACKEND = env("CELERY_BROKER_URL")
-CELERY_TIMEZONE = env("TIME_ZONE")
-CELERY_ACCEPT_CONTENT = ["application/json"]
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
+
+DEBUG = True
 
 # Versioning
 AVAILABLE_VERSIONS = {
@@ -294,11 +250,12 @@ sentry_sdk.init(
     integrations=[DjangoIntegration(), CeleryIntegration()],
 )
 
+REDIS_DSN = f"redis://:@{env('REDIS_URL')}:{env('REDIS_PORT')}"
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"{env('REDIS_URL')}:{env('REDIS_PORT')}",
+        "LOCATION": f"{REDIS_DSN}/{env('REDIS_DB')}",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "IGNORE_EXCEPTIONS": True,
@@ -310,7 +267,19 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [(env("REDIS_URL"), env("REDIS_PORT"))],
+            "hosts": [
+                REDIS_DSN,
+            ],
         },
     },
 }
+
+# Celery settings
+CELERY_BROKER_URL = f"{REDIS_DSN}/{env('REDIS_DB')}"
+CELERY_RESULT_BACKEND = f"{REDIS_DSN}/{env('REDIS_DB')}"
+
+USE_CELERY = env("USE_CELERY")
+CELERY_TIMEZONE = env("TIME_ZONE")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"

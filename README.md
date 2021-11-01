@@ -56,6 +56,8 @@ poetry remove <dependency-name>
 ## Admin url
 
 -> http://127.0.0.1:8000/admin/
+* login - +79000000000
+* password - password
 
 ```
 ## Environment

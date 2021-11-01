@@ -9,7 +9,6 @@ from django.contrib.gis.geos import Point
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from roadhelpbackend import celery as tasks
 from utils.mixins import (
     BaseMixin,
     ImageMixin,
@@ -158,10 +157,11 @@ class FriendRequest(BaseMixin):
 
     def send_push_notification(self):
         """Sent PUSH-notification to invited user"""
+        from ..tasks import notify_friend_request
         if settings.USE_CELERY:
-            tasks.notify_friend_request.delay(self.invited.id)
+            notify_friend_request.delay(self.invited.id)
         else:
-            tasks.notify_friend_request(self.invited.id)
+            notify_friend_request(self.invited.id)
 
 
 class FriendList(BaseMixin):

@@ -8,7 +8,6 @@ from rest_framework.authtoken.models import Token
 
 from account.models import User
 from authorization import models
-from roadhelpbackend import celery as tasks
 from userprofile import models as profile_models
 from utils import api_exceptions
 
@@ -77,10 +76,12 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         else:
             obj = models.SMSCode.objects.make(user=user, **validated_data)
 
+        from ..tasks import send_verification_sms
+
         if settings.USE_CELERY:
-            tasks.send_verification_sms.delay(sms_code_id=obj.id)
+            send_verification_sms.delay(sms_code_id=obj.id)
         else:
-            tasks.send_verification_sms(sms_code_id=obj.id)
+            send_verification_sms(sms_code_id=obj.id)
         return obj
 
     def to_representation(self, instance):
@@ -136,17 +137,22 @@ class AuthorizationView(serializers.ModelSerializer):
             .by_code(attrs.get("code"))
             .sent()
         )
+        from ..tasks import (
+            success_authorization,
+            not_completed_authorization,
+        )
 
         # if code is correct return SMSCode object
         if qs.exists():
             # put SMSCode object instead of code number
             attrs["code"] = qs.first()
+
             if settings.USE_CELERY:
-                tasks.success_authorization.delay(
+                success_authorization.delay(
                     user_id=user.id, sms_code_id=attrs["code"].id
                 )
             else:
-                tasks.success_authorization(
+                success_authorization(
                     user_id=user.id, sms_code_id=attrs["code"].id
                 )
             return attrs
@@ -163,11 +169,11 @@ class AuthorizationView(serializers.ModelSerializer):
                     )
                 else:
                     if settings.USE_CELERY:
-                        tasks.not_completed_authorization.delay(
+                        not_completed_authorization.delay(
                             user_id=user.id
                         )
                     else:
-                        tasks.not_completed_authorization(user_id=user.id)
+                        not_completed_authorization(user_id=user.id)
                     raise api_exceptions.TemporaryLockError(
                         remaining_time=user_lock.remain_before_unlock
                     )
