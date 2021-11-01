@@ -3,7 +3,6 @@ from django.core.cache import caches
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from roadhelpbackend import celery as tasks
 from utils.mixins import (
     BaseMixin,
     ImageMixin,
@@ -109,14 +108,16 @@ class ChatMessage(BaseMixin):
             .union({self.sender.id})
         )
 
+        from .tasks import notify_chat_participants
+
         if settings.USE_CELERY:
-            tasks.notify_chat_participants.delay(
+            notify_chat_participants.delay(
                 sender_id=self.sender.id,
                 room_id=self.room.id,
                 participants=list(offline_users),
             )
         else:
-            tasks.notify_chat_participants(
+            notify_chat_participants(
                 sender_id=self.sender.id,
                 room_id=self.room.id,
                 participants=list(offline_users),

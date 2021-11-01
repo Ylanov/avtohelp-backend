@@ -1,4 +1,4 @@
-start: migrate collectstatic run-gunicorn
+start: migrate collectstatic compilemessages run-gunicorn
 
 code-style: black flake8 isort
 
@@ -32,6 +32,9 @@ collectstatic:
 
 fixtures:
 	cd src/ && python3 manage.py loaddata quize
+
+compilemessages:
+	cd src/ && python3 manage.py compilemessages
 
 makemigrations:
 	cd src/ && python3 manage.py makemigrations
