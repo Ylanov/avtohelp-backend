@@ -10,7 +10,6 @@ from django.db import (
 from django.utils.translation import ugettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
-from roadhelpbackend import celery as tasks
 from utils.mixins import (
     BaseMixin,
     ImageMixin,
@@ -81,13 +80,15 @@ class AssistanceRequest(BaseMixin, ImageMixin):
         verbose_name_plural = _("Assistance requests")
 
     def send_push_notification(self):
+        from .tasks import notify_assistance_request
         if settings.USE_CELERY:
+
             transaction.on_commit(
-                lambda: tasks.notify_assistance_request.delay(self.id)
+                lambda: notify_assistance_request.delay(self.id)
             )
         else:
             transaction.on_commit(
-                lambda: tasks.notify_assistance_request(self.id)
+                lambda: notify_assistance_request(self.id)
             )
 
 
