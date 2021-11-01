@@ -1,6 +1,6 @@
 """Version 1.0.0 url conf."""
 from django.urls import path
-from views import (
+from .views import (
     ChatMessageListView,
     ChatReadMessageView,
     ChatRoomDetailView,
