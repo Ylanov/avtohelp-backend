@@ -158,6 +158,15 @@ MEDIA_URL = "/media/"
 
 STATIC_ROOT = PROJECT_ROOT / "static"
 
+LANGUAGE_PATHS = [
+    PROJECT_ROOT / "locale",
+]
+LANGUAGES = [
+    ('ru', 'Russian'),
+    ('en', 'English')
+]
+
+
 DEBUG = True
 
 # Versioning
