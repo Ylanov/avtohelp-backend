@@ -218,6 +218,151 @@
   </div>
 </div>
 
+{# ----------------------------------------------------- Логи сервисов ---- #}
+<div class="dash-section-title">
+  Логи сервисов
+  <label style="float:right; font-size:11px; color:#6b7280; font-weight:400; text-transform:none; letter-spacing:0;">
+    <input type="checkbox" id="logs-auto" checked style="vertical-align:middle;">
+    авто-обновление каждые 3 сек
+  </label>
+</div>
+
+<div class="dash-logs">
+  <div class="dash-log-tabs" id="log-tabs">
+    {% for key, label in log_services %}
+      <button class="dash-log-tab{% if forloop.first %} active{% endif %}"
+              data-service="{{ key }}">{{ label }}</button>
+    {% endfor %}
+    <div class="dash-log-status" id="log-status">—</div>
+  </div>
+  <pre id="log-output">Загрузка...</pre>
+</div>
+
+<style>
+  .dash-logs {
+    margin-bottom: 24px;
+    background: #0f172a;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .dash-log-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    background: #1e293b;
+    padding: 8px 8px 0;
+    align-items: center;
+  }
+  .dash-log-tab {
+    background: transparent;
+    color: #cbd5e1;
+    border: 0;
+    padding: 8px 14px;
+    border-radius: 6px 6px 0 0;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .dash-log-tab:hover { background: #334155; color: #fff; }
+  .dash-log-tab.active {
+    background: #0f172a;
+    color: #fff;
+    font-weight: 600;
+  }
+  .dash-log-status {
+    margin-left: auto;
+    padding: 4px 10px;
+    font-size: 11px;
+    color: #94a3b8;
+    font-family: ui-monospace, monospace;
+  }
+  #log-output {
+    margin: 0;
+    padding: 14px 18px;
+    color: #e2e8f0;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    max-height: 520px;
+    overflow: auto;
+    background: #0f172a;
+  }
+  /* подсветка строк с ERROR / WARNING */
+  #log-output .lvl-error   { color: #fca5a5; }
+  #log-output .lvl-warn    { color: #fde68a; }
+  #log-output .lvl-info    { color: #93c5fd; }
+  #log-output .lvl-http2xx { color: #86efac; }
+  #log-output .lvl-http5xx { color: #fca5a5; }
+</style>
+
+<script>
+(function () {
+  const tabsEl    = document.getElementById('log-tabs');
+  const outputEl  = document.getElementById('log-output');
+  const statusEl  = document.getElementById('log-status');
+  const autoEl    = document.getElementById('logs-auto');
+  let current     = tabsEl.querySelector('.dash-log-tab.active').dataset.service;
+  let timer       = null;
+
+  const highlight = (line) => {
+    // грубая подсветка по ключевым словам
+    let cls = '';
+    if (/\b(ERROR|CRITICAL|Traceback|Exception)\b/i.test(line)) cls = 'lvl-error';
+    else if (/\bWARN(?:ING)?\b/i.test(line)) cls = 'lvl-warn';
+    else if (/\b(?:HTTP\/1\.1"\s+[45]\d\d|status":\s*[45]\d\d)/.test(line)) cls = 'lvl-http5xx';
+    else if (/\b(?:HTTP\/1\.1"\s+2\d\d|GET|POST|PATCH|DELETE)\b/.test(line)) cls = 'lvl-http2xx';
+    else if (/\bINFO\b/.test(line)) cls = 'lvl-info';
+    const escaped = line
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+    return cls ? `<span class="${cls}">${escaped}</span>` : escaped;
+  };
+
+  const fetchLogs = async () => {
+    try {
+      const r = await fetch(`/admin/dashboard/logs/${current}/?tail=200`, {cache:'no-store'});
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({error: r.statusText}));
+        outputEl.textContent = '⚠ ' + (err.error || r.statusText);
+        statusEl.textContent = 'ошибка';
+        return;
+      }
+      const data = await r.json();
+      const lines = (data.logs || '').split('\n').map(highlight).join('\n');
+      outputEl.innerHTML = lines || '<em style="color:#94a3b8">пусто</em>';
+      outputEl.scrollTop = outputEl.scrollHeight;
+      const now = new Date();
+      statusEl.textContent = `${data.container} · ${data.tail} строк · ${now.toLocaleTimeString()}`;
+    } catch (e) {
+      outputEl.textContent = '⚠ сеть: ' + e.message;
+      statusEl.textContent = 'оффлайн';
+    }
+  };
+
+  const scheduleTick = () => {
+    if (timer) clearInterval(timer);
+    if (autoEl.checked) timer = setInterval(fetchLogs, 3000);
+  };
+
+  tabsEl.addEventListener('click', (e) => {
+    const btn = e.target.closest('.dash-log-tab');
+    if (!btn) return;
+    tabsEl.querySelectorAll('.dash-log-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    current = btn.dataset.service;
+    outputEl.textContent = 'Загрузка...';
+    fetchLogs();
+  });
+
+  autoEl.addEventListener('change', scheduleTick);
+
+  fetchLogs();
+  scheduleTick();
+})();
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 (function () {

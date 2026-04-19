@@ -126,6 +126,7 @@ def home(request):
         "registrations_chart_json": json.dumps(registrations_chart),
         "requests_chart_json": json.dumps(requests_chart),
         "recent": recent,
+        "log_services": ALLOWED_LOG_SERVICES,
         "brand": "AVTOHELP24",
     })
 
@@ -146,6 +147,76 @@ def _series_by_day(qs, *, date_field: str, since, until):
         data.append(int(rows.get(d, 0)))
         d += datetime.timedelta(days=1)
     return {"labels": labels, "data": data}
+
+
+# --------------------------------------------------------------------- logs
+# Сервисы, чьи логи разрешено читать из дашборда. Имена — ключи из
+# docker-compose.yml, к ним dashboard добавляет префикс compose-проекта и
+# суффикс "-1" (стандартное имя контейнера, которое даёт Docker Compose).
+ALLOWED_LOG_SERVICES = [
+    ("api",         "🌐 API (gunicorn)"),
+    ("ws",          "🔌 WebSocket (daphne)"),
+    ("celery",      "⚙️ Celery worker"),
+    ("celery-beat", "⏱ Celery beat"),
+    ("db",          "🐘 PostgreSQL"),
+    ("redis",       "📦 Redis"),
+]
+
+
+@staff_member_required
+@require_GET
+def logs(request, service: str):
+    """Return the last N lines of a container's stdout/stderr as JSON.
+
+    Streaming would be nicer but enough for a demo panel that polls every 3s.
+    Requires /var/run/docker.sock mounted into this container (see
+    docker-compose.yml api service).
+    """
+    import os
+
+    allowed_names = {name for name, _ in ALLOWED_LOG_SERVICES}
+    if service not in allowed_names:
+        return JsonResponse({"error": "unknown service"}, status=400)
+
+    try:
+        tail = int(request.GET.get("tail", 150))
+    except ValueError:
+        tail = 150
+    tail = max(10, min(tail, 1000))
+
+    project = os.environ.get("COMPOSE_PROJECT", "avtohelp-backend")
+    container_name = f"{project}-{service}-1"
+
+    try:
+        import docker
+    except ImportError:
+        return JsonResponse(
+            {"error": "docker SDK not installed in the container"},
+            status=500,
+        )
+
+    try:
+        client = docker.from_env()
+        container = client.containers.get(container_name)
+        raw = container.logs(
+            tail=tail, timestamps=True, stdout=True, stderr=True,
+        )
+    except docker.errors.NotFound:
+        return JsonResponse(
+            {"error": f"container {container_name} not found"},
+            status=404,
+        )
+    except docker.errors.APIError as e:
+        return JsonResponse({"error": f"docker API error: {e}"}, status=500)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({
+        "service": service,
+        "container": container_name,
+        "tail": tail,
+        "logs": raw.decode("utf-8", errors="replace"),
+    })
 
 
 # --------------------------------------------------------------------- health

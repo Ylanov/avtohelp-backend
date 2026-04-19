@@ -43,14 +43,19 @@ services:
       args:
         INSTALL_DEV: "true"   # ships pytest/factory-boy/mypy/ruff in the dev image
     restart: unless-stopped
+    user: "0:0"                   # root — чтобы dashboard мог читать /var/run/docker.sock
     env_file: .env
     environment:
       DB_HOST: db
       REDIS_URL: redis
+      COMPOSE_PROJECT: avtohelp-backend
     volumes:
       - ./src:/app/src            # live-reload: edits on host visible in container
       - media:/app/media
       - static:/app/static
+      # Dashboard читает логи других сервисов через Docker Engine API.
+      # Доступ только для staff_member_required; сокет смонтирован read-only.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "8000:8000"
     depends_on:
