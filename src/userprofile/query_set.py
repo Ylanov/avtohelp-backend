@@ -87,19 +87,18 @@ class ProfileQuerySet(models.QuerySet):
         ).exclude(user=user)
 
     def annotate_online_status(self):
-        """
-        Annotate online status
-        :return: annotate field online status
+        """Annotate online=False for every profile.
+
+        Historically this joined to django-online-users (OnlineUserActivity)
+        via `user__onlineuseractivity__user__isnull=False`. That package was
+        dropped during the Django 5.2 upgrade, and the Android contract does
+        not expose an `online` field anyway. Kept as a no-op so existing
+        call sites (`ProfileListView`, `ProfileDetailView`) do not need to
+        change. TODO(post-demo): replace with a Redis-backed presence
+        tracker updated by the Channels consumer.
         """
         return self.annotate(
-            online=models.Case(
-                models.When(
-                    models.Q(user__onlineuseractivity__user__isnull=False),
-                    then=True,
-                ),
-                default=False,
-                output_field=models.BooleanField(default=False),
-            )
+            online=models.Value(False, output_field=models.BooleanField()),
         )
 
     def annotate_friend_status(self, user):

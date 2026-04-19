@@ -38,6 +38,7 @@ env = environ.Env(
     # SMS
     SMS_SERVICE=(str, "https://smsc.ru/sys/send.php"),
     SMS_LOGIN=(str, ""),
+    SMS_PASSWORD=(str, ""),
     SMS_SENDER=(str, "RoadHelper"),
     USE_SMS=(bool, False),
     TEST_SMS_CODE=(bool, False),
@@ -49,6 +50,8 @@ env = environ.Env(
 
     # OTP
     OTP_SERVICE=(str, "https://api.new-tel.net"),
+    OTP_SERVER_KEY=(str, ""),
+    OTP_SIGNATURE_KEY=(str, ""),
 
     # FCM
     GOOGLE_APPLICATION_CREDENTIALS=(str, ""),

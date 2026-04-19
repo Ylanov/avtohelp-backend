@@ -80,8 +80,13 @@ def chat_update_logged_users(user_id, room_id):
 
 @database_sync_to_async
 def chat_logout_user(user_id, room_id):
-    """Logout logged user,"""
-    logged_users = caches["default"].get(f"room_{room_id}")
+    """Remove the user from the room's online set in the cache.
+
+    Guards against cache miss — .get returns None after a Redis restart,
+    and `user_id in None` raises TypeError. Previously this crashed the
+    disconnect path whenever the cache was cold.
+    """
+    logged_users = caches["default"].get(f"room_{room_id}") or set()
     if user_id in logged_users:
-        logged_users.remove(user_id)
+        logged_users.discard(user_id)
         caches["default"].set(f"room_{room_id}", logged_users)

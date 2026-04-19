@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
-from online_users.models import OnlineUserActivity
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -1608,32 +1607,10 @@ class TestProfile(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get("friend_request"), True)
 
-    def test_online_status(self):
-        """Test case for check user online status"""
-        # Create additional users
-        self.user_2 = User.objects.make(phone="+79010000000")
-        self.user_2.profile.first_name = "Lev"
-        self.user_2.profile.last_name = "Leshenko"
-        self.user_2.profile.save()
-
-        # Authorize user_1
-        token, created = Token.objects.get_or_create(user=self.user_1)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
-
-        # Create a record that the user is online
-        OnlineUserActivity.objects.create(
-            user=self.user_2, last_activity=timezone.now()
-        )
-
-        api_path = "%s:userprofile:profile-list" % self.VERSION
-        response = self.client.get(reverse(api_path), data={"online": True})
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            len(response.data.get("results")),
-            Profile.objects.annotate_online_status()
-            .filter(online=True)
-            .count(),
-        )
+    # test_online_status removed: django-online-users dependency dropped in
+    # the Django 5.2 upgrade. Online presence is now a no-op Value(False)
+    # annotation. Will be re-added as a Redis-backed presence tracker
+    # post-demo, with a dedicated test.
 
     def test_update_profile_location(self):
         """
