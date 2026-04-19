@@ -48,6 +48,7 @@ services:
       DB_HOST: db
       REDIS_URL: redis
     volumes:
+      - ./src:/app/src            # live-reload: edits on host visible in container
       - media:/app/media
       - static:/app/static
     ports:
@@ -82,6 +83,8 @@ services:
         condition: service_healthy
     ports:
       - "8001:8001"
+    volumes:
+      - ./src:/app/src            # live-reload
     # Daphne ASGI for WebSocket chat (/chat/stream)
     command:
       - sh
@@ -104,6 +107,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
+      - ./src:/app/src            # live-reload
       - media:/app/media
     command:
       - sh
@@ -125,6 +129,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - ./src:/app/src            # live-reload
     command:
       - sh
       - -c
