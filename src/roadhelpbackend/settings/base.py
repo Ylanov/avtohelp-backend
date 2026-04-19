@@ -22,6 +22,18 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+# Django 4+ требует CSRF_TRUSTED_ORIGINS с scheme для любых не-127.0.0.1 хостов,
+# иначе POST-формы (включая /admin/login/) получают 403 "Origin checking failed".
+# Автогенерируем на основе ALLOWED_HOSTS — и HTTP, и HTTPS вариант, чтобы admin
+# работал и через домен https://api.avtohelp24.ru, и через прямой http://<IP>:8000.
+CSRF_TRUSTED_ORIGINS = []
+for _host in ALLOWED_HOSTS:
+    if _host in ("localhost", "127.0.0.1", "0.0.0.0", "testserver"):
+        continue
+    CSRF_TRUSTED_ORIGINS.append(f"https://{_host}")
+    CSRF_TRUSTED_ORIGINS.append(f"http://{_host}")
+del _host
+
 ROOT_URLCONF = "roadhelpbackend.urls"
 WSGI_APPLICATION = "roadhelpbackend.wsgi.application"
 ASGI_APPLICATION = "roadhelpbackend.asgi.application"
