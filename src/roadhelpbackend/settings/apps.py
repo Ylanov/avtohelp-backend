@@ -1,5 +1,10 @@
 CONTRIB_APPS = [
-    "daphne",  # must come before django.contrib.staticfiles for Channels runserver
+    "daphne",              # before django.contrib.staticfiles for Channels runserver
+    # django-unfold admin theme — MUST come before django.contrib.admin
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
+    "unfold.contrib.inlines",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -26,6 +31,7 @@ EXTERNAL_APPS = [
 ]
 
 PROJECT_APPS = [
+    "dashboard.apps.DashboardConfig",   # AVTOHELP24 admin dashboard
     "authorization.apps.AuthorizationConfig",
     "account.apps.AccountConfig",
     "versioning.apps.VersioningConfig",

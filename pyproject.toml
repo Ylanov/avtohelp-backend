@@ -20,6 +20,8 @@ django-environ = "~0.12"
 django-phonenumber-field = {version = "~8.1", extras = ["phonenumbers"]}
 django-solo = "~2.4"
 django-multiselectfield = "~0.1.13"
+django-unfold = "~0.43"   # modern admin theme for the AVTOHELP24 dashboard
+psutil = "~6.1"           # process/host metrics for the health widget
 
 # WebSockets (chat)
 channels = {version = "~4.2", extras = ["daphne"]}

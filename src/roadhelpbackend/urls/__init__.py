@@ -25,6 +25,9 @@ urlpatterns = (
     [
         path("health/", healthcheck, name="health"),
         path("app", base_views.IndexView.as_view()),
+        # Dashboard lives UNDER /admin/ so the Unfold layout wraps it and
+        # staff_member_required uses the admin login page.
+        path("admin/dashboard/", include("dashboard.urls")),
         path("admin/", admin.site.urls),
         path(
             f"api/v{current_version}/",

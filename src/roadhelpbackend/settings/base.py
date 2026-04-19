@@ -212,3 +212,44 @@ NEWSLETTER_USERPROFILE_ID = env("NEWSLETTER_USERPROFILE_ID")
 RATELIMIT_AUTH_PER_IP = env("RATELIMIT_AUTH_PER_IP")
 RATELIMIT_AUTH_PER_PHONE = env("RATELIMIT_AUTH_PER_PHONE")
 RATELIMIT_ENABLE = True
+
+# --------------------------------------------------------------------------- Admin theme (django-unfold)
+# https://unfoldadmin.com/docs/configuration/settings/
+UNFOLD = {
+    "SITE_TITLE": "AVTOHELP24",
+    "SITE_HEADER": "AVTOHELP24",
+    "SITE_SUBHEADER": "Панель управления",
+    "SITE_URL": "/admin/dashboard/",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        # Tailwind blue-500 family — #3b82f6 accent chosen by the product owner.
+        "primary": {
+            "50":  "239 246 255",
+            "100": "219 234 254",
+            "200": "191 219 254",
+            "300": "147 197 253",
+            "400": "96 165 250",
+            "500": "59 130 246",
+            "600": "37 99 235",
+            "700": "29 78 216",
+            "800": "30 64 175",
+            "900": "30 58 138",
+            "950": "23 37 84",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Аналитика",
+                "separator": True,
+                "items": [
+                    {"title": "Дашборд", "icon": "dashboard", "link": "/admin/dashboard/"},
+                    {"title": "Health JSON", "icon": "monitoring", "link": "/admin/dashboard/health/"},
+                ],
+            },
+        ],
+    },
+}

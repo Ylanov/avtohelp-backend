@@ -1,0 +1,265 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block title %}AVTOHELP24 — дашборд{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        .dash-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .dash-card {
+            background: var(--color-bg-primary, #fff);
+            border: 1px solid var(--color-border-default, #e5e7eb);
+            border-radius: 10px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .dash-card-label { color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .dash-card-value { font-size: 28px; font-weight: 700; color: #111827; }
+        .dash-card.tint-blue   .dash-card-value { color: #3b82f6; }
+        .dash-card.tint-indigo .dash-card-value { color: #6366f1; }
+        .dash-card.tint-red    .dash-card-value { color: #ef4444; }
+        .dash-card.tint-orange .dash-card-value { color: #f97316; }
+        .dash-card.tint-green  .dash-card-value { color: #10b981; }
+        .dash-card.tint-teal   .dash-card-value { color: #14b8a6; }
+        .dash-card.tint-cyan   .dash-card-value { color: #06b6d4; }
+        .dash-card.tint-purple .dash-card-value { color: #8b5cf6; }
+
+        .dash-section-title {
+            font-size: 14px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: #6b7280; margin: 24px 0 12px 0;
+        }
+
+        .dash-charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) { .dash-charts { grid-template-columns: 1fr; } }
+        .dash-chart-box {
+            background: var(--color-bg-primary, #fff);
+            border: 1px solid var(--color-border-default, #e5e7eb);
+            border-radius: 10px;
+            padding: 16px 18px;
+        }
+        .dash-chart-box h3 { margin: 0 0 12px 0; font-size: 14px; color: #374151; }
+
+        .dash-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .dash-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 10px 16px;
+            background: #3b82f6;
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .dash-btn:hover { background: #2563eb; }
+        .dash-btn.ghost { background: #fff; color: #3b82f6; border: 1px solid #3b82f6; }
+        .dash-btn.ghost:hover { background: #eff6ff; }
+
+        .dash-two-col {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 900px) { .dash-two-col { grid-template-columns: 1fr; } }
+
+        .dash-feed {
+            background: var(--color-bg-primary, #fff);
+            border: 1px solid var(--color-border-default, #e5e7eb);
+            border-radius: 10px;
+            padding: 16px 18px;
+            max-height: 420px;
+            overflow: auto;
+        }
+        .dash-feed-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+            font-size: 13px;
+        }
+        .dash-feed-item:last-child { border-bottom: 0; }
+        .dash-feed-kind {
+            display: inline-block; padding: 1px 6px; border-radius: 4px;
+            font-size: 10px; text-transform: uppercase; margin-right: 6px;
+            background: #eff6ff; color: #3b82f6;
+        }
+        .dash-feed-kind.message { background: #ecfdf5; color: #10b981; }
+        .dash-feed-kind.login   { background: #fef3c7; color: #d97706; }
+
+        .dash-health {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .dash-health-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dash-dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; }
+        .dash-dot.ok  { background: #10b981; }
+        .dash-dot.bad { background: #ef4444; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<h1 style="margin-top: 0; color: #111827;">AVTOHELP24 — панель управления</h1>
+
+{% if messages %}
+  {% for message in messages %}
+    <div class="messagelist" style="background: {% if message.tags == 'error' %}#fee2e2{% elif message.tags == 'warning' %}#fef3c7{% else %}#d1fae5{% endif %}; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; white-space: pre-wrap; font-family: monospace; font-size: 12px;">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="dash-section-title">Метрики</div>
+<div class="dash-grid">
+  {% for m in metrics %}
+    <div class="dash-card tint-{{ m.tint }}">
+      <div class="dash-card-label">{{ m.label }}</div>
+      <div class="dash-card-value">{{ m.value }}</div>
+    </div>
+  {% endfor %}
+</div>
+
+<div class="dash-section-title">Активность за 7 дней</div>
+<div class="dash-charts">
+  <div class="dash-chart-box">
+    <h3>Регистрации</h3>
+    <canvas id="chart-registrations" height="120"></canvas>
+  </div>
+  <div class="dash-chart-box">
+    <h3>Запросы помощи</h3>
+    <canvas id="chart-requests" height="120"></canvas>
+  </div>
+</div>
+
+<div class="dash-section-title">Быстрые действия</div>
+<div class="dash-actions">
+  <form method="post" action="{% url 'dashboard:action-seed-demo' %}" style="display:inline">
+    {% csrf_token %}
+    <button class="dash-btn" type="submit">🌱 Загрузить демо-данные</button>
+  </form>
+  <form method="post" action="{% url 'dashboard:action-clear-cache' %}" style="display:inline">
+    {% csrf_token %}
+    <button class="dash-btn ghost" type="submit">♻️ Очистить Redis кэш</button>
+  </form>
+  <form method="post" action="{% url 'dashboard:action-test-push' %}" style="display:inline">
+    {% csrf_token %}
+    <button class="dash-btn ghost" type="submit">📱 Тестовый push мне</button>
+  </form>
+  <form method="post" action="{% url 'dashboard:action-run-tests' %}" style="display:inline">
+    {% csrf_token %}
+    <button class="dash-btn ghost" type="submit">🧪 Прогнать контрактные тесты</button>
+  </form>
+</div>
+
+<div class="dash-two-col">
+  <div>
+    <div class="dash-section-title">Состояние сервисов</div>
+    <div id="health-panel" class="dash-health">
+      <div class="dash-health-item"><div class="dash-dot"></div><span>Database</span></div>
+      <div class="dash-health-item"><div class="dash-dot"></div><span>Redis</span></div>
+      <div class="dash-health-item"><div class="dash-dot"></div><span>Celery</span></div>
+      <div class="dash-health-item"><div class="dash-dot"></div><span>Process</span></div>
+    </div>
+  </div>
+  <div>
+    <div class="dash-section-title">Недавняя активность</div>
+    <div class="dash-feed">
+      {% for item in recent %}
+        <div class="dash-feed-item">
+          <span class="dash-feed-kind {{ item.kind }}">{{ item.kind }}</span>
+          <span>{{ item.text }}</span>
+          <div style="color:#9ca3af; font-size:11px; margin-top:2px;">{{ item.ts|date:"d.m.Y H:i:s" }}</div>
+        </div>
+      {% empty %}
+        <div style="color:#9ca3af; font-size:13px;">Пока нет событий</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const reg = {{ registrations_chart_json|safe }};
+    const req = {{ requests_chart_json|safe }};
+
+    const mk = (ctxId, labels, data, color) => {
+        new Chart(document.getElementById(ctxId).getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    fill: true,
+                    borderColor: color,
+                    backgroundColor: color.replace('rgb', 'rgba').replace(')', ',0.15)'),
+                    tension: 0.35,
+                    pointRadius: 3,
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    };
+    mk('chart-registrations', reg.labels, reg.data, 'rgb(59, 130, 246)');
+    mk('chart-requests',      req.labels, req.data, 'rgb(239, 68, 68)');
+
+    // Health poll
+    const refreshHealth = () => {
+        fetch('{% url "dashboard:health" %}').then(r => r.json()).then(res => {
+            const panel = document.getElementById('health-panel');
+            const svc = res.services || {};
+            panel.innerHTML = '';
+            const tiles = [
+                ['Database', svc.database],
+                ['Redis',    svc.redis],
+                ['Celery',   svc.celery],
+                ['Process',  svc.process],
+            ];
+            for (const [name, data] of tiles) {
+                const ok = data && data.ok;
+                const el = document.createElement('div');
+                el.className = 'dash-health-item';
+                let extra = '';
+                if (name === 'Celery' && ok) extra = ` <span style="color:#6b7280;font-size:11px;">(${(data.workers || []).length})</span>`;
+                if (name === 'Process' && ok) extra = ` <span style="color:#6b7280;font-size:11px;">${data.rss_mb}MB</span>`;
+                el.innerHTML = `<div class="dash-dot ${ok?'ok':'bad'}"></div><span>${name}</span>${extra}`;
+                panel.appendChild(el);
+            }
+        }).catch(() => {});
+    };
+    refreshHealth();
+    setInterval(refreshHealth, 5000);
+})();
+</script>
+{% endblock %}
