@@ -63,7 +63,7 @@ def home(request):
             "tint": "orange",
         },
         {
-            "label": "Новые юзеры за 7 дней",
+            "label": "Новые пользователи за 7 дней",
             "value": User.objects.filter(date_joined__gte=week_ago).count(),
             "icon": "trending_up",
             "tint": "green",
@@ -220,7 +220,7 @@ def action_seed_demo(request):
 def action_clear_cache(request):
     try:
         caches["default"].clear()
-        _flash(request, "Redis кэш очищен", level="success")
+        _flash(request, "Кэш Redis очищен", level="success")
     except Exception as e:
         _flash(request, f"Не удалось очистить кэш: {e}", level="error")
     return redirect("dashboard:home")
@@ -229,60 +229,82 @@ def action_clear_cache(request):
 @staff_member_required
 @require_POST
 def action_test_push(request):
-    """Dispatch a harmless test push to the current admin's FCM devices."""
+    """Отправить тестовое push-уведомление на FCM-устройства текущего админа."""
     from utils.push import send_push
     devices = FCMDevice.objects.filter(user=request.user, active=True)
     if not devices.exists():
         _flash(
             request,
-            "У вашего админ-пользователя нет зарегистрированных FCM-устройств — нечего тестировать",
+            "У вашей учётной записи нет зарегистрированных FCM-устройств — "
+            "нечего отправлять. Привяжите устройство через Android-приложение.",
             level="warning",
         )
         return redirect("dashboard:home")
     result = send_push(
         devices,
         title="AVTOHELP24 — тестовое уведомление",
-        body="Если вы это видите, push работает ✓",
+        body="Если вы это видите, push-уведомления работают ✓",
         data={"type": "admin_test"},
     )
     _flash(
         request,
-        f"Push отправлен: {result['success']} успешно, {result['failure']} ошибок",
+        f"Уведомление отправлено: {result['success']} успешно, "
+        f"{result['failure']} ошибок",
         level="success" if result["success"] else "error",
     )
     return redirect("dashboard:home")
 
 
 @staff_member_required
-@require_POST
 def action_run_tests(request):
-    """Kick off the contract test suite in a subprocess and stream the tail."""
+    """Run the contract test suite and render the full output on its own page.
+
+    Uses a dedicated page (not a flash redirect) because pytest output is
+    too long to fit in a toast, and because gunicorn's default 30s timeout
+    would kill a flash-based approach mid-run. Handler can take up to
+    ~60s on a cold python start — gunicorn --timeout 300 was set in
+    docker-compose to accommodate.
+    """
+    import time
+
+    started = time.monotonic()
+    output = ""
+    returncode = None
+    error = None
+
     try:
         proc = subprocess.run(
-            ["python", "-m", "pytest", "-m", "contract", "--tb=short", "-q"],
+            ["python", "-m", "pytest", "-m", "contract", "--tb=short", "-v", "--color=no"],
             cwd=str(Path(settings.BASE_DIR).parent),
             capture_output=True,
             text=True,
-            timeout=180,
+            timeout=240,
         )
-        tail = "\n".join(
-            (proc.stdout + proc.stderr).strip().splitlines()[-20:]
-        )
-        level = "success" if proc.returncode == 0 else "error"
-        _flash(
-            request,
-            f"pytest exit={proc.returncode}\n{tail}",
-            level=level,
-        )
-    except subprocess.TimeoutExpired:
-        _flash(request, "Тесты превысили 3 минуты и были прерваны", level="error")
+        output = (proc.stdout + proc.stderr).rstrip()
+        returncode = proc.returncode
+    except subprocess.TimeoutExpired as e:
+        error = "Прогон превысил 4 минуты и был прерван"
+        if e.stdout:
+            output = e.stdout
+        if e.stderr:
+            output += "\n" + e.stderr
     except FileNotFoundError:
-        _flash(
-            request,
-            "pytest не найден в контейнере — пересоберите образ с INSTALL_DEV=true",
-            level="warning",
+        error = (
+            "pytest не найден в контейнере. Пересоберите образ командой "
+            "`docker compose up -d --build` — dev-зависимости ставятся "
+            "при INSTALL_DEV=true (по умолчанию в docker-compose.yml)."
         )
-    return redirect("dashboard:home")
+    except Exception as e:
+        error = f"Не удалось запустить pytest: {e}"
+
+    elapsed = time.monotonic() - started
+    return render(request, "dashboard/tests_result.html", {
+        "output": output or "",
+        "returncode": returncode,
+        "error": error,
+        "elapsed": round(elapsed, 2),
+        "ok": returncode == 0 and error is None,
+    })
 
 
 def _flash(request, msg, *, level="info"):
