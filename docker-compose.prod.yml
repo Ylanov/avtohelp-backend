@@ -1,0 +1,82 @@
+# Production overlay: compose it with docker-compose.yml on the server.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Adds: nginx reverse proxy on :80/:443 and a certbot sidecar for Let's Encrypt
+# renewal. The api / ws / celery services come from the base compose file.
+#
+# Before first-time bring-up on a fresh server, run:
+#   1. Fill .env with real secrets (SECRET_KEY, DB_PASSWORD, SMS_*, OTP_*, etc.)
+#   2. Put the Firebase service-account JSON at ./secrets/fcm-service-account.json
+#   3. Initialise certbot (one-shot): see deploy/README.md
+
+services:
+  api:
+    expose:
+      - "8000"
+    ports: []            # override base compose — nginx is the only public edge
+    environment:
+      DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
+    volumes:
+      - media:/app/media
+      - static:/app/static
+      - ./secrets:/app/secrets:ro
+
+  ws:
+    expose:
+      - "8001"
+    ports: []
+    environment:
+      DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
+    volumes:
+      - ./secrets:/app/secrets:ro
+
+  celery:
+    environment:
+      DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
+    volumes:
+      - media:/app/media
+      - ./secrets:/app/secrets:ro
+
+  celery-beat:
+    environment:
+      DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
+    volumes:
+      - ./secrets:/app/secrets:ro
+
+  db:
+    ports: []            # hide Postgres from the public net
+
+  redis:
+    ports: []            # hide Redis too
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+      - ws
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/avtohelp24.conf:/etc/nginx/conf.d/default.conf:ro
+      - letsencrypt:/etc/letsencrypt:ro
+      - certbot_webroot:/var/www/certbot:ro
+      - static:/srv/static:ro
+      - media:/srv/media:ro
+
+  certbot:
+    image: certbot/certbot:v2.11.0
+    restart: "no"
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot_webroot:/var/www/certbot
+    # Run on demand:
+    #   docker compose run --rm certbot renew
+    entrypoint: ["certbot"]
+    command: ["--help"]
+
+volumes:
+  letsencrypt:
+  certbot_webroot:

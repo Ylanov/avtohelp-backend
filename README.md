@@ -1,140 +1,99 @@
-# Introduction 
+# RoadHelp backend
 
-[![pipeline status](https://gitlab.com/Agencypro/roadhelpbackend/badges/dev/pipeline.svg)](https://gitlab.com/Agencypro/roadhelpbackend/-/commits/master)
+Backend for the RoadHelp ("автопомощь на дороге") mobile app — mutual roadside
+assistance. Drivers post a help request with a geo-location, nearby users are
+notified via FCM push, and they chat/call.
 
-[![coverage report](https://gitlab.com/Agencypro/roadhelpbackend/badges/master/coverage.svg)](https://gitlab.com/Agencypro/roadhelpbackend/-/commits/master)
+## Stack
 
+- Python 3.12, Django 5.2 LTS
+- DRF 3.15 + drf-spectacular (OpenAPI)
+- PostgreSQL 15 + PostGIS 3.4 (geo)
+- Redis 7 (cache, Celery broker, Channels layer)
+- Celery 5 (async tasks) + django-celery-beat
+- Channels 4 + daphne (WebSocket chat)
+- Firebase Admin SDK (FCM push)
+- gunicorn 23 (WSGI for REST) + daphne (ASGI for WS)
 
-This is backend application of the roadhelpbackend. 
-
-# Development
-
-## Environment
-
-Requirements:
-- Python 3.7
-- Poetry
-- Postgres 12
-- Redis-server
-
-# Introduction 
-
-This is backend application of the roadhelpbackend-app. 
-
-# Development
-before start 
-
-
-mac-os
-```
-brew install gdal
-brew install docker-compose
-```
-
-Install docker for mac os -> [link](https://docs.docker.com/desktop/mac/install/) 
-
-linux
+## Layout
 
 ```
-sudo apt-get install gdal-bin
-sudo apt-get install docker-compose docker
+src/
+├── roadhelpbackend/       # Django project: settings/ (base,dev,prod,test), urls/, routing.py
+├── authorization/         # phone SMS verification + token auth
+├── account/               # custom User model (phone as unique field)
+├── userprofile/           # Profile, ProfileLocation, ProfileCar, friends, blacklist, FCM devices
+├── order/                 # AssistanceRequest (the main feature)
+├── chat/                  # ChatRoom + ChatMessage + WebSocket consumer
+├── car/                   # CarMark / CarModel / CarColor / CarService catalogues
+├── catalog/               # City list
+├── base/                  # Newsletters, push-notification records, GeneralInfo aggregator
+└── utils/                 # shared mixins, api_exceptions, push helper
 
+docs/
+└── API_CONTRACT.md        # FROZEN contract consumed by the Android bug_fix branch
+
+deploy/
+├── nginx/avtohelp24.conf  # reverse proxy (HTTP→HTTPS, WSS to daphne)
+└── README.md              # step-by-step cloud deploy guide
 ```
 
-For both platforms
+## Local development
 
-```
-pip install poetry
-poetry install
-```
-
-For added new dependency
-```
-poetry add <dependency-name>
+```bash
+cp .env.example .env                     # fill secrets
+docker compose up -d --build
+docker compose exec api python src/manage.py migrate
+docker compose exec api python src/manage.py createsuperuser
 ```
 
-For remove some dependency
-```
-poetry remove <dependency-name>
-```
+Services:
 
-🏃‍For running django-app / django-api
-```
-make runserver (dev-server) (for unix-like OS)
-make run-gunicorn (throw gunicorn)
-```
+- REST API:  http://localhost:8000/api/v1.0.0/
+- Admin:     http://localhost:8000/admin/
+- Health:    http://localhost:8000/health/
+- Swagger:   http://localhost:8000/swagger/
+- Redoc:     http://localhost:8000/redoc/
+- WebSocket: ws://localhost:8001/chat/stream
 
-For prepare dev-env
-```
-docker-compose -f docker-compose.local-db.yml up -d
-```
+## Running the test suite
 
--> http://127.0.0.1:8000/admin/
-* login - +79000000000
-* password - password
-
-* login - +79000000000
-* password - password
+```bash
+docker compose exec api pytest -m contract
 ```
 
-[Swagger-Docs](127.0.0.1:8000/swagger/)
+Contract tests (`src/tests/test_contract_*.py`) exercise every endpoint the
+Android app relies on. They are the regression gate when upgrading
+dependencies — keep them green.
 
-## Environment
+## Production
 
-Requirements:
-- Python 3.7
-- Poetry
-- Postgres 12
+See [deploy/README.md](deploy/README.md) for the full step-by-step bring-up
+of `avtohelp24.ru` (nginx + Let's Encrypt + docker compose).
 
-# Env-variable for running application
+## API contract
 
-## Base settings
-| Env-name      | Type | Default value|
-| ----------- | ----------- | ----------- |
-| DEBUG      | Title       |   True    |
-| REDIS_URL   | Text        |  localhost     |
-| REDIS_PORT   | Text        |  6379     |
-| REDIS_DB   | Text        |   0    |
-| DB_HOST   | Text        |   postgres (docker) or localhost    |
-| DB_NAME   | Text        |       |
-| DB_PORT   | Text        |       |
-| DB_USER   | Text        |       |
-| DB_PASSWORD   | Text        |       |
-| TIME_ZONE   | Text        |       |
-| USE_TZ   | bool        |       |
-| USE_TZ   | bool        |       |
-| USE_I18N   | bool        |       |
-| USE_L10N   | bool        |       |
-| USE_CELERY   | bool        |       |
-| SECRET_KEY   | Text        |       |
-| APPROVE_ACCOUNT   | Text        |       |
-| TEST_SMS_CODE   | Text        |       |
-| USE_SMS   | bool        |       |
-| PAGE_SIZE   | Text        |       |
-| SMS_SEND_DELAY   | Text        |       |
-| SMS_CODE_LENGTH   | int        |       |
-| SMS_INPUT_ATTEMPTS   | int        |       |
-| SMS_BLOCKING_PERIOD   | int        |       |
-| LIMIT_UNREAD_MESSAGES   | int        |       |
-| MESSAGES_UPDATE_PERIOD   | int        |       |
-| SESSION_SAVE_EVERY_REQUEST   | bool        |       |
-| DATA_UPLOAD_MAX_MEMORY_SIZE   | int        |       |
-| FILE_UPLOAD_PERMISSIONS   | Text        |       |
-| NEWSLETTER_USERPROFILE_ID   | int        |       |
-| NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS   | bool        |       |
-| REQUEST_RELEVANCE   | Text        |       |
-| DEFAULT_REQUEST_RADIUS   | int        |       |
+All Android-facing routes, request bodies, and response shapes are frozen in
+[docs/API_CONTRACT.md](docs/API_CONTRACT.md). Do not change anything listed
+there without a synchronised Android release.
 
+## Environment variables
 
-##   3rd-party integrations
-| Env-name      | Type | Default value|
-| ----------- | ----------- | ----------- |
-| SENTRY_DSN   | URL        |       |
-| SMS_SERVICE   | URL        |       |
-| SMS_LOGIN   | Text        |       |
-| SMS_PASSWORD   | Text        |       |
-| SMS_SENDER   | Text        |       |
-| FCM_SERVER_KEY   | Text        |       |
-| OTP_SERVICE   | Text        |       |
-| OTP_SERVER_KEY   | Text        |       |
-| OTP_SIGNATURE_KEY   | Text        |       |
+Full list with defaults lives in `.env.example`. A summary:
+
+| Group       | Vars                                                                 |
+|-------------|----------------------------------------------------------------------|
+| Django core | `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DJANGO_SETTINGS_MODULE`     |
+| Database    | `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`            |
+| Redis       | `REDIS_URL`, `REDIS_PORT`, `REDIS_DB`                                |
+| Celery      | `USE_CELERY`                                                          |
+| SMS         | `SMS_SERVICE`, `SMS_LOGIN`, `SMS_PASSWORD`, `SMS_SENDER`, `USE_SMS`, `TEST_SMS_CODE`, `APPROVE_ACCOUNT` |
+| OTP call    | `OTP_SERVICE`, `OTP_SERVER_KEY`, `OTP_SIGNATURE_KEY`                  |
+| FCM         | `GOOGLE_APPLICATION_CREDENTIALS` (path to Firebase service-account JSON) |
+| Rate limit  | `RATELIMIT_AUTH_PER_IP`, `RATELIMIT_AUTH_PER_PHONE`                  |
+| Observability | `SENTRY_DSN`                                                       |
+| Business    | `REQUEST_RELEVANCE`, `DEFAULT_REQUEST_RADIUS`, `LIMIT_UNREAD_MESSAGES`, `MESSAGES_UPDATE_PERIOD`, `NEWSLETTER_USERPROFILE_ID`, `NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS` |
+
+## License
+
+Proprietary.
