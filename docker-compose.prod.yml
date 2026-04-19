@@ -12,6 +12,9 @@
 
 services:
   api:
+    build:
+      args:
+        INSTALL_DEV: "false"  # keep the prod image lean — no pytest/mypy/ruff
     expose:
       - "8000"
     ports: []            # override base compose — nginx is the only public edge
@@ -23,6 +26,9 @@ services:
       - ./secrets:/app/secrets:ro
 
   ws:
+    build:
+      args:
+        INSTALL_DEV: "false"
     expose:
       - "8001"
     ports: []
@@ -32,6 +38,9 @@ services:
       - ./secrets:/app/secrets:ro
 
   celery:
+    build:
+      args:
+        INSTALL_DEV: "false"
     environment:
       DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
     volumes:
@@ -39,6 +48,9 @@ services:
       - ./secrets:/app/secrets:ro
 
   celery-beat:
+    build:
+      args:
+        INSTALL_DEV: "false"
     environment:
       DJANGO_SETTINGS_MODULE: roadhelpbackend.settings.prod
     volumes:

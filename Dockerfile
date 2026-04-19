@@ -1,6 +1,11 @@
 # syntax=docker/dockerfile:1.7
 # Multi-stage: builder installs deps, runtime is slim.
+# Build argument INSTALL_DEV=true pulls in the dev group (pytest etc.) — used
+# by the local docker compose so `docker compose exec api pytest` Just Works.
+# Prod/CI images should leave it at the false default.
 FROM python:3.12-slim-bookworm AS builder
+
+ARG INSTALL_DEV=false
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -30,7 +35,14 @@ WORKDIR /app
 COPY pyproject.toml ./
 # Lock is generated in the image — reproducibility handled via exact version pins
 # in pyproject.toml rather than a committed lockfile (see README).
-RUN poetry lock && poetry install --only main --no-root
+# When INSTALL_DEV=true the dev group is included so pytest / factory-boy /
+# mypy / ruff all ship inside the image.
+RUN poetry lock && \
+    if [ "$INSTALL_DEV" = "true" ]; then \
+        poetry install --with dev --no-root ; \
+    else \
+        poetry install --only main --no-root ; \
+    fi
 
 
 FROM python:3.12-slim-bookworm AS runtime
