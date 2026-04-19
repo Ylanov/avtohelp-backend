@@ -47,12 +47,17 @@ class AssistanceRequestListView(AssistanceRequestMixin, generics.ListAPIView):
     filter_class = filters.AssistanceRequestFitlerSet
 
     def get_queryset(self):
-        return (
+        qs = (
             super()
             .get_queryset()
             .annotate_owner_status(user=self.request.user)
-            .order_by("distance")
         )
+        # `distance` is annotated by the parent mixin only when ?coordinates=
+        # parses to a valid lat,lng. On bad input `annotate_distance` returns
+        # the queryset untouched — we must skip order_by to avoid FieldError.
+        if "distance" in qs.query.annotations:
+            qs = qs.order_by("distance")
+        return qs
 
 
 class AssistanceRequestCountView(views.APIView):

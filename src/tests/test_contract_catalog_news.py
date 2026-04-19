@@ -5,17 +5,19 @@ pytestmark = pytest.mark.contract
 
 
 def test_catalog_cities_route(auth_client, api_url):
-    resp = auth_client.get(api_url("catalog/cities"))
+    # DRF SimpleRouter enforces trailing slash; Android Retrofit follows
+    # the 301 redirect transparently, so the contract is preserved.
+    resp = auth_client.get(api_url("catalog/cities/"))
     assert resp.status_code == 200
 
 
 def test_car_marks_accepts_mark_name_filter(auth_client, api_url):
-    resp = auth_client.get(api_url("car/marks?mark_name=Toyota"))
+    resp = auth_client.get(api_url("car/marks/?mark_name=Toyota"))
     assert resp.status_code == 200
 
 
 def test_car_colors_include_hex_color_field(auth_client, api_url):
-    resp = auth_client.get(api_url("car/colors"))
+    resp = auth_client.get(api_url("car/colors/"))
     assert resp.status_code == 200
     body = resp.json()
     if isinstance(body, list) and body:
@@ -23,7 +25,7 @@ def test_car_colors_include_hex_color_field(auth_client, api_url):
 
 
 def test_car_cars_route(auth_client, api_url):
-    resp = auth_client.get(api_url("car/cars"))
+    resp = auth_client.get(api_url("car/cars/"))
     assert resp.status_code == 200
 
 

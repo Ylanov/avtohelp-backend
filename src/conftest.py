@@ -7,46 +7,23 @@ API drift during the ongoing dependency upgrade.
 """
 from __future__ import annotations
 
-import factory
+import itertools
+
 import pytest
-from phonenumber_field.phonenumber import PhoneNumber
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from account.models import User
-from catalog.models import City
-from userprofile.models import Profile
+
+# Monotonic counter so each fixture call gets a unique phone.
+_phone_seq = itertools.count(1)
 
 
-# ---------------------------------------------------------------------- factories
-class CityFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = City
-
-    name = factory.Sequence(lambda n: f"City {n}")
+def _next_phone() -> str:
+    # Russian-format 11-digit number.
+    return f"+79{next(_phone_seq):09d}"
 
 
-class UserFactory(factory.django.DjangoModelFactory):
-    """Creates a User + its associated Profile in one go."""
-
-    class Meta:
-        model = User
-
-    phone = factory.Sequence(lambda n: PhoneNumber.from_string(f"+7900000{n:04d}"))
-    username = factory.Sequence(lambda n: f"user{n}")
-    is_active = True
-
-    @factory.post_generation
-    def profile(self, create, extracted, **kwargs):
-        if create and not Profile.objects.filter(user=self).exists():
-            Profile.objects.create(
-                user=self,
-                first_name=f"First{self.pk}",
-                last_name=f"Last{self.pk}",
-            )
-
-
-# ---------------------------------------------------------------------- fixtures
 @pytest.fixture
 def api_client() -> APIClient:
     """Plain unauthenticated DRF client."""
@@ -55,12 +32,18 @@ def api_client() -> APIClient:
 
 @pytest.fixture
 def user(db) -> User:
-    return UserFactory()
+    """Create a user the same way prod does — via User.objects.make().
+
+    This also materialises Profile + ProfileLocation, which several views
+    dereference as `request.user.profile` / `request.user.profilelocation`.
+    A plain .create() would trip RelatedObjectDoesNotExist.
+    """
+    return User.objects.make(phone=_next_phone())
 
 
 @pytest.fixture
 def other_user(db) -> User:
-    return UserFactory()
+    return User.objects.make(phone=_next_phone())
 
 
 @pytest.fixture
