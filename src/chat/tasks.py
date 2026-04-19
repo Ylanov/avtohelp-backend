@@ -9,6 +9,7 @@ from chat.models import (
 )
 from roadhelpbackend.celery import app
 from userprofile.models import FCMDevice
+from utils.push import send_push
 
 logger = logging.getLogger("CELERY")
 
@@ -64,26 +65,20 @@ def notify_chat_participants(sender_id, room_id, participants):
             user=user_id, sender=sender
         )
         devices = FCMDevice.objects.filter(user_id=user_id)
-        if devices.exists():
-            # Send PUSH-notification
-            raw_result = devices.send_message(
-                badge=unread_messages,
-                **notification.get_push_dict(
-                    sender_id=sender.profile.id, room_id=room_id
-                ),
-            )
+        if not devices.exists():
+            continue
 
-            result = (
-                raw_result
-                if hasattr(raw_result, "get")
-                else {k: v for k, v in raw_result[0].items()}
+        result = send_push(
+            devices,
+            badge=unread_messages,
+            **notification.get_push_dict(sender_id=sender.profile.id, room_id=room_id),
+        )
+        if result.get("success", 0) > 0:
+            notification.status = True
+            notification.sent_count = result["success"]
+            notification.save()
+            logger.info(f"Users notified: {result['success']}")
+        else:
+            logger.info(
+                f"Error sending PUSH-notifications. Failed: {result.get('failure', 0)}"
             )
-            if result.get("success") > 0:
-                notification.status = True
-                notification.sent_count = result.get("success")
-                notification.save()
-                logger.info(f'Users notified: {result.get("success")}')
-            else:
-                logger.info(
-                    f'Error was occurred when sending PUSH-notifications. Failed: {result.get("failure")}'  # noqa
-                )

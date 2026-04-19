@@ -2,11 +2,7 @@ import logging
 
 from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from image_cropping import (
-    ImageCropField,
-    ImageRatioField,
-)
+from django.utils.translation import gettext_lazy as _
 
 from utils.mixins import (
     BaseMixin,
@@ -60,15 +56,12 @@ class Newsletter(BaseMixin):
     )
     refused = models.BooleanField(default=False, verbose_name=_("Refused"))
 
-    image = ImageCropField(
+    image = models.ImageField(
         upload_to=image_path,
         null=True,
         blank=True,
         default=None,
         verbose_name=_("Image"),
-    )
-    cropping = ImageRatioField(
-        "image", "600x600", free_crop=True, size_warning=True
     )
 
     class Meta:

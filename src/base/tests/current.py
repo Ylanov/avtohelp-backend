@@ -1,4 +1,3 @@
-from autofixture import AutoFixture
 from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
@@ -27,10 +26,16 @@ class TestCatalog(APITestCase):
         print(f"End test base app v{cls.VERSION}\n")
 
     def setUp(self):
-        # Create news
-        self.news = AutoFixture(
-            models.Newsletter, field_values={"publish": True}
-        ).create(5)
+        # Create news — direct creation (autofixture removed)
+        self.news = [
+            models.Newsletter.objects.create(
+                title=f"News {i}",
+                text="body",
+                publish=True,
+                publish_date=timezone.now(),
+            )
+            for i in range(5)
+        ]
 
         # Create City
         self.city = catalog_models.City.objects.create(name="City 1")

@@ -6,24 +6,21 @@ from django.utils import timezone
 from order.choices import EXPIRED
 from order.models import AssistanceRequest
 from roadhelpbackend.celery import app
+from utils.push import send_push
 
 logger = logging.getLogger("CELERY")
 
 
 @app.task
 def check_request_relevance():
-    """Check relevance of assistance requests"""
+    """Mark assistance requests that have exceeded REQUEST_RELEVANCE as EXPIRED.
 
-    available_requests = AssistanceRequest.objects.exclude(status=EXPIRED)
-
-    if available_requests.exists():
-        for request in available_requests:
-            expired_date = request.created + timezone.timedelta(
-                minutes=settings.REQUEST_RELEVANCE
-            )
-            if timezone.now() >= expired_date:
-                request.status = EXPIRED
-                request.save()
+    Single SQL UPDATE — previously this iterated per-row (N+1).
+    """
+    cutoff = timezone.now() - timezone.timedelta(minutes=settings.REQUEST_RELEVANCE)
+    AssistanceRequest.objects.exclude(status=EXPIRED).filter(
+        created__lte=cutoff
+    ).update(status=EXPIRED)
 
 
 @app.task
@@ -66,22 +63,17 @@ def notify_assistance_request(request_id):
     )
 
     # send bulk push message for filtered users
-    if devices.exists():
-        notification = PushNotification.objects.make_assistance_request_notification(  # noqa
-            user=devices.first().user
-        )
-        raw_result = devices.send_message(
-            **notification.get_push_dict(request_id=request_id)
-        )
-        result = (
-            raw_result
-            if hasattr(raw_result, "get")
-            else {k: v for k, v in raw_result[0].items()}
-        )
-        if result.get("success"):
-            notification.status = True
-            notification.sent_count = result.get("success")
-            notification.save()
-            logger.info(f'Users notified: {result.get("success")}')
-        else:
-            logger.info("Error was occurred when sending PUSH-notifications")
+    if not devices.exists():
+        return
+
+    notification = base_models.PushNotification.objects.make_assistance_request_notification(  # noqa
+        user=devices.first().user
+    )
+    result = send_push(devices, **notification.get_push_dict(request_id=request_id))
+    if result.get("success"):
+        notification.status = True
+        notification.sent_count = result["success"]
+        notification.save()
+        logger.info(f"Users notified: {result['success']}")
+    else:
+        logger.info("Error when sending PUSH-notifications for assistance request.")

@@ -5,8 +5,10 @@ from django.contrib import (
     messages,
 )
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from fcm_django.models import FCMDevice as BaseFCMDevice
+
+from utils.push import send_push
 
 from .models import (
     BlackList,
@@ -134,57 +136,38 @@ class DeviceAdmin(admin.ModelAdmin):
         search_fields = ("name", "device_id")
 
     def send_messages(self, request, queryset, bulk=False, data=False):
-        """
-        Provides error handling for DeviceAdmin send_message and
-        send_bulk_message methods.
-        """
-        ret = []
-        errors = []
+        """Admin action: dispatch a test push to the selected devices."""
+        if bulk:
+            targets = [queryset]
+        else:
+            # queryset of single devices — each dispatched one-by-one
+            targets = list(queryset)
+
+        total_success = 0
         total_failure = 0
+        for target in targets:
+            kwargs = (
+                {"data": {"Nick": "Mario"}}
+                if data
+                else {"title": "Test notification",
+                      "body": "Test notification body",
+                      "sound": "default"}
+            )
+            # send_push accepts either a QuerySet or a single instance —
+            # for single instances we wrap with the queryset of just that pk.
+            devices = target if bulk else FCMDevice.objects.filter(pk=target.pk)
+            result = send_push(devices, **kwargs)
+            total_success += result.get("success", 0)
+            total_failure += result.get("failure", 0)
 
-        for device in queryset:
-            if bulk:
-                if data:
-                    response = queryset.send_message(data={"Nick": "Mario"})
-                else:
-                    response = queryset.send_message(
-                        title="Test notification",
-                        body="Test bulk notification",
-                        sound="default",
-                    )
-            else:
-                if data:
-                    response = device.send_message(data={"Nick": "Mario"})
-                else:
-                    response = device.send_message(
-                        title="Test notification",
-                        body="Test single notification",
-                        sound="default",
-                    )
-            if response:
-                ret.append(response)
-
-            failure = int(response["failure"])
-            total_failure += failure
-            errors.append(str(response))
-
-            if bulk:
-                break
-
-        if ret:
-            if errors:
-                msg = _("Some messages were sent: %s" % (ret))
-            else:
-                msg = _("All messages were sent: %s" % (ret))
-            self.message_user(request, msg)
-
-        if total_failure > 0:
+        if total_success:
+            self.message_user(
+                request, _("Push sent: %d successful") % total_success
+            )
+        if total_failure:
             self.message_user(
                 request,
-                _(
-                    "Some messages failed to send. %d devices were marked as "
-                    "inactive." % total_failure
-                ),
+                _("Push failed for %d devices") % total_failure,
                 level=messages.WARNING,
             )
 

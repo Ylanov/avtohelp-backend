@@ -1,8 +1,14 @@
-from colorful.fields import RGBColorField
 from django.contrib.gis.db import models as gis_models
+from django.core.validators import RegexValidator
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
+
+# 7-char "#RRGGBB" hex color. Replaces abandoned django-colorful dependency.
+_hex_color_validator = RegexValidator(
+    regex=r"^#(?:[0-9a-fA-F]{3}){1,2}$",
+    message=_("Enter a valid hex color like #aabbcc or #abc"),
+)
 
 from utils.mixins import (
     BaseMixin,
@@ -39,7 +45,13 @@ class CarModel(BaseMixin, NameMixin):
 class CarColor(NameMixin, BaseMixin):
     """Car color model"""
 
-    hex_color = RGBColorField(blank=True, default=None, null=True)
+    hex_color = models.CharField(
+        max_length=7,
+        blank=True,
+        default=None,
+        null=True,
+        validators=[_hex_color_validator],
+    )
 
     class Meta:
         """Meta class"""

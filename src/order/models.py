@@ -7,7 +7,7 @@ from django.db import (
     models,
     transaction,
 )
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from utils.mixins import (
@@ -75,7 +75,9 @@ class AssistanceRequest(BaseMixin, ImageMixin):
     gis = GeoManager()
 
     class Meta:
-        index_together = ["user", "lng", "lat", "status"]
+        indexes = [
+            models.Index(fields=["user", "lng", "lat", "status"], name="order_req_geo_status_idx"),
+        ]
         verbose_name = _("Assistance request")
         verbose_name_plural = _("Assistance requests")
 

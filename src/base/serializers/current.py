@@ -1,7 +1,6 @@
 import datetime
 
 from django.conf import settings
-from image_cropping.utils import get_backend
 from rest_framework import serializers
 
 from base import models
@@ -97,51 +96,20 @@ class NewsDetailSerializer(serializers.ModelSerializer):
 
     def get_image(self, news):
         request = self.context.get("request")
-
         if not news.image:
             return None
-
-        if not news.cropping:
-            return request.build_absolute_uri(news.image.url)
         try:
-            demention = NewsDetailSerializer.get_dementions(news)
-            thumbnail_url = get_backend().get_thumbnail_url(
-                news.image,
-                {
-                    "size": (demention[0], demention[1]),
-                    "box": news.cropping,
-                    "crop": True,
-                    "detail": True,
-                },
-            )
-            return request.build_absolute_uri(thumbnail_url)
-        except (Exception,):
+            return request.build_absolute_uri(news.image.url)
+        except Exception:
             return None
-
-    def get_dementions(news):
-        if not news.cropping:
-            return [news.image.width, news.image.height]
-
-        demention = [int(x) for x in news.cropping.split(",") if x]
-        x = demention[0] - demention[1]
-        y = demention[3] - demention[2]
-
-        if x == 0:
-            return [demention[2], demention[3]]
-        else:
-            if x < 0:
-                x = x * (-1)
-            if y < 0:
-                y = y * (-1)
-
-        return [x, y]
 
     def get_image_resolution(self, news):
         if not news.image:
             return None
-
-        dementions = NewsDetailSerializer.get_dementions(news)
-        return {"width": dementions[0], "height": dementions[1]}
+        try:
+            return {"width": news.image.width, "height": news.image.height}
+        except Exception:
+            return None
 
     def get_likes(self, news):
         return models.NewsletterLike.objects.filter(newsletter=news).count()

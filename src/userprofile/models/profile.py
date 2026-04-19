@@ -7,7 +7,7 @@ from django.contrib.gis.db.models import (
 )
 from django.contrib.gis.geos import Point
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from utils.mixins import (
     BaseMixin,
@@ -91,7 +91,9 @@ class ProfileLocation(BaseMixin):
     objects = models.Manager()
 
     class Meta:
-        index_together = ["user", "lng", "lat"]
+        indexes = [
+            models.Index(fields=["user", "lng", "lat"], name="profile_loc_user_geo_idx"),
+        ]
 
         verbose_name = _("Profile location")
         verbose_name_plural = _("Profile locations")

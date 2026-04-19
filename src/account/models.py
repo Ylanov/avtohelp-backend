@@ -10,7 +10,7 @@ from django.contrib.auth.models import (
 from django.contrib.gis.db.models.functions import Distance
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
 
 from utils.mixins import BaseMixin

@@ -2,7 +2,6 @@
 
 import django.db.models.deletion
 import django.utils.timezone
-import image_cropping.fields
 from django.conf import settings
 from django.db import migrations, models
 
@@ -67,22 +66,14 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="newsletter",
             name="cropping",
-            field=image_cropping.fields.ImageRatioField(
-                "image",
-                "600x600",
-                adapt_rotation=False,
-                allow_fullsize=False,
-                free_crop=True,
-                help_text=None,
-                hide_image_field=False,
-                size_warning=True,
-                verbose_name="cropping",
+            field=models.CharField(
+                max_length=255, blank=True, default="", verbose_name="cropping"
             ),
         ),
         migrations.AlterField(
             model_name="newsletter",
             name="image",
-            field=image_cropping.fields.ImageCropField(
+            field=models.ImageField(
                 blank=True,
                 default=None,
                 null=True,

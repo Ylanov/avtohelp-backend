@@ -2,7 +2,6 @@ import datetime
 
 from django.conf import settings
 from django.contrib import admin
-from image_cropping.admin import ImageCroppingMixin
 from solo.admin import SingletonModelAdmin
 
 from userprofile.models import Profile
@@ -19,8 +18,7 @@ from .models import (
 
 
 @admin.register(Newsletter)
-class NewsletterModelAdmin(ImageCroppingMixin, admin.ModelAdmin):
-    # class NewsletterModelAdmin(admin.ModelAdmin):
+class NewsletterModelAdmin(admin.ModelAdmin):
     """Custom page for Newsletter"""
 
     readonly_fields = (

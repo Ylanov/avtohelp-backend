@@ -1,6 +1,0 @@
-- hosts: "{{ variable_host | default('all') }}"
-  serial: 1
-  roles:
-    - roadhelper
-  vars:
-    ansible_connection: local
