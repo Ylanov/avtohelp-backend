@@ -7,9 +7,20 @@ app_name = "base"
 
 
 class BaseSimpleRouter(SimpleRouter):
+    """SimpleRouter subclass that allows an optional trailing slash.
+
+    Important: `super(SimpleRouter, self).__init__()` in the old code was
+    a bug — it SKIPS SimpleRouter.__init__ and calls BaseRouter.__init__
+    instead. That worked by accident on DRF 3.9, but DRF 3.15 moved
+    `_use_regex` initialisation into SimpleRouter.__init__, so skipping
+    it now crashes with:
+        AttributeError: 'BaseSimpleRouter' object has no attribute '_use_regex'
+    The fix is to call super().__init__() so SimpleRouter's setup actually runs.
+    """
+
     def __init__(self):
+        super().__init__()
         self.trailing_slash = "/?"
-        super(SimpleRouter, self).__init__()
 
 
 router = BaseSimpleRouter()

@@ -55,14 +55,12 @@ services:
       redis:
         condition: service_healthy
     # Run migrations + collectstatic, then gunicorn (WSGI).
-    command: >
-      sh -c "python src/manage.py migrate --noinput &&
-             python src/manage.py collectstatic --noinput &&
-             gunicorn --chdir /app/src
-               --workers 4 --worker-class gthread --threads 2
-               --bind 0.0.0.0:8000
-               --access-logfile - --error-logfile -
-               roadhelpbackend.wsgi:application"
+    # Use explicit exec-form to avoid YAML folded-scalar newline bugs that
+    # caused shell to treat continuation lines as separate commands.
+    command:
+      - sh
+      - -c
+      - "python src/manage.py migrate --noinput && python src/manage.py collectstatic --noinput && gunicorn --chdir /app/src --workers 4 --worker-class gthread --threads 2 --bind 0.0.0.0:8000 --access-logfile - --error-logfile - roadhelpbackend.wsgi:application"
 
   ws:
     build: .
@@ -79,10 +77,10 @@ services:
     ports:
       - "8001:8001"
     # Daphne ASGI for WebSocket chat (/chat/stream)
-    command: >
-      sh -c "daphne -b 0.0.0.0 -p 8001
-               --proxy-headers
-               roadhelpbackend.asgi:application"
+    command:
+      - sh
+      - -c
+      - "daphne -b 0.0.0.0 -p 8001 --proxy-headers roadhelpbackend.asgi:application"
 
   celery:
     build: .
@@ -98,11 +96,10 @@ services:
         condition: service_healthy
     volumes:
       - media:/app/media
-    command: >
-      sh -c "celery -A roadhelpbackend worker
-               --loglevel=INFO
-               --concurrency=4
-               -n worker@%h"
+    command:
+      - sh
+      - -c
+      - "celery -A roadhelpbackend worker --loglevel=INFO --concurrency=4 -n worker@%h"
 
   celery-beat:
     build: .
@@ -116,10 +113,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    command: >
-      sh -c "celery -A roadhelpbackend beat
-               --loglevel=INFO
-               --scheduler=django_celery_beat.schedulers:DatabaseScheduler"
+    command:
+      - sh
+      - -c
+      - "celery -A roadhelpbackend beat --loglevel=INFO --scheduler=django_celery_beat.schedulers:DatabaseScheduler"
 
 volumes:
   pg_data:
