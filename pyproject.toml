@@ -26,7 +26,7 @@ channels = {version = "~4.2", extras = ["daphne"]}
 channels-redis = "~4.2"
 
 # Database driver
-"psycopg[binary]" = "~3.2"
+psycopg = {version = "~3.2", extras = ["binary"]}
 
 # Task queue
 celery = {version = "~5.4", extras = ["redis"]}
