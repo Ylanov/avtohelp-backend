@@ -57,7 +57,9 @@ services:
       # Доступ только для staff_member_required; сокет смонтирован read-only.
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
-      - "8000:8000"
+      # Бинд только на loopback — снаружи единственный edge это nginx на хосте,
+      # который терминирует HTTPS для api.avtohelp24.ru и проксирует на 8000.
+      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -87,7 +89,8 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "8001:8001"
+      # Бинд только на loopback — nginx проксирует /chat/stream на 8001 (daphne).
+      - "127.0.0.1:8001:8001"
     volumes:
       - ./src:/app/src            # live-reload
     # Daphne ASGI for WebSocket chat (/chat/stream)
