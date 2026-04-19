@@ -1,3 +1,4 @@
-from .base import *
-from .apps import INSTALLED_APPS
-from .app_logger import LOGGING
+# Pick settings via DJANGO_SETTINGS_MODULE env var:
+#   roadhelpbackend.settings.dev   — local development
+#   roadhelpbackend.settings.prod  — production (default in Dockerfile)
+#   roadhelpbackend.settings.test  — pytest

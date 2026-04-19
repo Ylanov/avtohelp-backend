@@ -1,23 +1,128 @@
-version: '3'
+# Dev + demo compose. For prod add docker-compose.prod.yml with nginx + certbot.
+# Usage:
+#   cp .env.example .env   # fill secrets
+#   docker compose up -d --build
+#   docker compose exec api python src/manage.py migrate
+#   docker compose exec api python src/manage.py createsuperuser
+
 services:
+  db:
+    image: postgis/postgis:15-3.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-roadhelp}
+      POSTGRES_USER: ${DB_USER:-roadhelp}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   api:
-    build:
-      context: .
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_URL: redis
+    volumes:
+      - media:/app/media
+      - static:/app/static
     ports:
       - "8000:8000"
-    command:
-      [
-          "/bin/bash",
-          "-c",
-          "make start && make run-gunicorn",
-      ]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Run migrations + collectstatic, then gunicorn (WSGI).
+    command: >
+      sh -c "python src/manage.py migrate --noinput &&
+             python src/manage.py collectstatic --noinput &&
+             gunicorn --chdir /app/src
+               --workers 4 --worker-class gthread --threads 2
+               --bind 0.0.0.0:8000
+               --access-logfile - --error-logfile -
+               roadhelpbackend.wsgi:application"
+
+  ws:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_URL: redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    # Daphne ASGI for WebSocket chat (/chat/stream)
+    command: >
+      sh -c "daphne -b 0.0.0.0 -p 8001
+               --proxy-headers
+               roadhelpbackend.asgi:application"
 
   celery:
-    build:
-      context: .
-    command:
-      [
-          "/bin/bash",
-          "-c",
-          "make celery",
-      ]
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_URL: redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - media:/app/media
+    command: >
+      sh -c "celery -A roadhelpbackend worker
+               --loglevel=INFO
+               --concurrency=4
+               -n worker@%h"
+
+  celery-beat:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_URL: redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "celery -A roadhelpbackend beat
+               --loglevel=INFO
+               --scheduler=django_celery_beat.schedulers:DatabaseScheduler"
+
+volumes:
+  pg_data:
+  redis_data:
+  media:
+  static:

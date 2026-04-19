@@ -1,37 +1,39 @@
-import os
-import sentry_sdk
-from sentry_sdk.integrations.celery import CeleryIntegration
-from sentry_sdk.integrations.django import DjangoIntegration
+"""
+Base settings shared by dev / prod / test.
 
+Conventions:
+- No hardcoded secrets. Every secret pulls from .env (see env_settings.py).
+- DEBUG defaults to False. dev.py flips it on.
+- settings are loaded from the explicit module via DJANGO_SETTINGS_MODULE
+  (not via star-imports from __init__.py).
+"""
 from pathlib import Path
 
-from easy_thumbnails.conf import Settings as thumbnail_settings
-
+from .apps import INSTALLED_APPS  # noqa: F401
+from .app_logger import LOGGING  # noqa: F401
 from .env_settings import env
 
-BASE_DIR = Path(__file__).resolve().parent
-SETTINGS_FOLDER = Path(__file__)
+# --------------------------------------------------------------------------- paths
+BASE_DIR = Path(__file__).resolve().parents[2]   # .../src
+PROJECT_ROOT = BASE_DIR.parent                   # repo root
 
-SOURCE_FOLDER = SETTINGS_FOLDER.parents[1]
-PROJECT_ROOT = SOURCE_FOLDER.parent.parent
-
-PUBLIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "media"))
-
+# --------------------------------------------------------------------------- core
 SECRET_KEY = env("SECRET_KEY")
+DEBUG = env("DEBUG")
+ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
-USE_SMS = env("USE_SMS")
-TEST_SMS_CODE = env("TEST_SMS_CODE")
-APPROVE_ACCOUNT = env("APPROVE_ACCOUNT")
+ROOT_URLCONF = "roadhelpbackend.urls"
+WSGI_APPLICATION = "roadhelpbackend.wsgi.application"
+ASGI_APPLICATION = "roadhelpbackend.asgi.application"
 
-ALLOWED_HOSTS = [
-    "0.0.0.0",
-    "127.0.0.1",
-    "localhost",
-    "roadhelper.spider.ru",
-]
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+AUTH_USER_MODEL = "account.User"
+LOGIN_URL = "admin:login"
+LOGOUT_URL = "admin:logout"
 
-
+# --------------------------------------------------------------------------- middleware
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",            # must be very early
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -41,14 +43,11 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "roadhelpbackend.urls"
-
+# --------------------------------------------------------------------------- templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            PROJECT_ROOT / "templates",
-        ],
+        "DIRS": [PROJECT_ROOT / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -61,9 +60,7 @@ TEMPLATES = [
     },
 ]
 
-
-ASGI_APPLICATION = "roadhelpbackend.routing.application"
-
+# --------------------------------------------------------------------------- database
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
@@ -75,88 +72,68 @@ DATABASES = {
     }
 }
 
+# --------------------------------------------------------------------------- auth
 AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 9},
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",  # noqa
-        "OPTIONS": {
-            "min_length": 9,
-        },
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",  # noqa
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",  # noqa
-    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-AUTH_USER_MODEL = "account.User"
-LOGIN_URL = "admin:login"
-LOGOUT_URL = "admin:logout"
-
-
+# --------------------------------------------------------------------------- i18n
 LANGUAGE_CODE = "ru"
 TIME_ZONE = env("TIME_ZONE")
-
 USE_I18N = env("USE_I18N")
-USE_L10N = env("USE_L10N")
 USE_TZ = env("USE_TZ")
+LOCALE_PATHS = [PROJECT_ROOT / "locale"]
+LANGUAGES = [("ru", "Russian"), ("en", "English")]
 
-LOCALE_PATHS = (PROJECT_ROOT / "locale",)
-
+# --------------------------------------------------------------------------- static / media
 STATIC_URL = "/static/"
-
-MEDIA_ROOT = PROJECT_ROOT / "media/"
-MEDIA_URL = "/media/"
-
 STATIC_ROOT = PROJECT_ROOT / "static"
+MEDIA_URL = "/media/"
+MEDIA_ROOT = PROJECT_ROOT / "media"
 
-LANGUAGE_PATHS = [
-    PROJECT_ROOT / "locale",
-]
-LANGUAGES = [
-    ('ru', 'Russian'),
-    ('en', 'English')
-]
+DATA_UPLOAD_MAX_MEMORY_SIZE = env("DATA_UPLOAD_MAX_MEMORY_SIZE")
+FILE_UPLOAD_PERMISSIONS = 0o644
 
+# --------------------------------------------------------------------------- API versioning
+AVAILABLE_VERSIONS = {"future": "1.0.1", "current": "1.0.0"}
 
-DEBUG = True
-
-# Versioning
-AVAILABLE_VERSIONS = {
-    "future": "1.0.1",
-    "current": "1.0.0",
-}
-
-# DjangoRestFramework settings
-REST_DATE_FORMAT = "%d-%m-%Y"
-
-# REST Framework
+# --------------------------------------------------------------------------- DRF
 REST_FRAMEWORK = {
-    "DEFAULT_FILTER_BACKENDS": (
-        "django_filters.rest_framework.DjangoFilterBackend",
-    ),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",  # noqa
+    "DEFAULT_FILTER_BACKENDS": ("django_filters.rest_framework.DjangoFilterBackend",),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": env("PAGE_SIZE"),
     "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ),
-    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
-    "DEFAULT_VERSION": (AVAILABLE_VERSIONS["current"],),
-    "ALLOWED_VERSIONS": AVAILABLE_VERSIONS.values(),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSION": AVAILABLE_VERSIONS["current"],
+    "ALLOWED_VERSIONS": list(AVAILABLE_VERSIONS.values()),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "EXCEPTION_HANDLER": "utils.api_exceptions.roadhelper_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "RoadHelp API",
+    "DESCRIPTION": "API для мобильного приложения взаимопомощи водителей",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}
 
-# Thumbnail settings
+# --------------------------------------------------------------------------- CORS
+# By default: NO browser origins allowed. Android app ignores CORS. Web admin is same-origin.
+CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
+CORS_ALLOW_CREDENTIALS = False
+
+# --------------------------------------------------------------------------- Thumbnails
 THUMBNAIL_ALIASES = {
     "": {
         "news_small": {"size": (900, 600), "crop": True},
@@ -165,92 +142,8 @@ THUMBNAIL_ALIASES = {
     },
 }
 
-# CORS Config
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = False
-
-
-# SMS
-SMS_SEND_DELAY = env("SMS_SEND_DELAY")  # seconds
-SMS_CODE_LENGTH = env("SMS_CODE_LENGTH")  # characters
-SMS_INPUT_ATTEMPTS = env("SMS_INPUT_ATTEMPTS")  # count of attempts
-SMS_BLOCKING_PERIOD = env("SMS_BLOCKING_PERIOD")  # 24 hours in seconds
-
-
-NEWSLETTER_USERPROFILE_ID = env("NEWSLETTER_USERPROFILE_ID")
-
-# CHAT
-NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = env(
-    "NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS"
-)
-
-
-# ASSISTANCE REQUESTS
-REQUEST_RELEVANCE = env("REQUEST_RELEVANCE")  # minutes
-DEFAULT_REQUEST_RADIUS = env("DEFAULT_REQUEST_RADIUS")  # in meters
-
-
-# PUSH-NOTIFICATIONS
-# Django FCM (Firebase push notifications)
-FCM_DJANGO_SETTINGS = {
-    "FCM_SERVER_KEY": (env("FCM_SERVER_KEY")),
-}
-
-
-# SMSC Settings
-SMS_SERVICE = env("SMS_SERVICE")
-SMS_LOGIN = env("SMS_LOGIN")
-SMS_PASSWORD = env("SMS_PASSWORD")
-SMS_SENDER = env("SMS_SENDER")
-
-OTP_SERVICE = env("OTP_SERVICE")
-OTP_SERVER_KEY = env("OTP_SERVER_KEY")
-OTP_SIGNATURE_KEY = env("OTP_SIGNATURE_KEY")
-
-# Message PUSH-notifications
-LIMIT_UNREAD_MESSAGES = env("LIMIT_UNREAD_MESSAGES")
-MESSAGES_UPDATE_PERIOD = env("MESSAGES_UPDATE_PERIOD")
-
-
-# Save the session to the database on every single request
-SESSION_SAVE_EVERY_REQUEST = env("SESSION_SAVE_EVERY_REQUEST")
-
-
-# Django Rest Swagger
-SWAGGER_SETTINGS = {
-    "JSON_EDITOR": False,
-    "SHOW_REQUEST_HEADERS": True,
-    "SECURITY_DEFINITIONS": {
-        "api_key": {
-            "type": "apiKey",
-            "description": "Token authorization",
-            "name": "Authorization",
-            "in": "header",
-        }
-    },
-}
-
-
-DATA_UPLOAD_MAX_MEMORY_SIZE = env("DATA_UPLOAD_MAX_MEMORY_SIZE")
-FILE_UPLOAD_PERMISSIONS = 0o644
-
-THUMBNAIL_PROCESSORS = (
-    "image_cropping.thumbnail_processors.crop_corners",
-) + thumbnail_settings.THUMBNAIL_PROCESSORS
-
-IMAGE_CROPPING_BACKEND = (
-    "image_cropping.backends.easy_thumbs.EasyThumbnailsBackend"
-)
-IMAGE_CROPPING_BACKEND_PARAMS = {}
-
-
-# Integration with Sentry
-sentry_sdk.init(
-    dsn=env("SENTRY_DSN"),
-    integrations=[DjangoIntegration(), CeleryIntegration()],
-)
-
-REDIS_DSN = f"redis://:@{env('REDIS_URL')}:{env('REDIS_PORT')}"
+# --------------------------------------------------------------------------- Redis (cache + channels + celery broker)
+REDIS_DSN = f"redis://{env('REDIS_URL')}:{env('REDIS_PORT')}"
 
 CACHES = {
     "default": {
@@ -266,20 +159,56 @@ CACHES = {
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [
-                REDIS_DSN,
-            ],
-        },
+        "CONFIG": {"hosts": [REDIS_DSN]},
     },
 }
 
-# Celery settings
+# --------------------------------------------------------------------------- Celery
 CELERY_BROKER_URL = f"{REDIS_DSN}/{env('REDIS_DB')}"
 CELERY_RESULT_BACKEND = f"{REDIS_DSN}/{env('REDIS_DB')}"
-
 USE_CELERY = env("USE_CELERY")
 CELERY_TIMEZONE = env("TIME_ZONE")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
+
+# --------------------------------------------------------------------------- SMS / OTP
+SMS_SERVICE = env("SMS_SERVICE")
+SMS_LOGIN = env("SMS_LOGIN")
+SMS_PASSWORD = env("SMS_PASSWORD")
+SMS_SENDER = env("SMS_SENDER")
+USE_SMS = env("USE_SMS")
+TEST_SMS_CODE = env("TEST_SMS_CODE")
+APPROVE_ACCOUNT = env("APPROVE_ACCOUNT")
+SMS_SEND_DELAY = env("SMS_SEND_DELAY")
+SMS_CODE_LENGTH = env("SMS_CODE_LENGTH")
+SMS_INPUT_ATTEMPTS = env("SMS_INPUT_ATTEMPTS")
+SMS_BLOCKING_PERIOD = env("SMS_BLOCKING_PERIOD")
+
+OTP_SERVICE = env("OTP_SERVICE")
+OTP_SERVER_KEY = env("OTP_SERVER_KEY")
+OTP_SIGNATURE_KEY = env("OTP_SIGNATURE_KEY")
+
+# --------------------------------------------------------------------------- FCM
+# fcm-django 2.x uses firebase-admin SDK — initialization happens lazily via
+# GOOGLE_APPLICATION_CREDENTIALS env var (path to service account JSON).
+FCM_DJANGO_SETTINGS = {
+    "DEFAULT_FIREBASE_APP": None,  # use default app
+    "APP_VERBOSE_NAME": "RoadHelp FCM",
+    "ONE_DEVICE_PER_USER": False,
+    "DELETE_INACTIVE_DEVICES": True,
+    "UPDATE_ON_DUPLICATE_REG_ID": True,
+}
+
+# --------------------------------------------------------------------------- Business rules
+REQUEST_RELEVANCE = env("REQUEST_RELEVANCE")       # minutes
+DEFAULT_REQUEST_RADIUS = env("DEFAULT_REQUEST_RADIUS")  # meters
+NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS = env("NOTIFY_USERS_ON_ENTER_OR_LEAVE_ROOMS")
+LIMIT_UNREAD_MESSAGES = env("LIMIT_UNREAD_MESSAGES")
+MESSAGES_UPDATE_PERIOD = env("MESSAGES_UPDATE_PERIOD")
+NEWSLETTER_USERPROFILE_ID = env("NEWSLETTER_USERPROFILE_ID")
+
+# --------------------------------------------------------------------------- Rate limits
+RATELIMIT_AUTH_PER_IP = env("RATELIMIT_AUTH_PER_IP")
+RATELIMIT_AUTH_PER_PHONE = env("RATELIMIT_AUTH_PER_PHONE")
+RATELIMIT_ENABLE = True
