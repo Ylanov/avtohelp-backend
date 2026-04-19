@@ -6,7 +6,7 @@ from django.contrib.gis.db.models import (
     PointField,
 )
 from django.contrib.gis.geos import Point
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from utils.mixins import (
@@ -148,12 +148,17 @@ class FriendRequest(BaseMixin):
             "invited",
         )
 
+    @transaction.atomic
     def approve(self, owner, invited):
-        """Approve friend request"""
-        # update flag
+        """Approve a friend request and materialise the FriendList row.
+
+        Wrapped in an atomic block so that if FriendList.objects.create() fails
+        (for example because of a race that already created the pair) the
+        `approved=True` flag is rolled back too. Prior to this fix the request
+        could be left approved with no matching friendship record.
+        """
         self.approved = True
-        self.save()
-        # create new record in FriendList
+        self.save(update_fields=["approved", "modified"])
         FriendList.objects.create(owner=owner, friend=invited, request=self)
         return self
 

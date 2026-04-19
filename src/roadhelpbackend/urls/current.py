@@ -1,6 +1,8 @@
 """Version 1.0.0 url conf."""
 from django.urls import include, path
 
+from base.views.common import GeneralInfoView
+
 app_name = "current"
 
 urlpatterns = [
@@ -11,4 +13,7 @@ urlpatterns = [
     path("userprofile/", include("userprofile.urls")),
     path("order/", include("order.urls.current")),
     path("chat/", include("chat.urls")),
+    # Bootstrap endpoint consumed by the Android app; kept verbatim from the
+    # API contract (client calls "api/general_info" relative to baseURL).
+    path("api/general_info", GeneralInfoView.as_view(), name="general-info"),
 ]

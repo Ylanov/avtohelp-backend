@@ -85,15 +85,15 @@ class PhoneVerificationSerializer(serializers.ModelSerializer):
         return obj
 
     def to_representation(self, instance):
-        """Override to_representation method"""
-        import os
+        """Verification response.
 
-        configuration = os.environ.get("SETTINGS_CONFIGURATION")
-        if (configuration == "local") or (configuration == "development"):
-            return {"code": instance.code}
-        return super(PhoneVerificationSerializer, self).to_representation(
-            instance
-        )
+        Security: the SMS code is NEVER returned in the response — not even
+        in dev or test configurations. The old `{"code": ...}` leak has been
+        removed because the SETTINGS_CONFIGURATION flag could silently be set
+        in prod, exposing every code to whoever polls the endpoint.
+        Clients must always wait for the SMS/call.
+        """
+        return {}
 
 
 class ProfileMinSerializer(serializers.ModelSerializer):

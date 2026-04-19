@@ -5,6 +5,8 @@ from .views import (
     ChatReadMessageView,
     ChatRoomDetailView,
     ChatRoomListView,
+    ChatRoomMessageCountView,
+    ChatRoomUnreadMessageCountView,
     ChatTotalUnreadMessageCountView,
     ChatView,
     PrivateChatRoomCreateView,
@@ -23,6 +25,18 @@ urlpatterns = [
         "rooms/private/create",
         PrivateChatRoomCreateView.as_view(),
         name="private-room-create",
+    ),
+    # MORE SPECIFIC routes first — "/count" and "/unread/count" must match
+    # before the generic "/<pk>" list view.
+    path(
+        "messages/room/<int:pk>/count",
+        ChatRoomMessageCountView.as_view(),
+        name="message-room-count",
+    ),
+    path(
+        "messages/room/<int:pk>/unread/count",
+        ChatRoomUnreadMessageCountView.as_view(),
+        name="message-room-unread-count",
     ),
     path(
         "messages/room/<int:pk>",

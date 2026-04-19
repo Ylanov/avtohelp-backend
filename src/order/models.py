@@ -108,3 +108,11 @@ class AssistanceRequestUserRead(BaseMixin):
         on_delete=models.CASCADE,
     )
     objects = AssistanceRequestUserReadManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["request", "user"],
+                name="uniq_assistance_request_user_read",
+            ),
+        ]

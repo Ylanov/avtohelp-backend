@@ -243,21 +243,18 @@ class SMSCode(BaseMixin):
 
     @property
     def datetime_before_resend(self):
-        """Datetime before for re-request sms code"""
-        last_sms_datetime = SMSCode.objects.order_by("created").last().created
-        timedelta_datetime = timezone.timedelta(
-            seconds=settings.SMS_SEND_DELAY
-        )
-        return last_sms_datetime + timedelta_datetime
+        """Datetime before re-requesting an SMS code.
+
+        Uses the current instance's created timestamp as the anchor — the old
+        code called `SMSCode.objects.order_by("created").last().created`,
+        which raises AttributeError when the table is empty.
+        """
+        return self.created + timezone.timedelta(seconds=settings.SMS_SEND_DELAY)
 
     @property
     def datetime_before_unlock(self):
-        """Datetime before for unlock"""
-        last_sms_datetime = SMSCode.objects.order_by("created").last().created
-        timedelta_datetime = timezone.timedelta(
-            seconds=settings.SMS_BLOCKING_PERIOD
-        )
-        return last_sms_datetime + timedelta_datetime
+        """Datetime before the per-phone block window ends."""
+        return self.created + timezone.timedelta(seconds=settings.SMS_BLOCKING_PERIOD)
 
     @property
     def remain_before_resend(self):

@@ -95,18 +95,17 @@ class ChatMessage(BaseMixin):
         verbose_name_plural = _("Chat messages")
 
     def send_push_notification_offline_users(self):
+        """Send push notification to offline users in this room (sender excluded).
+
+        Fix: previously crashed with AttributeError after a Redis restart —
+        `caches["default"].get(...)` returns None when the key is missing,
+        and the old code called `.union()` on that None.
         """
-        Sent push notification to offline users in chat
-        room exclude sender
-        """
-        participants = {
-            i.get("id") for i in self.room.participants.all().values("id")
-        }
-        offline_users = participants.difference(
-            caches["default"]
-            .get(f"room_{self.room.id}")
-            .union({self.sender.id})
+        participants = set(
+            self.room.participants.all().values_list("id", flat=True)
         )
+        online_users = caches["default"].get(f"room_{self.room.id}") or set()
+        offline_users = participants - online_users - {self.sender.id}
 
         from .tasks import notify_chat_participants
 

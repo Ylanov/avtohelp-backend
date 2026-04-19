@@ -50,10 +50,9 @@ class ChatReadMessageView(generics.CreateAPIView):
 
 
 class ChatTotalUnreadMessageCountView(views.APIView):
-    """MessageList view"""
+    """Total unread messages across ALL rooms for the current user."""
 
     def get(self, request, *args, **kwargs):
-        """Get count of assistance requests"""
         user = self.request.user
         return Response(
             {
@@ -65,6 +64,34 @@ class ChatTotalUnreadMessageCountView(views.APIView):
                 .count()
             }
         )
+
+
+class ChatRoomMessageCountView(views.APIView):
+    """Total message count in one room (for the pagination UI)."""
+
+    permission_classes = (permissions.ChatMessagePermission,)
+
+    def get(self, request, *args, **kwargs):
+        count = models.ChatMessage.objects.filter(
+            room_id=self.kwargs.get("pk")
+        ).count()
+        return Response({"count": count})
+
+
+class ChatRoomUnreadMessageCountView(views.APIView):
+    """Unread message count in ONE room for the current user."""
+
+    permission_classes = (permissions.ChatMessagePermission,)
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        count = (
+            models.ChatMessage.objects.filter(room_id=self.kwargs.get("pk"))
+            .exclude(sender=user)
+            .filter(~Q(chatreadmessage__user=user))
+            .count()
+        )
+        return Response({"count": count})
 
 
 class ChatRoomDetailView(generics.RetrieveAPIView):

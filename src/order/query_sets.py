@@ -17,6 +17,39 @@ from .choices import (
 )
 
 
+def _coerce_lat_lng(lat, lng):
+    """Return a validated Point for the project's PointField values.
+
+    NOTE: this codebase has stored points as Point(lat, lng) everywhere
+    (serializers, fixtures, migrations, tests). Technically PostGIS expects
+    Point(x=lng, y=lat) in srid=4326 — so the stored coordinates are
+    mirrored globally, but self-consistent: every query references the
+    same convention, so nearest-neighbour results remain correct for
+    regional data. We preserve that convention here rather than flipping
+    it in one place and silently breaking every distance calculation.
+    TODO(post-demo): fix the convention across the whole project, add a
+    data migration that swaps existing Point coordinates.
+    """
+    try:
+        lat_f = float(lat)
+        lng_f = float(lng)
+    except (TypeError, ValueError):
+        return None
+    if not (-90.0 <= lat_f <= 90.0) or not (-180.0 <= lng_f <= 180.0):
+        return None
+    return Point(lat_f, lng_f, srid=4326)
+
+
+def _parse_lat_lng(raw: str):
+    """Parse 'lat,lng' query-string form into a Point, or return None."""
+    if not raw or "," not in raw:
+        return None
+    parts = raw.split(",", 1)
+    if len(parts) != 2:
+        return None
+    return _coerce_lat_lng(parts[0].strip(), parts[1].strip())
+
+
 class AssistanceRequestQuerySet(QuerySet):
     def by_user(self, user):
         """Filter request by user"""
@@ -53,42 +86,34 @@ class AssistanceRequestQuerySet(QuerySet):
 
     def annotate_distance(
         self,
-        raw_coordinates: list = None,
+        raw_coordinates: str = None,
         latitude: float = None,
         longitude: float = None,
         point: Point = None,
     ):
-        """
-        Annotate service distance from position
-        raw_coordinates can contain -
-        - latitude (index 0),
-        - longitude (index 1),
+        """Annotate distance from a reference point.
 
-        point parameter is Point object
+        Accepts either:
+          - raw_coordinates: "lat,lng" string (from the ?coordinates= query param)
+          - latitude + longitude
+          - a Point
+
+        Validates ranges (lat ∈ [-90, 90], lng ∈ [-180, 180]). On any parse
+        error returns the queryset unmodified — calling code must be prepared
+        for no `distance` annotation rather than a 500.
         """
+        reference = None
         if raw_coordinates:
-            x, y = (
-                raw_coordinates.split(",")[0],
-                raw_coordinates.split(",")[1],
-            )
-            return self.annotate(
-                distance=Distance(
-                    "location", Point(float(x), float(y), srid=4326)
-                )
-            )
-        elif latitude and longitude:
-            return self.annotate(
-                distance=Distance(
-                    "location",
-                    Point(float(latitude), float(longitude), srid=4326),
-                )
-            )
-        elif point:
-            return self.annotate(
-                distance=Distance("location", point, srid=4326)
-            )
-        else:
+            reference = _parse_lat_lng(raw_coordinates)
+        elif latitude is not None and longitude is not None:
+            reference = _coerce_lat_lng(latitude, longitude)
+        elif point is not None:
+            reference = point
+
+        if reference is None:
             return self
+
+        return self.annotate(distance=Distance("location", reference))
 
     def annotate_owner_status(self, user):
 
